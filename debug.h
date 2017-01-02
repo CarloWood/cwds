@@ -2,7 +2,7 @@
  * \file debug.h
  * \brief This file contains the declaration of debug related macros, objects and functions.
  *
- * Copyright (C) 2016 Carlo Wood
+ * Copyright (C) 2016 - 2017 Carlo Wood
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CWD_DEBUG_H
-#define CWD_DEBUG_H
+#pragma once
 
 #ifndef CWDEBUG
 
@@ -78,6 +77,8 @@
 
 #ifndef NAMESPACE_DEBUG
 #define NAMESPACE_DEBUG debug
+#define NAMESPACE_DEBUG_START namespace debug {
+#define NAMESPACE_DEBUG_END }
 #endif
 
 #ifndef NAMESPACE_CHANNELS
@@ -92,13 +93,13 @@
 // the \c dc (Debug Channels) namespace.
 //
 // @sa debug::channels::dc
-
 #define DEBUGCHANNELS ::NAMESPACE_DEBUG::NAMESPACE_CHANNELS
 #endif
+
 #include <libcwd/debug.h>
 
 //! Debug specific code.
-namespace NAMESPACE_DEBUG {
+NAMESPACE_DEBUG_START
 
 void init();                // Initialize debugging code, called once from main.
 void init_thread();         // Initialize debugging code, called once for each thread.
@@ -155,7 +156,7 @@ struct Indent {
   ~Indent() { if (M_indent > 0) libcwd::libcw_do.dec_indent(M_indent); }
 };
 
-} // namespace debug
+NAMESPACE_DEBUG_END
 
 //! @brief A debug streambuf that prints characters written to it with a green background.
 class DebugBuf : public std::streambuf
@@ -214,5 +215,3 @@ extern pthread_mutex_t cout_mutex;
 #endif // CWDEBUG
 
 #include "debug_ostream_operators.h"
-
-#endif // CWD_DEBUG_H

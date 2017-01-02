@@ -38,7 +38,7 @@
 #include "debug.h"                      // NAMESPACE_DEBUG
 #endif
 
-namespace NAMESPACE_DEBUG {
+NAMESPACE_DEBUG_START
 
 template<typename T>
 inline char const* type_name_of()
@@ -50,7 +50,7 @@ inline char const* type_name_of()
 #endif
 }
 
-} // namespace NAMESPACE_DEBUG
+NAMESPACE_DEBUG_END
 
 struct timeval;
 
@@ -61,7 +61,7 @@ extern std::ostream& operator<<(std::ostream& os, timeval const& time);         
 template<typename T>
 std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
 {
-  os << "(boost::shared_ptr<" << debug::type_name_of<T>() << ">)({";
+  os << "(boost::shared_ptr<" << NAMESPACE_DEBUG::type_name_of<T>() << ">)({";
   if (data.get())
     os << *data;
   else
@@ -73,7 +73,7 @@ std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
 template<typename T>
 std::ostream& operator<<(std::ostream& os, boost::weak_ptr<T> const& data)
 {
-  return os << "(boost::weak_ptr<" << debug::type_name_of<T>() << ">)({ " << *boost::shared_ptr<T>(data) << "})";
+  return os << "(boost::weak_ptr<" << NAMESPACE_DEBUG::type_name_of<T>() << ">)({ " << *boost::shared_ptr<T>(data) << "})";
 }
 #endif // USE_LIBBOOST
 
@@ -88,9 +88,9 @@ std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data)
 template<typename T1, typename T2, typename T3>
 std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
 {
-  os << "{map<" << debug::type_name_of<T1>() <<
-      ", " << debug::type_name_of<T2>() <<
-      ", " << debug::type_name_of<T3>() <<">:";
+  os << "{map<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
   typedef std::map<T1, T2, T3> map_type;
   for (typename map_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
     os << '{' << *iter << '}';
