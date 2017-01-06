@@ -1,15 +1,15 @@
 AM_CPPFLAGS = -iquote $(top_srcdir)
 
-noinst_LTLIBRARIES = libdebug.la
+noinst_LTLIBRARIES = libcwd.la
 
-libdebug_la_SOURCES = \
+libcwd_la_SOURCES = \
 	debug.cxx \
 	debug.h \
 	debug_ostream_operators.cxx \
 	debug_ostream_operators.h
 
-libdebug_la_CXXFLAGS = @LIBCWD_FLAGS@
-libdebug_la_LIBADD = @LIBCWD_LIBS@
+libcwd_la_CXXFLAGS = @LIBCWD_FLAGS@
+libcwd_la_LIBADD = @LIBCWD_LIBS@
 
 # --------------- Maintainer's Section
 
