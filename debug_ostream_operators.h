@@ -1,6 +1,6 @@
 /**
- * \file debug_ostream_operators.h
- * \brief This file contains the declaration of debug serializers.
+ * @file
+ * @brief This file contains the declaration of debug serializers.
  *
  * Copyright (C) 2016 Carlo Wood.
  *
@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CWD_DEBUG_OSTREAM_OPERATORS_H
-#define CWD_DEBUG_OSTREAM_OPERATORS_H
+#pragma once
 
 #ifdef CWDEBUG
 
@@ -98,4 +97,3 @@ std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
 }
 
 #endif // CWDEBUG
-#endif // CWD_DEBUG_OSTREAM_OPERATORS_H

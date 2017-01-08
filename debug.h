@@ -1,6 +1,6 @@
 /**
- * \file debug.h
- * \brief This file contains the declaration of debug related macros, objects and functions.
+ * @file
+ * @brief This file contains the declaration of debug related macros, objects and functions.
  *
  * Copyright (C) 2016 - 2017 Carlo Wood
  *

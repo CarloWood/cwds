@@ -1,6 +1,6 @@
 /**
- * \file debug.cxx
- * \brief This file contains the definitions of debug related objects and functions.
+ * @file
+ * @brief This file contains the definitions of debug related objects and functions.
  *
  * Copyright (C) 2016 Carlo Wood.
  *
