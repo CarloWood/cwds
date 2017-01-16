@@ -64,7 +64,7 @@ std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
   if (data.get())
     os << *data;
   else
-    os << "<NULL>";
+    os << "<nullptr>";
   return os << "})";
 }
 
