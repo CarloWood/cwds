@@ -98,6 +98,9 @@
 
 #include <libcwd/debug.h>
 
+#define NAMESPACE_DEBUG_CHANNELS_START NAMESPACE_DEBUG_START namespace NAMESPACE_CHANNELS { namespace dc {
+#define NAMESPACE_DEBUG_CHANNELS_END } } NAMESPACE_DEBUG_END
+
 //! Debug specific code.
 NAMESPACE_DEBUG_START
 
