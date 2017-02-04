@@ -129,7 +129,7 @@ which don't know if such a debug.h is provided should therefore use
 in their <tt>Makefile.am</tt>:
 
 <pre>
-AM_CPPFLAGS = -iquote $(top_builddir) -iquote $(top_srcdir) -iquote $(top_srcdir)/cwds
+AM_CPPFLAGS = -iquote $(top_srcdir) -iquote $(top_srcdir)/cwds
 </pre>
 
 So that library projects (or applications) can put a <tt>debug.h</tt>
@@ -144,10 +144,8 @@ in <tt>$(top_srcdir)</tt> that contains something like:
 #include "cwds/debug.h"
 </pre>
 
-Or, if they don't, that then <tt>cwds/debug.h</tt> will be included
-directly. Note that the <tt>-iquote $(top_builddir)</tt> is necessary
-too in order to pick up the generated <tt>config.h</tt> that is
-included from <tt>cwds/sys.h</tt>.
+Or, if they don't, then <tt>cwds/debug.h</tt> will be included
+directly.
 
 In order to initialize libcwd properly, the following has to be added
 to the top of <tt>main</tt>:
