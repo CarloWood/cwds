@@ -3,3 +3,178 @@
 This repository is a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 providing standard-ish support code for applications that use [libcwd](https://github.com/CarloWood/libcwd).
 
+It provides the following features,
+* defines all libcwd debug macros as empty (with the exception of <tt>LibcwDoutFatal</tt>) when not compiling with debug support.
+* defines the extra helper macros:
+  * <tt>DEBUG_ONLY(...)</tt>
+  * <tt>COMMA_DEBUG_ONLY(...)</tt>
+  * <tt>ASSERT(expr)</tt>
+* and when compiled with debugging, the macros,
+  * <tt>NAMESPACE_DEBUG</tt>
+  * <tt>NAMESPACE_DEBUG_START</tt>
+  * <tt>NAMESPACE_DEBUG_END</tt>
+  * <tt>NAMESPACE_CHANNELS</tt>
+  * <tt>DEBUGCHANNELS</tt>
+  * <tt>NAMESPACE_DEBUG_CHANNELS_START</tt>
+  * <tt>NAMESPACE_DEBUG_CHANNELS_END</tt>
+  * <tt>DoutEntering</tt>
+* Declares initialization functions for libcwd to be called from the top of <tt>main</tt> and the start of threads.
+* Provides a function to turn an address into a string with filename and line number.
+* Defines exception safe struct for indenting debug output (<tt>Indent</tt>) and making temporarily making allocation invisible (<tt>InvisibleAllocations</tt>).
+* Defines a streambuf class that can be used to turn background color of all debug output green.
+* Defines a global mutex to be used for <tt>std::cout</tt> (if you want output to std::cout not to interfer with debug output).
+* Defines ostream serializers for many types to pretty-print them easily to a debug stream, like
+  * <tt>timeval</tt>
+  * <tt>boost::shared_ptr&lt;T&gt;</tt>
+  * <tt>boost::weak_ptr&lt;T&gt;</tt>
+  * <tt>std::pair&lt;T1, T2&gt;</tt>
+  * <tt>std::map&lt;T1, T2, T3&gt;</tt>
+
+## Checking out a project that uses the cwd submodule.
+
+To clone a project example-project that uses cwd simply run:
+
+<pre>
+<b>git clone --recursive</b> &lt;<i>URL-to-project</i>&gt;<b>/example-project.git</b>
+<b>cd example-project</b>
+<b>./autogen.sh</b>
+</pre>
+
+The <tt>--recursive</tt> is optional because <tt>./autogen.sh</tt> will fix
+it when you forgot it.
+
+Afterwards you probably want to use <tt>--enable-mainainer-mode</tt>
+as option to the generated <tt>configure</tt> script. Note that <tt>--enable-mainainer-mode</tt>
+enables debugging by default (<tt>--enable-debug</tt>), and will try to use libcwd when
+available; <tt>configure</tt> will check for the existence of libcwd and use it when
+found. If you want to use maintainer-mode without debugging then configure
+using <tt>--enable-mainainer-mode --disable-debug</tt>, or if you want to enforce
+using libcwd, with or without maintainer-mode, then use <tt>--enable-libcwd</tt>.
+
+## Adding the cwd submodule to a project
+
+To add this submodule to a project, that project should already
+be set up to use [cwm4](https://github.com/CarloWood/cwm4).
+
+Simply execute the following in a directory of that project
+where you want to have the <tt>cwd</tt> subdirectory:
+
+<pre>
+git submodule add https://github.com/CarloWood/cwd.git
+</pre>
+
+This should clone cwd into the subdirectory <tt>cwd</tt>, or
+if you already cloned it there, it should add it.
+
+Changes to <tt>configure.ac</tt> and <tt>Makefile.am</tt>
+are taken care of my <tt>cwm4</tt>, except for linking
+which works as usual.
+
+For example a module that defines a
+
+<pre>
+bin_PROGRAMS = singlethreaded_foobar multithreaded_foobar
+</pre>
+
+would also define
+
+<pre>
+singlethreaded_foobar_CXXFLAGS = @LIBCWD_FLAGS@
+singlethreaded_foobar_LDADD = ../cwd/libcwd.la @LIBCWD_LIBS@
+
+multithreaded_foobar_CXXFLAGS = @LIBCWD_R_FLAGS@
+multithreaded_foobar_LDADD = ../cwd/libcwd_r.la @LIBCWD_R_LIBS@
+</pre>
+
+or whatever the path to `cwd` etc. is, to add linking with cwd
+in addition to linking with libcwd.
+
+The availability of libcwd.la and/or libcwd_r.la is determined by the second
+parameter of the <tt>CW_OPG_CXXFLAGS</tt> macro in <tt>configure.ac</tt>;
+which can be <tt>[no]</tt> (single-threaded) in which case only <tt>libcwd.la</tt>
+is available, <tt>[yes]</tt> (multi-threaded) in which case only <tt>libcwd_r.la</tt>
+is available, or <tt>[both]</tt> in which case both are available.
+See the [cwm4](https://github.com/CarloWood/cwm4) submodule for more details.
+
+As described in the documentation of [libcwd](https://github.com/CarloWood/libcwd),
+each (C++) source file must begin with <tt>#include &lt;sys.h&gt;</tt> and
+use <tt>#include &lt;debug.h&gt;</tt> when containing any debug code.
+This submodule provides those header files, but there is some room for tuning
+the namespace used for the debugging specific code of the application.
+
+The following namespaces are relevant:
+
+<pre>
+namespace example {
+  namespace debug {
+    namespace channels {
+      namespace dc {
+<pre>
+
+Where <tt>namespace example</tt> is optional, in fact, anything
+inside namespace <tt>debug</tt> can be put anywhere, we're just using
+<tt>example::debug</tt> as the example right now.
+
+Also the name of <tt>namespace channels</tt> can be changed, although
+that is only necessary in special cases when writing a library that
+wishes to reuse the name of an existing debug channel. You'll know
+when you need that, until then I suggest you'll just leave it at
+<tt>channels</tt>.
+
+By default (which is ok for any application, but not for libraries)
+the debug namespace is just <tt>debug::</tt>, thus no <tt>namespace example</tt>.
+This is the case when directly including the <tt>debug.h</tt> provided
+by this submodule. Hence, a library should provide yet another debug.h
+file and make sure that is first in the include path. Other submodules,
+which don't know if such a debug.h is provided should therefore use
+in their <tt>Makefile.am</tt>:
+
+<pre>
+AM_CPPFLAGS = -iquote $(top_builddir) -iquote $(top_srcdir) -iquote $(top_srcdir)/cwd
+</pre>
+
+So that library projects (or applications) can put a <tt>debug.h</tt>
+in <tt>$(top_srcdir)</tt> that contains something like:
+
+<pre>
+#pragma once
+
+#define NAMESPACE_DEBUG example::debug
+#define NAMESPACE_DEBUG_START namespace example { namespace debug {
+#define NAMESPACE_DEBUG_END } }
+#include "cwd/debug.h"
+</pre>
+
+Or, if they don't, that then <tt>cwd/debug.h</tt> will be included
+directly. Note that the <tt>-iquote $(top_builddir)</tt> is necessary
+too in order to pick up the generated <tt>config.h</tt> that is
+included from <tt>cwd/sys.h</tt>.
+
+In order to initialize libcwd properly, the following has to be added
+to the top of <tt>main</tt>:
+
+<pre>
+int main()
+{
+#ifdef DEBUGGLOBAL
+  GlobalObjectManager::main_entered();
+#endif
+  Debug(NAMESPACE_DEBUG::init());
+</pre>
+
+The first three lines are actually something from [ai-utils](https://github.com/CarloWood/ai-utils),
+just shown here to show the typical order.
+
+Threads on the other hand need to begin with the following code:
+
+<pre>
+  Debug(NAMESPACE_DEBUG::init_thread());
+</pre>
+
+Finally, run
+
+<pre>
+./autogen.sh
+</pre>
+
+to let cwm4 do its magic, and commit all the changes.
