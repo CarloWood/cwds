@@ -108,7 +108,7 @@ namespace example {
   namespace debug {
     namespace channels {
       namespace dc {
-<pre>
+</pre>
 
 Where <tt>namespace example</tt> is optional, in fact, anything
 inside namespace <tt>debug</tt> can be put anywhere, we're just using
