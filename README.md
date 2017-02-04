@@ -133,7 +133,7 @@ AM_CPPFLAGS = -iquote $(top_srcdir) -iquote $(top_srcdir)/cwds
 </pre>
 
 So that library projects (or applications) can put a <tt>debug.h</tt>
-in <tt>$(top_srcdir)</tt> that contains something like:
+in <tt>$(top_srcdir)</tt> that contains something like
 
 <pre>
 #pragma once
@@ -144,7 +144,7 @@ in <tt>$(top_srcdir)</tt> that contains something like:
 #include "cwds/debug.h"
 </pre>
 
-Or, if they don't, then <tt>cwds/debug.h</tt> will be included
+or if they don't, that then <tt>cwds/debug.h</tt> will be included
 directly.
 
 In order to initialize libcwd properly, the following has to be added
