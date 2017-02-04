@@ -79,13 +79,14 @@ bin_PROGRAMS = singlethreaded_foobar multithreaded_foobar
 would also define
 
 <pre>
+singlethreaded_foobar_CXXFLAGS = @LIBCWD_FLAGS@
 singlethreaded_foobar_LDADD = ../cwds/libcwds.la
 
+multithreaded_foobar_CXXFLAGS = @LIBCWD_R_FLAGS@
 multithreaded_foobar_LDADD = ../cwds/libcwds_r.la
 </pre>
 
-or whatever the path to `cwds` etc. is, to add linking with cwds
-in addition to linking with libcwd.
+or whatever the path to `cwds` etc. is, to link with cwds and libcwd.
 
 The availability of libcwds.la and/or libcwds_r.la is determined by the second
 parameter of the <tt>CW_OPG_CXXFLAGS</tt> macro in <tt>configure.ac</tt>;
