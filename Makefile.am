@@ -2,10 +2,10 @@ AM_CPPFLAGS = -iquote $(top_builddir) -iquote $(top_srcdir)
 
 noinst_LTLIBRARIES =
 if CW_NON_THREADED
-noinst_LTLIBRARIES += libcwd.la
+noinst_LTLIBRARIES += libcwds.la
 endif
 if CW_THREADED
-noinst_LTLIBRARIES += libcwd_r.la
+noinst_LTLIBRARIES += libcwds_r.la
 endif
 
 SOURCES = \
@@ -14,13 +14,13 @@ SOURCES = \
 	debug_ostream_operators.cxx \
 	debug_ostream_operators.h
 
-libcwd_la_SOURCES = ${SOURCES}
-libcwd_la_CXXFLAGS = @LIBCWD_FLAGS@
-libcwd_la_LIBADD = @LIBCWD_LIBS@
+libcwds_la_SOURCES = ${SOURCES}
+libcwds_la_CXXFLAGS = @LIBCWD_FLAGS@
+libcwds_la_LIBADD = @LIBCWD_LIBS@
 
-libcwd_r_la_SOURCES = ${SOURCES}
-libcwd_r_la_CXXFLAGS = @LIBCWD_R_FLAGS@
-libcwd_r_la_LIBADD = @LIBCWD_R_LIBS@
+libcwds_r_la_SOURCES = ${SOURCES}
+libcwds_r_la_CXXFLAGS = @LIBCWD_R_FLAGS@
+libcwds_r_la_LIBADD = @LIBCWD_R_LIBS@
 
 # --------------- Maintainer's Section
 

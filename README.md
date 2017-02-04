@@ -1,4 +1,4 @@
-# cwd submodule
+# cwds submodule
 
 This repository is a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 providing standard-ish support code for applications that use [libcwd](https://github.com/CarloWood/libcwd).
@@ -30,9 +30,9 @@ It provides the following features,
   * <tt>std::pair&lt;T1, T2&gt;</tt>
   * <tt>std::map&lt;T1, T2, T3&gt;</tt>
 
-## Checking out a project that uses the cwd submodule.
+## Checking out a project that uses the cwds submodule.
 
-To clone a project example-project that uses cwd simply run:
+To clone a project example-project that uses cwds simply run:
 
 <pre>
 <b>git clone --recursive</b> &lt;<i>URL-to-project</i>&gt;<b>/example-project.git</b>
@@ -51,19 +51,19 @@ found. If you want to use maintainer-mode without debugging then configure
 using <tt>--enable-mainainer-mode --disable-debug</tt>, or if you want to enforce
 using libcwd, with or without maintainer-mode, then use <tt>--enable-libcwd</tt>.
 
-## Adding the cwd submodule to a project
+## Adding the cwds submodule to a project
 
 To add this submodule to a project, that project should already
 be set up to use [cwm4](https://github.com/CarloWood/cwm4).
 
 Simply execute the following in a directory of that project
-where you want to have the <tt>cwd</tt> subdirectory:
+where you want to have the <tt>cwds</tt> subdirectory:
 
 <pre>
-git submodule add https://github.com/CarloWood/cwd.git
+git submodule add https://github.com/CarloWood/cwds.git
 </pre>
 
-This should clone cwd into the subdirectory <tt>cwd</tt>, or
+This should clone cwds into the subdirectory <tt>cwds</tt>, or
 if you already cloned it there, it should add it.
 
 Changes to <tt>configure.ac</tt> and <tt>Makefile.am</tt>
@@ -79,20 +79,18 @@ bin_PROGRAMS = singlethreaded_foobar multithreaded_foobar
 would also define
 
 <pre>
-singlethreaded_foobar_CXXFLAGS = @LIBCWD_FLAGS@
-singlethreaded_foobar_LDADD = ../cwd/libcwd.la @LIBCWD_LIBS@
+singlethreaded_foobar_LDADD = ../cwds/libcwds.la
 
-multithreaded_foobar_CXXFLAGS = @LIBCWD_R_FLAGS@
-multithreaded_foobar_LDADD = ../cwd/libcwd_r.la @LIBCWD_R_LIBS@
+multithreaded_foobar_LDADD = ../cwds/libcwds_r.la
 </pre>
 
-or whatever the path to `cwd` etc. is, to add linking with cwd
+or whatever the path to `cwds` etc. is, to add linking with cwds
 in addition to linking with libcwd.
 
-The availability of libcwd.la and/or libcwd_r.la is determined by the second
+The availability of libcwds.la and/or libcwds_r.la is determined by the second
 parameter of the <tt>CW_OPG_CXXFLAGS</tt> macro in <tt>configure.ac</tt>;
-which can be <tt>[no]</tt> (single-threaded) in which case only <tt>libcwd.la</tt>
-is available, <tt>[yes]</tt> (multi-threaded) in which case only <tt>libcwd_r.la</tt>
+which can be <tt>[no]</tt> (single-threaded) in which case only <tt>libcwds.la</tt>
+is available, <tt>[yes]</tt> (multi-threaded) in which case only <tt>libcwds_r.la</tt>
 is available, or <tt>[both]</tt> in which case both are available.
 See the [cwm4](https://github.com/CarloWood/cwm4) submodule for more details.
 
@@ -130,7 +128,7 @@ which don't know if such a debug.h is provided should therefore use
 in their <tt>Makefile.am</tt>:
 
 <pre>
-AM_CPPFLAGS = -iquote $(top_builddir) -iquote $(top_srcdir) -iquote $(top_srcdir)/cwd
+AM_CPPFLAGS = -iquote $(top_builddir) -iquote $(top_srcdir) -iquote $(top_srcdir)/cwds
 </pre>
 
 So that library projects (or applications) can put a <tt>debug.h</tt>
@@ -142,13 +140,13 @@ in <tt>$(top_srcdir)</tt> that contains something like:
 #define NAMESPACE_DEBUG example::debug
 #define NAMESPACE_DEBUG_START namespace example { namespace debug {
 #define NAMESPACE_DEBUG_END } }
-#include "cwd/debug.h"
+#include "cwds/debug.h"
 </pre>
 
-Or, if they don't, that then <tt>cwd/debug.h</tt> will be included
+Or, if they don't, that then <tt>cwds/debug.h</tt> will be included
 directly. Note that the <tt>-iquote $(top_builddir)</tt> is necessary
 too in order to pick up the generated <tt>config.h</tt> that is
-included from <tt>cwd/sys.h</tt>.
+included from <tt>cwds/sys.h</tt>.
 
 In order to initialize libcwd properly, the following has to be added
 to the top of <tt>main</tt>:
