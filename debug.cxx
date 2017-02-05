@@ -37,12 +37,6 @@
 pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
-#if __SIZEOF_SIZE_T__ == __SIZEOF_LONG__
-#define CW_FORMAT_SIZE_T "l"
-#else
-#define CW_FORMAT_SIZE_T "ll"
-#endif
-
 namespace NAMESPACE_DEBUG {
   namespace NAMESPACE_CHANNELS {
     namespace dc {
@@ -166,9 +160,11 @@ namespace NAMESPACE_DEBUG {
     static bool first_thread = true;
     if (!first_thread)			// So far, the application has only one thread.  So don't add a thread id.
     {
-      // Set the thread id in the margin.
       char margin[12];
-      sprintf(margin, "%-10" CW_FORMAT_SIZE_T "u ", (size_t)pthread_self());
+      union { pthread_t pt; size_t size; } convert;
+      convert.pt = pthread_self();
+      // Set the thread id in the margin.
+      sprintf(margin, "%-10zu ", convert.size);
       Debug( libcw_do.margin().assign(margin, 11) );
     }
   }
