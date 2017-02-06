@@ -217,7 +217,7 @@ extern pthread_mutex_t cout_mutex;
 
 #endif // CWDEBUG
 
-#include <debug_ostream_operators.h>
+#include "debug_ostream_operators.h"
 #if defined(GTKMM) && defined(HAVE_GTK_DEBUG_OSTREAM_OPERATORS_H)
-#include <gtk_debug_ostream_operators.h>
+#include "gtk_debug_ostream_operators.h"
 #endif

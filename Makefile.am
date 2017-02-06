@@ -1,8 +1,7 @@
-# This submodule needs a special trick to include sys.h, debug.h and debug_ostream_operators.h
-# from $(top_builddir) and/or $(top_srcdir) if they exist there, instead of from $(srcdir).
+# This submodule needs a special trick to include sys.h and debug.h from $(top_builddir) and/or
+# $(top_srcdir) if they exist there, instead of from $(srcdir).
 # Using double quotes always first looks in the current directory, so we need to include <sys.h>,
-# <debug.h> and <debug_ostream_operators.h> respectively in this source tree and then use
-# -I instead of -iquote to find them.
+# and <debug.h> respectively in this source tree and then use -I instead of -iquote to find them.
 #
 # Also, we need to overwrite DEFAULT_INCLUDES to obtain the correct order (instead of using AM_CPPFLAGS).
 DEFAULT_INCLUDES = -I $(top_builddir) -I $(top_srcdir) -I $(srcdir)
