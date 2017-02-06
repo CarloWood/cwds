@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "sys.h"                        // Needed for platform-specific code
+#include <sys.h>                        // Needed for platform-specific code
 
 #ifdef CWDEBUG
 
@@ -28,7 +28,7 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include "debug.h"
+#include <debug.h>
 #ifdef USE_LIBCW
 #include <libcw/memleak.h>		// memleak_filter
 #endif

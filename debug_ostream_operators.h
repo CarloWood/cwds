@@ -34,7 +34,7 @@
 #include <typeinfo>
 #endif
 #ifndef NAMESPACE_DEBUG
-#include "debug.h"                      // NAMESPACE_DEBUG
+#include <debug.h>                      // NAMESPACE_DEBUG
 #endif
 
 NAMESPACE_DEBUG_START

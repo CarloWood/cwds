@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "sys.h"        // Put this outside the #ifdef CWDEBUG .. #endif in order
+#include <sys.h>        // Put this outside the #ifdef CWDEBUG .. #endif in order
                         // to force recompilation after the configuration changed.
 
 #ifdef CWDEBUG
 
 #include <iostream>
-#include "debug.h"
+#include <debug.h>
 
 //! For debugging purposes. Write a timeval to \a os.
 std::ostream& operator<<(std::ostream& os, timeval const& time)

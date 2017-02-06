@@ -96,8 +96,8 @@ is available, or <tt>[both]</tt> in which case both are available.
 See the [cwm4](https://github.com/CarloWood/cwm4) submodule for more details.
 
 As described in the documentation of [libcwd](https://github.com/CarloWood/libcwd),
-each (C++) source file must begin with <tt>#include &lt;sys.h&gt;</tt> and
-use <tt>#include &lt;debug.h&gt;</tt> when containing any debug code.
+each (C++) source file must begin with <tt>#include "sys.h"</tt> and
+use <tt>#include "debug.h"</tt> when containing any debug code.
 This submodule provides those header files, but there is some room for tuning
 the namespace used for the debugging specific code of the application.
 
