@@ -56,8 +56,7 @@ using libcwd, with or without maintainer-mode, then use <tt>--enable-libcwd</tt>
 To add this submodule to a project, that project should already
 be set up to use [cwm4](https://github.com/CarloWood/cwm4).
 
-Simply execute the following in a directory of that project
-where you want to have the <tt>cwds</tt> subdirectory:
+Simply execute the following in the root of that project:
 
 <pre>
 git submodule add https://github.com/CarloWood/cwds.git
@@ -80,10 +79,10 @@ would also define
 
 <pre>
 singlethreaded_foobar_CXXFLAGS = @LIBCWD_FLAGS@
-singlethreaded_foobar_LDADD = ../cwds/libcwds.la
+singlethreaded_foobar_LDADD = $(top_builddir)/cwds/libcwds.la
 
 multithreaded_foobar_CXXFLAGS = @LIBCWD_R_FLAGS@
-multithreaded_foobar_LDADD = ../cwds/libcwds_r.la
+multithreaded_foobar_LDADD = $(top_builddir)/cwds/libcwds_r.la
 </pre>
 
 or whatever the path to `cwds` etc. is, to link with cwds and libcwd.
@@ -129,7 +128,7 @@ which don't know if such a debug.h is provided should therefore use
 in their <tt>Makefile.am</tt>:
 
 <pre>
-AM_CPPFLAGS = -iquote $(top_srcdir) -iquote $(top_srcdir)/cwds
+AM_CPPFLAGS = -iquote $(top_builddir) -iquote $(top_srcdir) -iquote $(top_srcdir)/cwds
 </pre>
 
 So that library projects (or applications) can put a <tt>debug.h</tt>
@@ -138,14 +137,24 @@ in <tt>$(top_srcdir)</tt> that contains something like
 <pre>
 #pragma once
 
+// These three defines are only necessary if you need to 'example' namespace.
+// The default is just 'debug'.
 #define NAMESPACE_DEBUG example::debug
 #define NAMESPACE_DEBUG_START namespace example { namespace debug {
 #define NAMESPACE_DEBUG_END } }
 #include "cwds/debug.h"
+
+NAMESPACE_DEBUG_CHANNELS_START
+
+extern channel_ct my_channel;
+extern channel_ct ...
+
+NAMESPACE_DEBUG_CHANNELS_END
 </pre>
 
 or if they don't, that then <tt>cwds/debug.h</tt> will be included
-directly.
+directly. The <tt>-iquote $(top_builddir)</tt> is needed to find
+any generated header files, most notably <tt>sys.h</tt>.
 
 In order to initialize libcwd properly, the following has to be added
 to the top of <tt>main</tt>:
