@@ -2,7 +2,7 @@
  * @file
  * @brief This file contains the definition of debug serializers.
  *
- * Copyright (C) 2016 Carlo Wood.
+ * Copyright (C) 2016, 2017  Carlo Wood.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,7 +24,7 @@
 #ifdef CWDEBUG
 
 #include <iostream>
-#include <debug.h>
+#include "debug.h"      // Include cwds/debug.h, not the projects debug.h.
 
 //! For debugging purposes. Write a timeval to \a os.
 std::ostream& operator<<(std::ostream& os, timeval const& time)

@@ -28,7 +28,7 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include <debug.h>
+#include "debug.h"                      // Include cwds/debug.h, not the projects debug.h.
 #ifdef USE_LIBCW
 #include <libcw/memleak.h>		// memleak_filter
 #endif
