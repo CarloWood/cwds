@@ -196,7 +196,7 @@ extern pthread_mutex_t cout_mutex;
 // Print "Entering " << \a data to channel \a cntrl and increment
 // debugging output indentation until the end of the current scope.
 #define DoutEntering(cntrl, data) \
-  int __speech_debug_indentation = 2;                                                                      \
+  int __cwds_debug_indentation = 2;                                                                      \
   {                                                                                                                     \
     LIBCWD_TSD_DECLARATION;                                                                                             \
     if (LIBCWD_DO_TSD_MEMBER_OFF(::libcwd::libcw_do) < 0)                                                               \
@@ -210,10 +210,10 @@ extern pthread_mutex_t cout_mutex;
       if (on)                                                                                                           \
         Dout(cntrl, "Entering " << data);                                                                               \
       else                                                                                                              \
-        __speech_debug_indentation = 0;                                                                    \
+        __cwds_debug_indentation = 0;                                                                    \
     }                                                                                                                   \
   }                                                                                                                     \
-  debug::Indent __speech_debug_indent(__speech_debug_indentation);
+  debug::Indent __cwds_debug_indent(__cwds_debug_indentation);
 
 #endif // CWDEBUG
 
