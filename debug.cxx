@@ -160,13 +160,14 @@ namespace NAMESPACE_DEBUG {
     static bool first_thread = true;
     if (!first_thread)			// So far, the application has only one thread.  So don't add a thread id.
     {
-      char margin[12];
+      std::stringstream margin;
       union { pthread_t pt; size_t size; } convert;
       convert.pt = pthread_self();
       // Set the thread id in the margin.
-      sprintf(margin, "%-10zu ", convert.size);
-      Debug( libcw_do.margin().assign(margin, 11) );
+      margin << std::hex << std::setw(12) << convert.size << ' ';
+      Debug( libcw_do.margin().assign(margin.str()) );
     }
+    first_thread = false;
   }
 
   /*! @brief Initialize debugging code from main.
