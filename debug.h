@@ -159,6 +159,25 @@ struct Indent {
   ~Indent() { if (M_indent > 0) libcwd::libcw_do.dec_indent(M_indent); }
 };
 
+//! @brief Interface for marking scopes with a marker character.
+//
+// Creation of the object appends the character and a space to
+// the current marker after first adding the current indentation
+// to it as spaces, and sets the indentation to zero. Destruction
+// restores things again.
+struct Mark {
+  int M_indent;                 //!< The old indentation.
+  //! Construct a Mark object.
+  Mark(char m = '|') : M_indent(libcwd::libcw_do.get_indent())
+  {
+    libcwd::libcw_do.push_marker();
+    libcwd::libcw_do.marker().append(std::string(M_indent, ' ') + m + ' ');
+    libcwd::libcw_do.set_indent(0);
+  }
+  //! Destructor.
+  ~Mark() { libcwd::libcw_do.pop_marker(); }
+};
+
 NAMESPACE_DEBUG_END
 
 //! @brief A debug streambuf that prints characters written to it with a green background.
