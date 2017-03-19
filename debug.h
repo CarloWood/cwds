@@ -175,7 +175,11 @@ struct Mark {
     libcwd::libcw_do.set_indent(0);
   }
   //! Destructor.
-  ~Mark() { libcwd::libcw_do.pop_marker(); }
+  ~Mark()
+  {
+    libcwd::libcw_do.pop_marker();
+    libcwd::libcw_do.set_indent(M_indent);
+  }
 };
 
 NAMESPACE_DEBUG_END
