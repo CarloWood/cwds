@@ -204,7 +204,7 @@ namespace NAMESPACE_DEBUG {
 
     // You want this, unless you mix streams output with C output.
     // Read  http://gcc.gnu.org/onlinedocs/libstdc++/27_io/howto.html#8 for an explanation.
-    std::ios::sync_with_stdio(false);
+    std::ios::sync_with_stdio(true);
 
     // Cancel previous call to set_invisible_on.
     Debug(set_invisible_off());
