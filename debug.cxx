@@ -59,7 +59,7 @@ namespace NAMESPACE_DEBUG {
     /*! @brief The type of rcfile_dc_states.
      * @internal
      */
-    typedef std::map<std::string, bool> rcfile_dc_states_type;
+    using rcfile_dc_states_type = std::map<std::string, bool>;
 
     /*! @brief Map containing the default debug channel states used at the start of each new thread.
      * @internal

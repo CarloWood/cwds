@@ -21,11 +21,11 @@ SOURCES = \
 	debug_ostream_operators.h
 
 libcwds_la_SOURCES = ${SOURCES}
-libcwds_la_CXXFLAGS = @LIBCWD_FLAGS@
+libcwds_la_CXXFLAGS = -std=c++11 @LIBCWD_FLAGS@
 libcwds_la_LIBADD = @LIBCWD_LIBS@
 
 libcwds_r_la_SOURCES = ${SOURCES}
-libcwds_r_la_CXXFLAGS = @LIBCWD_R_FLAGS@
+libcwds_r_la_CXXFLAGS = -std=c++11 @LIBCWD_R_FLAGS@
 libcwds_r_la_LIBADD = @LIBCWD_R_LIBS@
 
 # --------------- Maintainer's Section
