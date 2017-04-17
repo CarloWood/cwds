@@ -192,7 +192,7 @@ class DebugBuf : public std::streambuf
     ~DebugBuf() { Dout(dc::finish, ""); }
 
     /// Implement std::streambuf::overflow.
-    /*virtual*/ int_type overflow(int_type c = traits_type::eof())
+    int_type overflow(int_type c = traits_type::eof()) override
     {
       if (c != traits_type::eof())
       {
