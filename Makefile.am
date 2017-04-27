@@ -18,7 +18,9 @@ SOURCES = \
 	debug.cxx \
 	debug.h \
 	debug_ostream_operators.cxx \
-	debug_ostream_operators.h
+	debug_ostream_operators.h \
+	tracked.cxx \
+	tracked.h
 
 libcwds_la_SOURCES = ${SOURCES}
 libcwds_la_CXXFLAGS = -std=c++11 @LIBCWD_FLAGS@

@@ -48,6 +48,7 @@ namespace NAMESPACE_DEBUG {
 
       channel_ct xmlparser DDCN("XMLPARSER");   //!< This debug channel is used for parsing xml files.
       channel_ct profiler  DDCN("PROFILER");    //!< This debug channel is used for profiling the jack client.
+      channel_ct tracked   DDCN("TRACKED");     //!< This debug channel is tracker::B and tracker::D.
 
     } // namespace dc
   } // namespace DEBUGCHANNELS

@@ -121,6 +121,7 @@ using libcwd::channel_ct;
 // and add their definition in a custom debug.cpp file.
 extern channel_ct xmlparser;
 extern channel_ct profiler;
+extern channel_ct tracked;
 
 } // namespace dc
 } // namespace NAMESPACE_CHANNELS
