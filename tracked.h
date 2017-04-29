@@ -9,12 +9,11 @@
 
 #define DECLARE_TRACKED(C)                                                      \
     namespace { constexpr char const* const name_##C = #C; }                    \
-    struct C : tracked::detail::Tracked<&name_##C> {                            \
-      using tracked::detail::Tracked<&name_##C>::Tracked;                       \
+    struct C : tracked::Tracked<&name_##C> {                            \
+      using tracked::Tracked<&name_##C>::Tracked;                       \
     }
 
 namespace tracked {
-namespace detail {
 
 // Usage:
 //
@@ -254,8 +253,6 @@ void Tracked<NAME>::atexit()
     Dout(dc::finish, ".");
   }
 }
-
-} // namespace detail
 
 void mute()
 { 

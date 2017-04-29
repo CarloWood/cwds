@@ -29,6 +29,8 @@ It provides the following features,
   * <tt>boost::weak_ptr&lt;T&gt;</tt>
   * <tt>std::pair&lt;T1, T2&gt;</tt>
   * <tt>std::map&lt;T1, T2, T3&gt;</tt>
+* Defines a class tracked::Tracked<&name> that can be used to
+  track proper use of move/copy constructors and assignment operators.
 
 ## Checking out a project that uses the cwds submodule.
 
