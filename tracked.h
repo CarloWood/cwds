@@ -3,12 +3,14 @@
 
 #pragma once
 
+#include "debug.h"
 #include <new>
 #include <iostream>
+#include <vector>
 #include <boost/range/adaptor/reversed.hpp>
 
-#define DECLARE_TRACKED(C)                                                      \
-    namespace { constexpr char const* const name_##C = #C; }                    \
+#define DECLARE_TRACKED(C)                                              \
+    namespace { constexpr char const* const name_##C = #C; }            \
     struct C : tracked::Tracked<&name_##C> {                            \
       using tracked::Tracked<&name_##C>::Tracked;                       \
     }
@@ -254,13 +256,13 @@ void Tracked<NAME>::atexit()
   }
 }
 
-void mute()
+inline void mute()
 { 
   Dout(dc::tracked, "muted");
   Debug(dc::tracked.off());
 }
 
-void unmute()
+inline void unmute()
 { 
   Debug(dc::tracked.on());
   Dout(dc::tracked, "unmuted");
