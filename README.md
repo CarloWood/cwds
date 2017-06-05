@@ -139,24 +139,42 @@ in <tt>$(top_srcdir)</tt> that contains something like
 <pre>
 #pragma once
 
-// These three defines are only necessary if you need to 'example' namespace.
+// These three defines are only necessary if you want the 'example' namespace.
 // The default is just 'debug'.
 #define NAMESPACE_DEBUG example::debug
 #define NAMESPACE_DEBUG_START namespace example { namespace debug {
 #define NAMESPACE_DEBUG_END } }
 #include "cwds/debug.h"
 
+#ifdef CWDEBUG
 NAMESPACE_DEBUG_CHANNELS_START
-
 extern channel_ct my_channel;
 extern channel_ct ...
-
 NAMESPACE_DEBUG_CHANNELS_END
+#endif
 </pre>
 
 or if they don't, that then <tt>cwds/debug.h</tt> will be included
 directly. The <tt>-iquote $(top_builddir)</tt> is needed to find
 any generated header files, most notably <tt>sys.h</tt>.
+
+Debug channels that are only used in a single compilation unit can be
+defined by just adding
+
+<pre>
+#include "sys.h"
+#include "debug.h"
+
+[...]
+
+#ifdef CWDEBUG
+NAMESPACE_DEBUG_CHANNELS_START
+channel_ct my_channel;
+NAMESPACE_DEBUG_CHANNELS_END
+#endif
+</pre>
+
+of the respective source file, of course.
 
 In order to initialize libcwd properly, the following has to be added
 to the top of <tt>main</tt>:
