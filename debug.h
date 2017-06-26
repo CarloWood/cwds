@@ -173,13 +173,15 @@ struct Mark {
   {
     libcwd::libcw_do.push_marker();
     libcwd::libcw_do.marker().append(std::string(M_indent, ' ') + m + ' ');
+    // This is basically a decrement of M_indent.
     libcwd::libcw_do.set_indent(0);
   }
   //! Destructor.
   ~Mark()
   {
     libcwd::libcw_do.pop_marker();
-    libcwd::libcw_do.set_indent(M_indent);
+    // Restore indentation relative to possible other indentation increments that happened in the mean time.
+    libcwd::libcw_do.inc_indent(M_indent);
   }
 };
 
