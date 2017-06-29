@@ -176,6 +176,13 @@ struct Mark {
     // This is basically a decrement of M_indent.
     libcwd::libcw_do.set_indent(0);
   }
+  Mark(char const* utf8_m) : M_indent(libcwd::libcw_do.get_indent())
+  {
+    libcwd::libcw_do.push_marker();
+    libcwd::libcw_do.marker().append(std::string(M_indent, ' ') + utf8_m + ' ');
+    // This is basically a decrement of M_indent.
+    libcwd::libcw_do.set_indent(0);
+  }
   //! Destructor.
   ~Mark()
   {
