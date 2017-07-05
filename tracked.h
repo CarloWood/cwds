@@ -82,7 +82,7 @@ struct Tracked {
   }
 
   void operator=(Tracked const& r)
-  { 
+  {
     assert_status_below(Entry::destructed, "assign to");
     r.assert_status_below(Entry::pillaged, "assign from");
     Dout(dc::tracked, *this << '=' << r);
@@ -90,7 +90,7 @@ struct Tracked {
   }
 
   void operator=(Tracked&& r)
-  { 
+  {
     assert_status_below(Entry::destructed, "move-assign to");
     r.assert_status_below(Entry::pillaged, "move");
     entry()->set_status(Entry::fresh);
@@ -126,12 +126,12 @@ struct Tracked {
   void* operator new[](std::size_t const, void* const p) throw() { return p; }
 
   void operator delete(void* const p, std::size_t const s) throw()
-  { 
+  {
     static_cast<Tracked*>(p)->op_delete(static_cast<Tracked*>(p), s);
   }
 
   void operator delete[](void* const p, std::size_t const s) throw()
-  { 
+  {
     static_cast<Tracked*>(p)->op_array_delete(static_cast<Tracked*>(p), s);
   }
 
@@ -191,7 +191,7 @@ void Tracked<NAME>::assert_status_below(typename Entry::Status status, std::stri
 
 template<char const* const* NAME>
 void* Tracked<NAME>::op_new(std::size_t, bool const array, void* const r)
-{ 
+{
   if (!r)
     return 0;
   Dout(dc::tracked, "new(" << *NAME << (array ? "[]" : "") << ")");
@@ -200,9 +200,9 @@ void* Tracked<NAME>::op_new(std::size_t, bool const array, void* const r)
 
 template<char const* const* NAME>
 void Tracked<NAME>::op_delete(void* const p, std::size_t const s)
-{ 
+{
   ::operator delete(p);
-  
+
   for (auto&& e : Entry::entries())
     if (!(e < p) && e < static_cast<char*>(p) + s)
     {
@@ -257,13 +257,13 @@ void Tracked<NAME>::atexit()
 }
 
 inline void mute()
-{ 
+{
   Dout(dc::tracked, "muted");
   Debug(dc::tracked.off());
 }
 
 inline void unmute()
-{ 
+{
   Debug(dc::tracked.on());
   Dout(dc::tracked, "unmuted");
 }
@@ -285,7 +285,7 @@ int main()
     B b3(b1);                  // B3*(B1)
     B b4(std::move(b1));       // B1=>B4*
     B b5(b1);                  // Trying to copy pillaged B1: B5*(B1)
-    B b6(std::move(b1));       // Trying to move pillaged B1: B1=>B6*                    
+    B b6(std::move(b1));       // Trying to move pillaged B1: B1=>B6*
     b4.~B();                   // B4~
     d = &b1;
   }                            // B6~, B5~, Trying to re-destruct destructed B4: B4~, B3~, B2~, B1~
