@@ -229,11 +229,12 @@ extern pthread_mutex_t cout_mutex;
 // Print "Entering " << \a data to channel \a cntrl and increment
 // debugging output indentation until the end of the current scope.
 #define DoutEntering(cntrl, data) \
-  int __cwds_debug_indentation = 2;                                                                      \
+  int __cwds_debug_indentation = 2;                                                                                     \
   {                                                                                                                     \
     LIBCWD_TSD_DECLARATION;                                                                                             \
     if (LIBCWD_DO_TSD_MEMBER_OFF(::libcwd::libcw_do) < 0)                                                               \
     {                                                                                                                   \
+      using namespace ::libcwd;                                                                                         \
       ::libcwd::channel_set_bootstrap_st __libcwd_channel_set(LIBCWD_DO_TSD(::libcwd::libcw_do) LIBCWD_COMMA_TSD);      \
       bool on;                                                                                                          \
       {                                                                                                                 \
@@ -241,9 +242,17 @@ extern pthread_mutex_t cout_mutex;
         on = (__libcwd_channel_set|cntrl).on;                                                                           \
       }                                                                                                                 \
       if (on)                                                                                                           \
-        Dout(cntrl, "Entering " << data);                                                                               \
+	do                                                                                                              \
+	{														\
+	  LIBCWD_ASSERT_NOT_INTERNAL;                                                                                   \
+	  LIBCWD_LibcwDoutScopeBegin_MARKER;                                                                            \
+	  ::libcwd::debug_ct& __libcwd_debug_object(::libcwd::libcw_do);                                                \
+	  LIBCWD_DO_TSD(__libcwd_debug_object).start(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);	\
+	  LibcwDoutStream << "Entering " << data;                                    				        \
+	  LIBCWD_DO_TSD(__libcwd_debug_object).finish(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);    \
+	} while(0);													\
       else                                                                                                              \
-        __cwds_debug_indentation = 0;                                                                    \
+        __cwds_debug_indentation = 0;                                                                    		\
     }                                                                                                                   \
   }                                                                                                                     \
   debug::Indent __cwds_debug_indent(__cwds_debug_indentation);
