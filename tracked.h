@@ -27,6 +27,29 @@ namespace tracked {
 //
 // One may use tracked::mute() and tracked::unmute() to
 // verbosely turn dc::tracked on and off.
+//
+// To track an existing class Foo, derive it from Tracked:
+//
+// extern char const* name_Foo;
+// class Foo : public tracked::Tracked<&name_Foo>
+// {
+//   using tracked::Tracked<&name_Foo>::Tracked;
+//
+//   Foo(Foo& orig) : tracked::Tracked<&name_Foo>{orig}, ... { }
+//   Foo(Foo const& orig) : tracked::Tracked<&name_Foo>{orig}, ... { }
+//   Foo(Foo&& orig) : tracked::Tracked<&name_Foo>{std::move(orig)}, ... { }
+//   Foo(Foo const&& orig) : tracked::Tracked<&name_Foo>{std::move(orig)}, ... { }
+//   void operator=(Foo const& orig) { tracked::Tracked<&name_Foo>::operator=(orig); ... }
+//   void operator=(Foo&& orig) { tracked::Tracked<&name_Foo>::operator=(std::move(orig)); ... }
+// ...
+//
+// and add to Foo.cxx
+//
+// char const* name_Foo;
+//
+// To print the instance name of an object, one could
+// write static_cast<Foo::Tracked const&>(*this) to an ostream.
+//
 
 template<char const* const* NAME>
 struct Tracked {
@@ -96,6 +119,13 @@ struct Tracked {
     entry()->set_status(Entry::fresh);
     Dout(dc::tracked, r << "=>" << *this);
     r.entry()->set_status(Entry::pillaged);
+  }
+
+  void refresh()
+  {
+    assert_status_below(Entry::destructed, "refresh");
+    entry()->set_status(Entry::fresh);
+    Dout(dc::tracked, "Revived " << *this);
   }
 
   void* operator new(std::size_t const s)
