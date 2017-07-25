@@ -23,7 +23,7 @@
 
 #ifdef CWDEBUG
 
-#include <iostream>
+#include <ostream>
 #include "debug.h"      // Include cwds/debug.h, not the projects debug.h.
 
 //! For debugging purposes. Write a timeval to \a os.

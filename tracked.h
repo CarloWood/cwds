@@ -5,7 +5,7 @@
 
 #include "debug.h"
 #include <new>
-#include <iostream>
+#include <ostream>
 #include <vector>
 #include <boost/range/adaptor/reversed.hpp>
 
