@@ -61,7 +61,7 @@
 #ifdef DEBUG
 #define ASSERT(x) assert(x)
 #else
-#define ASSERT(x)
+#define ASSERT(x) do { } while(0)
 #endif
 
 #else // CWDEBUG
