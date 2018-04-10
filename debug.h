@@ -119,9 +119,6 @@ using libcwd::channel_ct;
 
 // Add the declaration of new debug channels here
 // and add their definition in a custom debug.cpp file.
-extern channel_ct xmlparser;
-extern channel_ct profiler;
-extern channel_ct tracked;
 
 } // namespace dc
 } // namespace NAMESPACE_CHANNELS
@@ -166,7 +163,8 @@ struct Indent {
 // the current marker after first adding the current indentation
 // to it as spaces, and sets the indentation to zero. Destruction
 // restores things again.
-struct Mark {
+struct Mark
+{
   int M_indent;                 //!< The old indentation.
   //! Construct a Mark object.
   Mark(char m = '|') : M_indent(libcwd::libcw_do.get_indent())
