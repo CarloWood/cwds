@@ -253,7 +253,7 @@ extern pthread_mutex_t cout_mutex;
         __cwds_debug_indentation = 0;                                                                    		\
     }                                                                                                                   \
   }                                                                                                                     \
-  debug::Indent __cwds_debug_indent(__cwds_debug_indentation);
+  NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
 
 #endif // CWDEBUG
 

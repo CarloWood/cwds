@@ -26,8 +26,10 @@
 #include <iosfwd>                       // std::ostream&
 #include <utility>                      // std::pair
 #include <map>
+#ifdef USE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
+#endif
 #if CWDEBUG_LOCATION
 #include <libcwd/type_info.h>
 #else
