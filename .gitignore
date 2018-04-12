@@ -11,3 +11,10 @@ install-sh
 ltmain.sh
 missing
 env.source
+# In case someone configures in the source tree:
+.deps
+.libs
+Makefile
+libcwds*.la
+*.lo
+*.o
