@@ -9,6 +9,10 @@
 #include <vector>
 #include <boost/range/adaptor/reversed.hpp>
 
+NAMESPACE_DEBUG_CHANNELS_START
+extern channel_ct tracked;
+NAMESPACE_DEBUG_CHANNELS_END
+
 #define DECLARE_TRACKED(C)                                              \
     namespace { constexpr char const* const name_##C = #C; }            \
     struct C : tracked::Tracked<&name_##C> {                            \

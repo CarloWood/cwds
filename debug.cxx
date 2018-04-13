@@ -231,4 +231,8 @@ std::string call_location(void const* return_addr)
 
 NAMESPACE_DEBUG_END
 
+NAMESPACE_DEBUG_CHANNELS_START
+channel_ct tracked("TRACKED");
+NAMESPACE_DEBUG_CHANNELS_END
+
 #endif // CWDEBUG
