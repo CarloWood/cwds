@@ -19,6 +19,8 @@ SOURCES = \
 	debug.h \
 	debug_ostream_operators.cxx \
 	debug_ostream_operators.h \
+	signal_safe_printf.cxx \
+	signal_safe_printf.h \
 	tracked.h
 
 libcwds_la_SOURCES = ${SOURCES}
