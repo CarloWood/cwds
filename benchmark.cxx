@@ -21,6 +21,7 @@
 #include "sys.h"
 #include "benchmark.h"
 #include "debug.h"
+#include <cstring>
 #include <pthread.h>
 #include <sys/syscall.h>
 #include <stdexcept>
@@ -55,8 +56,8 @@ Stopwatch::Stopwatch(unsigned int cpu_nr)
     // Pin main thread to a cpu 'cpu_nr'.
     pthread_t thread = pthread_self();
 
-    // If cpu_nr is 0xffffffff try to pin the thread on the CPU that it is currently running on.
-    if (cpu_nr == 0xffffffff)
+    // If cpu_nr is cpu_any try to pin the thread on the CPU that it is currently running on.
+    if (cpu_nr == cpu_any)
     {
       unsigned cpu;
       unsigned node;

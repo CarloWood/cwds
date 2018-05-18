@@ -42,7 +42,9 @@ class Stopwatch
   cpu_set_t* m_cpuset;
 
  public:
-  Stopwatch(unsigned int cpu_nr = 0xffffffff);
+  static unsigned int constexpr cpu_any = 0xffffffff;  // This value means: keep running on whatever cpu this thread is running.
+
+  Stopwatch(unsigned int cpu_nr = cpu_any);
   ~Stopwatch();
 
   void* operator new(size_t size);
@@ -53,26 +55,59 @@ class Stopwatch
     __builtin_prefetch(this, 1);
   }
 
-  void start()
+  // From the Intel instruction set manual,
+  // https://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-vol-3a-part-1-manual.html :
+  //
+  // [Paragraph 8.2.5]
+  // ...
+  //   The SFENCE, LFENCE, and MFENCE instructions provide a performance-efficient way of ensuring load and store
+  //   memory ordering between routines that produce weakly-ordered results and routines that consume that data. The
+  //   functions of these instructions are as follows:
+  // [...]
+  //   LFENCE — Serializes all load (read) operations that occurred prior to the LFENCE instruction in the program
+  //   instruction stream, but does not affect store operations.2
+  // [...]
+  //   2. Specifically, LFENCE does not execute until all prior instructions have completed locally, and no later instruction begins execution
+  //   until LFENCE completes. As a result, an instruction that loads from memory and that precedes an LFENCE receives data from memory
+  //   prior to completion of the LFENCE. An LFENCE that follows an instruction that stores to memory might complete before the data
+  //   being stored have become globally visible. Instructions following an LFENCE may be fetched from memory before the LFENCE, but
+  //   they will not execute until the LFENCE completes.
+  //
+  //
+  // [Paragraph 8.3]
+  // ...
+  //   The Intel 64 and IA-32 architectures define several serializing instructions. These instructions force the
+  //   processor to complete all modifications to flags, registers, and memory by previous instructions and to drain all
+  //   buffered writes to memory before the next instruction is fetched and executed.
+  // [...]
+  //   * Non-privileged serializing instructions — CPUID, IRET, and RSM.
+  // [...]
+  //   When the processor serializes instruction execution, it ensures that all pending memory transactions are
+  //   completed (including writes stored in its store buffer) before it executes the next instruction. Nothing can pass a
+  //   serializing instruction and a serializing instruction cannot pass any other instruction (read, write, instruction fetch,
+  //   or I/O). For example, CPUID can be executed at any privilege level to serialize instruction execution with no effect
+  //   on program flow, except that the EAX, EBX, ECX, and EDX registers are modified.
+  //
+  // The RDTSCP instruction waits until all previous instructions have been executed before reading the counter.
+  // However, subsequent instructions may begin execution before the read operation is performed.
+  void start() __attribute__((__always_inline__))
   {
     asm volatile (
-        "cpuid\n\t"                     // Finish all previous code.
-        "rdtsc\n\t"                     // Read Time Stamp Clock register.
-        "mov %%edx, %0\n\t"
-        "mov %%eax, %1\n\t"
-        : "=r" (cycles_start_high), "=r" (cycles_start_low)
-        :: "%rax", "%rbx", "%rcx", "%rdx");
+        "lfence\n\t"            // Finish all previous code locally, specifically all loads from memory.
+                                // Stores to memory might not yet have been flushed to memory (are not visible globally).
+        "rdtsc"                 // Only after the LFENCE instruction completes, read the Time Stamp Clock register.
+        : "=a" (cycles_start_low), "=d" (cycles_start_high));
   }
 
-  void stop()
+  void stop() __attribute__((__always_inline__))
   {
     asm volatile (
-        "rdtscp\n\t"                    // Read Time Stamp Clock register after all previous code finished.
-        "mov %%edx, %0\n\t"
-        "mov %%eax, %1\n\t"
-        "cpuid\n\t"                     // Prevent subsequent code from being ordered before the read of the Time Stamp Clock.
-        : "=r" (cycles_end_high), "=r" (cycles_end_low)
-        :: "%rax", "%rbx", "%rcx", "%rdx");
+        "rdtscp"                // Read Time Stamp Clock register after all previous code finished.
+        : "=a" (cycles_end_low), "=d" (cycles_end_high)
+        :: "%rcx");
+    asm volatile (
+        "cpuid"                 // Prevent subsequent code from being ordered before the read of the Time Stamp Clock.
+        ::: "%rax", "%rbx", "%rcx", "%rdx");
   }
 
   uint64_t start_cycles() const
