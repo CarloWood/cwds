@@ -87,9 +87,6 @@ class Stopwatch
   //   serializing instruction and a serializing instruction cannot pass any other instruction (read, write, instruction fetch,
   //   or I/O). For example, CPUID can be executed at any privilege level to serialize instruction execution with no effect
   //   on program flow, except that the EAX, EBX, ECX, and EDX registers are modified.
-  //
-  // The RDTSCP instruction waits until all previous instructions have been executed before reading the counter.
-  // However, subsequent instructions may begin execution before the read operation is performed.
   void start() __attribute__((__always_inline__))
   {
     asm volatile (
@@ -99,6 +96,13 @@ class Stopwatch
         : "=a" (cycles_start_low), "=d" (cycles_start_high));
   }
 
+  // From Intel® 64 and IA-32 Architectures Developer's Manual,
+  // https://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-manual-325462.html
+  //
+  // Vol. 2B 4-547, RDTSCP—Read Time-Stamp Counter and Processor ID
+  //
+  // The RDTSCP instruction waits until all previous instructions have been executed before reading the counter.
+  // However, subsequent instructions may begin execution before the read operation is performed.
   void stop() __attribute__((__always_inline__))
   {
     asm volatile (
