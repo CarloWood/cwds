@@ -33,6 +33,9 @@ libcwds_r_la_SOURCES = ${SOURCES}
 libcwds_r_la_CXXFLAGS = -std=c++11 @LIBCWD_R_FLAGS@
 libcwds_r_la_LIBADD = @LIBCWD_R_LIBS@
 
+# Always compile benchmark.cxx with -O3.
+libcwds_la-benchmark.lo libcwds_r_la-benchmark.lo: CXXFLAGS += -O3
+
 # --------------- Maintainer's Section
 
 if MAINTAINER_MODE

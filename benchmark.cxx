@@ -21,6 +21,7 @@
 #include "sys.h"
 #include "benchmark.h"
 #include "debug.h"
+#include "FrequencyCounter.h"
 #include <cstring>
 #include <pthread.h>
 #include <sys/syscall.h>
@@ -125,5 +126,43 @@ Stopwatch::~Stopwatch()
     CPU_FREE(m_cpuset);
   }
 }
+
+void Stopwatch::calibrate_overhead()
+{
+  static int volatile v;
+  int volatile* vp = &v;
+  // Warm up cache.
+  get_minimum_of(1000, [vp](){ for (int r = 0; r < 100; ++r) { *vp = r; }});
+  eda::FrequencyCounter<int> fc;
+
+  // The expected function for the number of cycles is: cycles(rm) = offset + rm;
+  // Hence we can calculate offset by minimizing the sum of squares of 'cycles(rm) - rm',
+  // which turns out to be simply the average thereof.
+  for (int rm = 1; rm <= 12; ++rm)
+  {
+    auto measurement = measure(
+        [rm, vp](){
+          int r;
+          asm volatile (
+              "mov %1, %0\n"
+              ".LCUST1:"
+              : "=r" (r)
+              : "g" (rm));
+          *vp = r;
+          asm volatile (
+              "decl %0\n\t"
+              "jne .LCUST1"
+              : "+r" (r));
+        });
+    int overhead = measurement.m_cycles - rm;   // Anticipated overhead.
+    if (measurement.is_t999())
+      fc.add(overhead);
+  }
+  s_stopwatch_overhead = fc.most();
+  Dout(dc::notice, "Set s_stopwatch_overhead to " << s_stopwatch_overhead);
+}
+
+// A value of zero means 'uninitialized' (it is impossible that the overhead is zero).
+int Stopwatch::s_stopwatch_overhead;
 
 } // namespace benchmark

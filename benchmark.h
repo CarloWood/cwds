@@ -20,9 +20,15 @@
 
 #pragma once
 
+#include "FrequencyCounter.h"
 #include <sched.h>
 #include <cstdint>
 #include <cstdlib>
+#include <limits>
+
+#if !defined(__OPTIMIZE__)
+#error benchmark.h included without using optimization!
+#endif
 
 namespace benchmark {
 
@@ -40,6 +46,9 @@ class Stopwatch
   uint32_t cycles_end_high;
   uint32_t cycles_end_low;
   cpu_set_t* m_cpuset;
+
+ public:
+  static int s_stopwatch_overhead;
 
  public:
   static unsigned int constexpr cpu_any = 0xffffffff;  // This value means: keep running on whatever cpu this thread is running.
@@ -128,6 +137,38 @@ class Stopwatch
   {
     return ((uint64_t)(cycles_end_high - cycles_start_high) << 32) + cycles_end_low - cycles_start_low;
   }
+
+  // Run functor() number_of_runs times and return to smallest interval measured (in cycles).
+  template<class T>
+  uint64_t get_minimum_of(int const number_of_runs, T const functor)
+  {
+    uint64_t cycles = std::numeric_limits<uint64_t>::max();
+    for (int i = 0; i < number_of_runs; ++i)
+    {
+      start();
+      functor();
+      stop();
+      uint64_t ncycles = diff_cycles();
+      if (ncycles < cycles)
+        cycles = ncycles;
+    }
+    return cycles;
+  }
+
+  template<class T>
+  eda::FrequencyCounterResult measure(T const functor)
+  {
+    eda::FrequencyCounter<int, 3> fc;
+    while (!fc.add(get_minimum_of(1000, functor)))
+      ;
+    eda::FrequencyCounterResult result = fc.result();
+    result.m_cycles -= s_stopwatch_overhead;
+    if (result.m_cycles < 0)
+      result.m_cycles = 0;
+    return result;
+  }
+
+  void calibrate_overhead();
 };
 
 } // namespace benchmark

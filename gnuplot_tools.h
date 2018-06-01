@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <iostream>
 #include "gnuplot-iostream/gnuplot-iostream.h"  // Please also install https://github.com/dstahlke/gnuplot-iostream.git
+#include "FrequencyCounter.h"
 #include "debug.h"
 
 // https://en.wikipedia.org/wiki/Exploratory_Data_Analysis
@@ -68,45 +69,9 @@ class MinAvgMax
   }
 };
 
-template<typename T>
-class FrequencyCounter
-{
-  using counters_type = std::map<T, size_t>;
-  using iterator = typename counters_type::iterator;
-
-  counters_type m_counters;
-  iterator m_hint;
-
- public:
-  FrequencyCounter() : m_hint(m_counters.end()) { }
-
-  void add(T data)
-  {
-    m_hint = m_counters.emplace_hint(m_hint, data, 0);
-    m_hint->second++;
-  }
-
-  T most() const
-  {
-    size_t max = 0;
-    T result;
-    for (auto e : m_counters)
-    {
-      if (e.second > max)
-      {
-        max = e.second;
-        result = e.first;
-      }
-    }
-    return result;
-  }
-
-  counters_type const& counters() const { return m_counters; }
-};
-
 class Plot
 {
- private:
+ protected:
   Gnuplot gp;
   std::string m_title;
   std::string m_xlabel;
@@ -197,8 +162,8 @@ class PlotHistogram : public Plot
 
   void show()
   {
-    set_xrange(m_mam.min() - m_bucket_width, m_mam.max() + m_bucket_width);
-    set_yrange(0, 0);
+    if (m_x_min == 0.0 && m_x_max == 0.0)
+      set_xrange(m_mam.min() - m_bucket_width, m_mam.max() + m_bucket_width);
     set_header("smooth freq");
     add("set boxwidth " + std::to_string(m_bucket_width));
     add("set style fill solid 0.5");
