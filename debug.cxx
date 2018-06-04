@@ -163,6 +163,19 @@ void init_thread()
  */
 void init()
 {
+#ifdef DEBUGGLOBAL
+  // This has to be done at the very start of main().
+  // By moving this here, the line
+  //     Debug(NAMESPACE_DEBUG::init());
+  // must be done at the very start of main().
+  // If that is a problem then you can start main() with,
+  // #ifdef DEBUGGLOBAL
+  //   GlobalObjectManager::main_entered();
+  // #endif
+  // And call init() later when the call here will be skipped.
+  if (!Singleton<GlobalObjectManager>::instantiate().is_after_global_constructors())
+    GlobalObjectManager::main_entered();
+#endif
 #if CWDEBUG_ALLOC && defined(USE_LIBCW)
   // Tell the memory leak detector which parts of the code are
   // expected to leak so that we won't get an alarm for those.
@@ -184,14 +197,14 @@ void init()
   memleak_filter().set_flags(libcwd::show_objectfile|libcwd::show_function);
 #endif
 
-#ifndef NO_SYNC_WITH_STDIO
-  // The following call allocated the filebuf's of cin, cout, cerr, wcin, wcout and wcerr.
+#ifndef NO_SYNC_WITH_STDIO_FALSE        // By defining this you will synchronize with the standard C streams.
+  // The following call allocates the filebuf's of cin, cout, cerr, wcin, wcout and wcerr.
   // Because this causes a memory leak being reported, make them invisible.
   Debug(set_invisible_on());
 
   // You want this, unless you mix streams output with C output.
-  // Read  http://gcc.gnu.org/onlinedocs/libstdc++/27_io/howto.html#8 for an explanation.
-  std::ios::sync_with_stdio(true);
+  // Read http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio for more information.
+  std::ios::sync_with_stdio(false);
 
   // Cancel previous call to set_invisible_on.
   Debug(set_invisible_off());
