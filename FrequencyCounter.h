@@ -61,9 +61,10 @@ class FrequencyCounter
       m_max_iters[i] = m_counters.end();
   }
 
-  bool add(T value);
+  bool add(T value);    // Returns true when result() became valid.
   T most() const { return m_max_iters[0]->first; }
   FrequencyCounterResult result() const { return m_result; }
+  double average() const;
 
   counters_type const& counters() const { return m_counters; }
 
@@ -129,7 +130,6 @@ bool FrequencyCounter<T, nk>::add(T value)
     int m1 = m_max_iters[i]->second.count;
     ASSERT(m1 >= m2);
     double test_statistic = 1.0 * (m1 - m2) * (m1 - m2) / (m1 + m2);
-    Dout(dc::notice, "test_statistic = " << test_statistic);
     if (test_statistic > 10.828)
     {
       m_result.m_cycles = m_max_iters[0]->first;
@@ -144,6 +144,19 @@ bool FrequencyCounter<T, nk>::add(T value)
       break;
   }
   return false;
+}
+
+template<typename T, int nk>
+double FrequencyCounter<T, nk>::average() const
+{
+  double avg = 0;
+  size_t count = 0;
+  for (int i = 0; i < nk && m_max_iters[i] != m_counters.end(); ++i)
+  {
+    avg += (double)m_max_iters[i]->first * m_max_iters[i]->second.count;
+    count += m_max_iters[i]->second.count;
+  }
+  return avg / count;
 }
 
 } // namespace eda
