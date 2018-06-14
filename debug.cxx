@@ -32,6 +32,9 @@
 #ifdef USE_LIBCW
 #include <libcw/memleak.h>		// memleak_filter
 #endif
+#ifdef DEBUGGLOBAL
+#include "utils/Singleton.h"            // This header is part of git submodule https://github.com/CarloWood/ai-utils
+#endif
 
 #if LIBCWD_THREAD_SAFE
 pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
