@@ -24,7 +24,7 @@
 #ifdef CWDEBUG
 
 #include <ostream>
-#include <debug.h>      // Include the projects debug.h if it exists.
+#include "debug.h"
 
 //! For debugging purposes. Write a timeval to \a os.
 std::ostream& operator<<(std::ostream& os, timeval const& time)
