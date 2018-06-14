@@ -82,16 +82,22 @@ void signal_safe_printf(char const* fmt, ...)
                 }
                 case 'l':
                 {
-                    if (p[1] == 'u' || p[1] == 'x') // %lu and %lx
+                    ++p;
+                    if (*p == 'u' || *p == 'x') // %lu and %lx
                     {
-                        int base = (*++p == 'd') ? 10 : 16;
-                        {
-                            ++p;
-                            unsigned long arg = va_arg(args, unsigned long);
-                            out = signal_safe_write_int(out, base, arg);
-                            break;
-                        }
+                        int base = (*p == 'u') ? 10 : 16;
+                        unsigned long arg = va_arg(args, unsigned long);
+                        out = signal_safe_write_int(out, base, arg);
+                        break;
                     }
+                    else if (*p == 'd')         // %ld
+                    {
+                        long arg = va_arg(args, long);
+                        out = signal_safe_write_int(out, 10, arg);
+                        break;
+                    }
+                    *out++ = 'l';
+                    break;
                 }
                 case 's':       // %s
                 {
@@ -100,27 +106,14 @@ void signal_safe_printf(char const* fmt, ...)
                     while (*str) *out++ = *str++;
                     break;
                 }
-                case 'u':
+                case 'u':       // %u
                 {
-                    switch (*++p)
-                    {
-                        case 'l':   // %ul
-                        {
-                            ++p;
-                            unsigned long arg = va_arg(args, unsigned long);
-                            out = signal_safe_write_int(out, 10, arg);
-                            break;
-                        }
-                        default:    // %u
-                        {
-                            unsigned int arg = va_arg(args, unsigned int);
-                            out = signal_safe_write_int(out, 10, arg);
-                            break;
-                        }
-                    }
+                    ++p;
+                    unsigned int arg = va_arg(args, unsigned int);
+                    out = signal_safe_write_int(out, 10, arg);
                     break;
                 }
-                case 'x':           // %x
+                case 'x':       // %x
                 {
                     ++p;
                     int arg = va_arg(args, int);
