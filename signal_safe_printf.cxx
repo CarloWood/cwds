@@ -125,7 +125,7 @@ void signal_safe_printf(char const* fmt, ...)
             }
         }
         else
-            *out++ = *p++; 
+            *out++ = *p++;
     }
     va_end(args);
     size_t s = out - buf;

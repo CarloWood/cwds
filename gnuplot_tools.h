@@ -95,7 +95,7 @@ class Plot
   void add_data_point(double x, double y, double dy, std::string const& description)
   {
     std::unique_lock<std::mutex> lk(m_mutex);
-    m_map[description].emplace_back(x, y, dy); 
+    m_map[description].emplace_back(x, y, dy);
   }
 
   bool has_data() const { return !m_map.empty(); }
