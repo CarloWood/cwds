@@ -192,6 +192,10 @@ struct Mark
 
 NAMESPACE_DEBUG_END
 
+NAMESPACE_DEBUG_CHANNELS_START
+extern channel_ct system;
+NAMESPACE_DEBUG_CHANNELS_END
+
 //! @brief A debug streambuf that prints characters written to it with a green background.
 class DebugBuf : public std::streambuf
 {

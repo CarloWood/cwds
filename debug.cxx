@@ -249,6 +249,7 @@ NAMESPACE_DEBUG_END
 
 NAMESPACE_DEBUG_CHANNELS_START
 channel_ct tracked("TRACKED");
+channel_ct system("SYSTEM");    // Intended to be used for system calls.
 NAMESPACE_DEBUG_CHANNELS_END
 
 #endif // CWDEBUG
