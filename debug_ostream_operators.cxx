@@ -24,12 +24,67 @@
 #ifdef CWDEBUG
 
 #include <ostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "debug.h"
 
 //! For debugging purposes. Write a timeval to \a os.
 std::ostream& operator<<(std::ostream& os, timeval const& time)
 {
   return os << "{tv_sec:" << time.tv_sec << ", tv_usec:" << time.tv_usec << '}';
+}
+
+std::ostream& operator<<(std::ostream& os, NAMESPACE_DEBUG::PosixMode posix_mode)
+{
+  int pm = posix_mode.m_posix_mode;
+
+  if ((pm & 3) == 0)
+    os << "O_RDONLY";
+  else if ((pm & 3) == 1)
+    os << "O_WRONLY";
+  else if ((pm & 3) == 2)
+    os << "O_RDWR";
+  else
+  {
+    os << "<ERROR MODE>";
+    return os;
+  }
+  if ((pm & O_APPEND))
+    os << "|O_APPEND";
+  if ((pm & O_ASYNC))
+    os << "|O_ASYNC";
+  if ((pm & O_CLOEXEC))
+    os << "|O_CLOEXEC";
+  if ((pm & O_CREAT))
+    os << "|O_CREAT";
+  if ((pm & O_DIRECT))
+    os << "|O_DIRECT";
+  if ((pm & O_DIRECTORY))
+    os << "|O_DIRECTORY";
+  if ((pm & O_DSYNC))
+    os << "|O_DSYNC";
+  if ((pm & O_EXCL))
+    os << "|O_EXCL";
+  if ((pm & O_LARGEFILE))
+    os << "|O_LARGEFILE";
+  if ((pm & O_NOATIME))
+    os << "|O_NOATIME";
+  if ((pm & O_NOCTTY))
+    os << "|O_NOCTTY";
+  if ((pm & O_NOFOLLOW))
+    os << "|O_NOFOLLOW";
+  if ((pm & O_NONBLOCK))
+    os << "|O_NONBLOCK";
+  if ((pm & O_PATH))
+    os << "|O_PATH";
+  if ((pm & O_SYNC))
+    os << "|O_SYNC";
+  if ((pm & O_TMPFILE))
+    os << "|O_TMPFILE";
+  if ((pm & O_TRUNC))
+    os << "|O_TRUNC";
+  return os;
 }
 
 #endif // CWDEBUG

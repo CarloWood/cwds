@@ -51,7 +51,17 @@ inline char const* type_name_of()
 #endif
 }
 
+// Use to print human readable form of a POSIX mode (see man 2 open).
+struct PosixMode
+{
+  int m_posix_mode;
+
+  PosixMode(int posix_mode) : m_posix_mode(posix_mode) { }
+};
+
 NAMESPACE_DEBUG_END
+
+extern std::ostream& operator<<(std::ostream& os, NAMESPACE_DEBUG::PosixMode posix_mode);
 
 struct timeval;
 
