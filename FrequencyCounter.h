@@ -140,7 +140,7 @@ bool FrequencyCounter<T, nk>::add(T value)
       m_result.m_cycles = sum / (i + 1);
       return true;
     }
-    if (std::abs(m_max_iters[i]->first - m_max_iters[i - 1]->first) > 1)
+    if (std::abs(typename std::make_signed<T>::type(m_max_iters[i]->first - m_max_iters[i - 1]->first)) > 1)
       break;
   }
   return false;
