@@ -88,6 +88,8 @@ class Plot
  public:
   Plot(std::string title, std::string xlabel, std::string ylabel) :
     m_title(title), m_xlabel(xlabel), m_ylabel(ylabel), m_x_min(0.0), m_x_max(0.0), m_y_min(0.0), m_y_max(0.0) { }
+  // Added destructor to avoid the compiler warning: inlining failed in call to ‘eda::Plot::~Plot() noexcept’: call is unlikely and code size would grow [-Winline]
+  ~Plot() { }
 
   void set_xrange(double x_min, double x_max) { m_x_min = x_min; m_x_max = x_max; }
   void set_yrange(double y_min, double y_max) { m_y_min = y_min; m_y_max = y_max; }
