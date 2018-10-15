@@ -130,5 +130,6 @@ void signal_safe_printf(char const* fmt, ...)
     va_end(args);
     size_t s = out - buf;
     assert(s <= sizeof(buf));
-    write(STDOUT_FILENO, buf, s);
+    [[maybe_unused]] size_t wlen = write(STDOUT_FILENO, buf, s);
+    assert(wlen == s);
 }
