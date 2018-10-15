@@ -26,11 +26,11 @@ SOURCES = \
 	tracked.h
 
 libcwds_la_SOURCES = ${SOURCES}
-libcwds_la_CXXFLAGS = -std=c++11 @LIBCWD_FLAGS@
+libcwds_la_CXXFLAGS = @LIBCWD_FLAGS@
 libcwds_la_LIBADD = @CW_EXTRA_CWDS_LIBS@ @LIBCWD_LIBS@
 
 libcwds_r_la_SOURCES = ${SOURCES}
-libcwds_r_la_CXXFLAGS = -std=c++11 @LIBCWD_R_FLAGS@
+libcwds_r_la_CXXFLAGS = @LIBCWD_R_FLAGS@
 libcwds_r_la_LIBADD = @CW_EXTRA_CWDS_R_LIBS@ @LIBCWD_R_LIBS@
 
 # Always compile benchmark.cxx with -O3.
