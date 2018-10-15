@@ -33,7 +33,7 @@
 #define AllocTag_dynamic_description(p, x)
 #define AllocTag(p, x)
 #define Debug(x) do { } while(0)
-#define Dout(a, b)
+#define Dout(a, b) do { } while(0)
 #define DoutEntering(a, b)
 #define DoutFatal(a, b) LibcwDoutFatal(::std, , a, b)
 #define ForAllDebugChannels(STATEMENT)
