@@ -54,7 +54,7 @@ using rcfile_dc_states_type = std::map<std::string, bool>;
 /*! @brief Map containing the default debug channel states used at the start of each new thread.
  * @internal
  *
- * The first thread calls main, which calls debug::init which will initialize this
+ * The first thread calls main, which calls NAMESPACE_DEBUG::init which will initialize this
  * map with all debug channel labels and whether or not they were turned on in the
  * rcfile or not.
  */
@@ -78,7 +78,7 @@ void set_state(char const* dc_label, bool is_on)
  * @internal
  *
  * One time initialization function of rcfile_dc_state.
- * This must be called from debug::init after reading the rcfile.
+ * This must be called from NAMESPACE_DEBUG::init after reading the rcfile.
  */
 void save_dc_states()
 {
