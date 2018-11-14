@@ -182,11 +182,17 @@ struct Mark
     libcwd::libcw_do.set_indent(0);
   }
   //! Destructor.
-  ~Mark()
+  ~Mark() { end(); }
+  void end()
   {
-    libcwd::libcw_do.pop_marker();
-    // Restore indentation relative to possible other indentation increments that happened in the mean time.
-    libcwd::libcw_do.inc_indent(M_indent);
+    if (M_indent != -1)
+    {
+      libcwd::libcw_do.pop_marker();
+      // Restore indentation relative to possible other indentation increments that happened in the mean time.
+      libcwd::libcw_do.inc_indent(M_indent);
+      // Mark that end() was already called.
+      M_indent = -1;
+    }
   }
 };
 
