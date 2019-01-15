@@ -80,9 +80,11 @@ bin_PROGRAMS = singlethreaded_foobar multithreaded_foobar
 would also define
 
 <pre>
+singlethreaded_foobar_SOURCES = singlethreaded_foobar.cpp
 singlethreaded_foobar_CXXFLAGS = @LIBCWD_FLAGS@
 singlethreaded_foobar_LDADD = $(top_builddir)/cwds/libcwds.la
 
+multithreaded_foobar_SOURCES = multithreaded_foobar.cpp
 multithreaded_foobar_CXXFLAGS = @LIBCWD_R_FLAGS@
 multithreaded_foobar_LDADD = $(top_builddir)/cwds/libcwds_r.la
 </pre>
@@ -182,9 +184,6 @@ to the top of <tt>main</tt>:
 <pre>
 int main()
 {
-#ifdef DEBUGGLOBAL
-  GlobalObjectManager::main_entered();
-#endif
   Debug(NAMESPACE_DEBUG::init());
 </pre>
 
