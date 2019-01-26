@@ -127,39 +127,64 @@ Stopwatch::~Stopwatch()
   }
 }
 
-void Stopwatch::calibrate_overhead()
+void Stopwatch::calibrate_overhead(size_t iterations, size_t minimum_of)
 {
   static int volatile v;
   int volatile* vp = &v;
   // Warm up cache.
-  get_minimum_of(1000, [vp](){ for (int r = 0; r < 100; ++r) { *vp = r; }});
-  eda::FrequencyCounter<int> fc;
+  get_minimum_of(100UL, [vp](){ for (int r = 0; r < 100; ++r) { *vp = r; }}, 10UL);
 
-  // The expected function for the number of cycles is: cycles(rm) = offset + rm;
-  // Hence we can calculate offset by minimizing the sum of squares of 'cycles(rm) - rm',
-  // which turns out to be simply the average thereof.
-  for (int rm = 1; rm <= 12; ++rm)
+  if (s_stopwatch_overhead == 0)
   {
-    auto measurement = measure(
-        [rm, vp](){
-          int r;
-          asm volatile (
-              "mov %1, %0\n"
-              ".LCUST1:"
-              : "=r" (r)
-              : "g" (rm));
-          *vp = r;
-          asm volatile (
-              "decl %0\n\t"
-              "jne .LCUST1"
-              : "+r" (r));
-        });
-    int overhead = measurement.m_cycles - rm;   // Anticipated overhead.
-    if (measurement.is_t999())
-      fc.add(overhead);
+    // Measure the overhead for calling start/stop (iterations == 1).
+    eda::FrequencyCounter<int> fc;
+
+    // The expected function for the number of cycles is: cycles(rm) = offset + rm;
+    // Hence we can calculate offset by minimizing the sum of squares of 'cycles(rm) - rm',
+    // which turns out to be simply the average thereof.
+    for (int rm = 1; rm <= 12; ++rm)
+    {
+      auto measurement = measure<3>(1,
+          [rm, vp](){
+            int r;
+            asm volatile (
+                "mov %1, %0\n"
+                ".LCUST1:"
+                : "=r" (r)
+                : "g" (rm));
+            *vp = r;
+            asm volatile (
+                "decl %0\n\t"
+                "jne .LCUST1"
+                : "+r" (r));
+          }, 1000);
+      int overhead = measurement.m_cycles - rm;   // Anticipated overhead.
+      if (measurement.is_t999())
+        fc.add(overhead);
+    }
+    s_stopwatch_overhead = fc.most();
+    Dout(dc::notice, "Note: s_stopwatch_overhead was set to " << s_stopwatch_overhead << " clock cycles.");
   }
-  s_stopwatch_overhead = fc.most();
-  Dout(dc::notice, "Set s_stopwatch_overhead to " << s_stopwatch_overhead);
+
+  // Measure the overhead for a loop of size 'iterations'.
+  calibrated_iterations = iterations;
+  iterations_overhead = 0;              // An iteration of 1 is already included in s_stopwatch_overhead.
+
+  if (iterations > 1)
+  {
+    eda::FrequencyCounter<int> fc;
+
+    for (int run = 0; run < 100; ++run)
+    {
+      auto measurement = measure<3>(iterations, [](){ asm volatile (""); }, minimum_of);
+      int overhead = measurement.m_cycles;
+      if (measurement.is_t999())
+        fc.add(overhead);
+    }
+    iterations_overhead = fc.most();
+    Dout(dc::notice, "Note: iterations_overhead (with iterations = " << iterations <<
+        " and minimum_of = " << minimum_of << ") determined to be " << iterations_overhead << " clock cycles.");
+  }
 }
 
 // A value of zero means 'uninitialized' (it is impossible that the overhead is zero).

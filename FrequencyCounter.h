@@ -41,7 +41,7 @@ struct FrequencyCounterResult
 };
 
 // Count the number of occurrances of type T, added to this object with FrequencyCounter<T>::add(T).
-// Keeps track of the eight most frequently occurring values of T.
+// Keeps track of the nk most frequently occurring values of T.
 template<typename T, int nk = 1>
 class FrequencyCounter
 {

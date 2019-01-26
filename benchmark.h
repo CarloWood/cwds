@@ -30,6 +30,92 @@
 #error benchmark.h included without using optimization!
 #endif
 
+// Usage example
+//
+// cpu_frequency is 1 / delta_t where delta_t is the time between
+// two clock ticks as measured with rdtsc / rdtscp. It should be
+// the cpu clock frequency.
+//
+// cpu is a number from 0 till N, where N is the number of cores
+// you have (see: grep '^processor' /proc/cpuinfo).
+//
+// loopsize is the size of the loop around the test code.
+// It should be such that the result (in clock cycles)
+// is between 1000 and 10000. The reason is simply accuracy:
+// the measurements are likely to reproduce within a single
+// clock cycle, so 1000 is more than enough for accuracy (0.1%)
+// while over 10000 just starts to waste too much time without
+// any gain (and increasing the chance for interrupts invalidating
+// measurements).
+//
+// minimum_of is the loop size of a loop around the inner loop
+// that measures the number of cycles needed for executing the
+// test code loopsize times. Only the minimum measurement of
+// minimum_of measurements is used. This is an easy way to
+// quickly get rid of outliers, so a value of 3 should be enough;
+// it is when a value of 4 (etc) doesn't give a better reproducablity
+// and/or speed up the total time of the measurement.
+//
+// nk is the number of buckets of FrequencyCounter to average over.
+// The above minimum measurements are put in buckets, if the actual
+// variation of the measurements is large than it might makes sense
+// to not just report the bucket with the largest count.
+// My guess is that a value of 3 should be right for most measurements
+// (sharp peaks) while a value of 8 might be needed but might start
+// to pick up a different execution paths (ie, a there is a spike
+// of measurements of 5 clocks, nearly none of 7 clocks, but then
+// there are also a significant number of executions that take 10
+// clocks; then a small value of nk will report 5, while a larger
+// value will report maybe 7 clocks - the average between the
+// two peaks (assuming they have about the same occurance count).
+//
+
+#ifdef EXAMPLE_CODE        // Undefined
+
+#include "sys.h"
+#include "debug.h"
+#include "cwds/benchmark.h"
+//#include "iacaMarks.h"        // Optionally include to define IACA_START and IACA_STOP.
+
+double const cpu_frequency = 3612059050.0;        // In cycles per second.
+int const cpu = 0;                                // The CPU to run on.
+size_t const loopsize = 1000;                     // We'll be measing the number of clock cylces needed for this many iterations of the test code.
+size_t const minimum_of = 3;                      // All but the fastest measurement of this many measurements are thrown away (3 is normally enough).
+int const nk = 3;                                 // The number of buckets of FrequencyCounter (with the highest counts) that are averaged over.
+
+int main()
+{
+  Debug(NAMESPACE_DEBUG::init());
+
+  benchmark::Stopwatch stopwatch(cpu);          // Declare stopwatch and configure on which CPU it must run.
+
+  // Calibrate Stopwatch overhead.
+  stopwatch.calibrate_overhead(loopsize, minimum_of);
+
+  uint64_t const m = 0x0000080e70100000UL;      // Some input value (doesn't have to be a const).
+
+  // The lambda is marked mutable because of the asm() that claims to change m,
+  // however - you should not *really* change the input variables!
+  // The [m = m] is needed because our m is const and doing just [m] weirdly
+  // enough makes the type of the captured m also const, despite the mutable.
+  auto result = stopwatch.measure<nk>(loopsize, [m = m]() mutable {
+      uint64_t lsb;                     // Declare any (temporary) "output" variables.
+      //IACA_START                      // Optional; needed when you want to analyse the generated assembly code with IACA
+                                        // (https://software.intel.com/en-us/articles/intel-architecture-code-analyzer).
+      asm volatile ("" : "+r" (m));     // See https://stackoverflow.com/a/54245040/1487069 for an explanation and discussion.
+
+      // Code under test.
+      lsb = m & -m;                     // This will result in three assembly instructions.
+
+      asm volatile ("" :: "r" (lsb));   // Same.
+      //IACA_END                        // Optional; needed when you want to analyse the generated assembly code with IACA.
+  }, minimum_of);
+
+  std::cout << "Result: " << (result / cpu_frequency * 1e9 / loopsize) << " ns [measured " << result << " clocks]." << std::endl;
+}
+
+#endif // EXAMPLE_CODE
+
 namespace benchmark {
 
 unsigned int constexpr cache_line_size = 64;    // grep cache_alignment /proc/cpuinfo
@@ -47,8 +133,11 @@ class Stopwatch
   uint32_t cycles_end_low;
   cpu_set_t* m_cpuset;
 
+  unsigned int calibrated_iterations;   // The iterations value last passed to calibrate_overhead().
+  uint32_t iterations_overhead;         // The overhead when using calibrated_iterations, in clock cycles.
+
  public:
-  static int s_stopwatch_overhead;
+  static int s_stopwatch_overhead;      // The overhead of calling start()/stop(), in clock cycles.
 
  public:
   static unsigned int constexpr cpu_any = 0xffffffff;  // This value means: keep running on whatever cpu this thread is running.
@@ -138,15 +227,18 @@ class Stopwatch
     return ((uint64_t)(cycles_end_high - cycles_start_high) << 32) + cycles_end_low - cycles_start_low;
   }
 
-  // Run functor() number_of_runs times and return to smallest interval measured (in cycles).
+  // Measure the number of clock cycles that it takes to run functor() iterations times
+  // and return to smallest value of doing that minimum_of times.
   template<class T>
-  uint64_t get_minimum_of(int const number_of_runs, T const functor)
+  uint64_t get_minimum_of(unsigned int const iterations, T const functor, unsigned int const minimum_of)
   {
     uint64_t cycles = std::numeric_limits<uint64_t>::max();
-    for (int i = 0; i < number_of_runs; ++i)
+    T benchmark_code = functor;
+    for (unsigned int i = 0; i < minimum_of; ++i)
     {
       start();
-      functor();
+      for (unsigned int j = 0; j < iterations; ++j)
+        benchmark_code();
       stop();
       uint64_t ncycles = diff_cycles();
       if (ncycles < cycles)
@@ -155,20 +247,26 @@ class Stopwatch
     return cycles;
   }
 
-  template<class T>
-  eda::FrequencyCounterResult measure(T const functor)
+  // Same as above but correct for loop and stopwatch overhead (call calibrate_overhead() first!),
+  // as well as repeat calling get_minimum_of() until we are 99.9% sure which what measurement
+  // occurs most often (to get something that will reproduce extremely well).
+  template<int nk = 3, class T>
+  eda::FrequencyCounterResult measure(unsigned int iterations, T const functor, unsigned int minimum_of = 3)
   {
-    eda::FrequencyCounter<int, 3> fc;
-    while (!fc.add(get_minimum_of(1000, functor)))
+    eda::FrequencyCounter<int, nk> fc;
+    while (!fc.add(get_minimum_of(iterations, functor, minimum_of)))
       ;
     eda::FrequencyCounterResult result = fc.result();
+    Dout(dc::notice, "Measured with overhead: " << result.m_cycles);
     result.m_cycles -= s_stopwatch_overhead;
+    if (iterations == calibrated_iterations)
+      result.m_cycles -= iterations_overhead;
     if (result.m_cycles < 0)
       result.m_cycles = 0;
     return result;
   }
 
-  void calibrate_overhead();
+  void calibrate_overhead(size_t iterations, size_t minimum_of);
 };
 
 } // namespace benchmark
