@@ -29,6 +29,7 @@
 #include <string>
 #include <sstream>
 #include "debug.h"
+#include <unistd.h>                     // Needed for pipe
 #ifdef USE_LIBCW
 #include <libcw/memleak.h>		// memleak_filter
 #endif
@@ -246,6 +247,23 @@ std::string call_location(void const* return_addr)
 #endif
 
 NAMESPACE_DEBUG_END
+
+HelperPipeFDs::HelperPipeFDs()
+{
+  if (pipe(m_pipefd) == -1)
+  {
+    perror("pipe");
+    exit(1);
+  }
+}
+
+std::string DebugPipedOStringStream::str()
+{
+  std::string result{std::istreambuf_iterator<char>(ibuf()), std::istreambuf_iterator<char>()};
+  if (result.back() == '\n')
+    result.pop_back();
+  return result;
+}
 
 NAMESPACE_DEBUG_CHANNELS_START
 channel_ct tracked("TRACKED");

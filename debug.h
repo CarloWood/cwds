@@ -26,7 +26,7 @@
 /// @cond Doxygen_Suppress
 
 #include <iostream>
-#include <cstdlib>      // std::exit, EXIT_FAILURE
+#include <cstdlib>              // std::exit, EXIT_FAILURE
 
 #define AllocTag1(p)
 #define AllocTag2(p, desc)
@@ -65,6 +65,8 @@
 #endif
 
 #else // CWDEBUG
+
+#include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 
 //! Assert \a x, if debugging is turned on.
 #define ASSERT(x) LIBCWD_ASSERT(x)
@@ -226,6 +228,46 @@ class DebugBuf : public std::streambuf
       }
       return c;
     }
+};
+
+//! @brief A class that wraps a POSIX pipe(2). Helper class for DebugPipedOStringStream.
+class HelperPipeFDs
+{
+ private:
+  int m_pipefd[2];
+
+ protected:
+  HelperPipeFDs();
+
+  int fd_out() const { return m_pipefd[0]; }  // The read end of the pipe.
+  int fd_in() const { return m_pipefd[1]; }   // The write end of the pipe.
+};
+
+//! @brief A class that wraps two __gnu_cxx::stdio_filebuf<char>'s. Helper class for DebugPipedOStringStream.
+struct HelperPipeBufs : public HelperPipeFDs
+{
+ private:
+  __gnu_cxx::stdio_filebuf<char> m_obuf;  // Read from ostream, write to pipe.
+  __gnu_cxx::stdio_filebuf<char> m_ibuf;  // Read from pipe write to istream.
+
+ protected:
+  HelperPipeBufs() : m_obuf(fd_in(), std::ios::out), m_ibuf(fd_out(), std::ios::in) { }
+
+  std::streambuf* obuf() { return &m_obuf; }
+  std::streambuf* ibuf() { return &m_ibuf; }
+
+ public:
+  //! @brief Flush and close write-end of pipe. Unblocks DebugPipedOStringStream::str().
+  void close() { m_obuf.close(); }
+};
+
+class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
+{
+ public:
+  DebugPipedOStringStream() : std::ostream(obuf()) { }
+
+  //! @brief Read blocking from read-end of pipe until EOF. Call close() (after writing) to unblock.
+  std::string str();
 };
 
 #if LIBCWD_THREAD_SAFE
