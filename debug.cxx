@@ -201,12 +201,14 @@ void init()
   memleak_filter().set_flags(libcwd::show_objectfile|libcwd::show_function);
 #endif
 
-#ifndef NO_SYNC_WITH_STDIO_FALSE        // By defining this you will synchronize with the standard C streams.
+#ifdef NO_SYNC_WITH_STDIO_FALSE
+#warning "NO_SYNC_WITH_STDIO_FALSE is now the default."
+#endif
+#ifdef SYNC_WITH_STDIO_FALSE        // By defining this you will no longer synchronize with the standard C streams.
   // The following call allocates the filebuf's of cin, cout, cerr, wcin, wcout and wcerr.
   // Because this causes a memory leak being reported, make them invisible.
   Debug(set_invisible_on());
 
-  // You want this, unless you mix streams output with C output.
   // Read http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio for more information.
   std::ios::sync_with_stdio(false);
 
