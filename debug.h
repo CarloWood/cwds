@@ -103,11 +103,23 @@
 #define NAMESPACE_DEBUG_CHANNELS_START NAMESPACE_DEBUG_START namespace NAMESPACE_CHANNELS { namespace dc {
 #define NAMESPACE_DEBUG_CHANNELS_END } } NAMESPACE_DEBUG_END
 
+namespace libcwd {
+
+enum thread_init_t {
+  thread_init_default,
+  from_rcfile,
+  copy_from_main,
+  debug_off
+};
+
+} // namespace libcwd
+
 //! Debug specific code.
 NAMESPACE_DEBUG_START
 
-void init();                // Initialize debugging code, called once from main.
-void init_thread();         // Initialize debugging code, called once for each thread.
+void init();                                                                            // Initialize debugging code, called once from main.
+extern libcwd::thread_init_t thread_init_default;
+void init_thread(libcwd::thread_init_t thread_init = libcwd::thread_init_default);      // Initialize debugging code, called once for each thread.
 
 //! @brief Debug Channels (dc) namespace.
 //

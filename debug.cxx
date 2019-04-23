@@ -41,6 +41,13 @@
 pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
+namespace libcwd {
+namespace _private_ {
+// Non-const pointer - but do NOT write to it.
+extern ::libcwd::_private_::TSD_st* main_thread_tsd;
+} // namespace _private_
+} // namespace libcwd
+
 NAMESPACE_DEBUG_START
 
 // Anonymous namespace, this map and its initialization functions are private to this file
@@ -122,6 +129,9 @@ bool is_on_in_rcfile(char const* dc_label)
   return iter->second;
 }
 
+// Initialize this in main once, before starting other threads.
+libcwd::thread_init_t thread_init_default = libcwd::from_rcfile;
+
 /*! @brief Initialize debugging code from new threads.
  *
  * This function needs to be called at the start of each new thread,
@@ -132,16 +142,33 @@ bool is_on_in_rcfile(char const* dc_label)
  * Furthermore it initializes the debug ostream, its mutex and the
  * margin of the default debug object (Dout).
  */
-void init_thread()
+void init_thread(libcwd::thread_init_t thread_init)
 {
-  // Turn on all debug channels that are turned on as per rcfile configuration.
-  ForAllDebugChannels(
-      if (!debugChannel.is_on() && is_on_in_rcfile(debugChannel.get_label()))
-        debugChannel.on();
-  );
+  if (thread_init == libcwd::thread_init_default)
+    thread_init = thread_init_default;
+  if (thread_init == libcwd::from_rcfile)
+  {
+    // Turn on all debug channels that are turned on as per rcfile configuration.
+    ForAllDebugChannels(
+        if (!debugChannel.is_on() && is_on_in_rcfile(debugChannel.get_label()))
+          debugChannel.on();
+    );
+  }
+  else if (thread_init == libcwd::copy_from_main)
+  {
+    // Turn on all debug channels that are turned on in the main thread.
+    ForAllDebugChannels(
+        if (!debugChannel.is_on(*libcwd::_private_::main_thread_tsd))
+          debugChannel.on();
+    );
+  }
 
-  // Turn on debug output.
-  Debug( libcw_do.on() );
+  if (thread_init != libcwd::debug_off)
+  {
+    // Turn on debug output.
+    Debug( libcw_do.on() );
+  }
+
 #if LIBCWD_THREAD_SAFE
   Debug( libcw_do.set_ostream(&std::cout, &cout_mutex) );
 #else
