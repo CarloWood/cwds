@@ -44,6 +44,7 @@ pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
 namespace libcwd {
 namespace _private_ {
 // Non-const pointer - but do NOT write to it.
+// main_thread_tsd is defined in libcwd v1.1.1 and higher (libcwd.so.5.1), or see libcwd github (added 23 apr 2019).
 extern ::libcwd::_private_::TSD_st* main_thread_tsd;
 } // namespace _private_
 } // namespace libcwd
