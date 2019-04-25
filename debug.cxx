@@ -143,7 +143,7 @@ libcwd::thread_init_t thread_init_default = libcwd::from_rcfile;
  * Furthermore it initializes the debug ostream, its mutex and the
  * margin of the default debug object (Dout).
  */
-void init_thread(libcwd::thread_init_t thread_init)
+void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
 {
   if (thread_init == libcwd::thread_init_default)
     thread_init = thread_init_default;
@@ -177,14 +177,21 @@ void init_thread(libcwd::thread_init_t thread_init)
 #endif
 
   static bool first_thread = true;
-  if (!first_thread)			// So far, the application has only one thread.  So don't add a thread id.
+  if (!thread_name.empty())
   {
-    std::stringstream margin;
+    std::string margin = thread_name.substr(0, 15) + std::string(16 - std::min(15UL, thread_name.length()), ' ');
+    Dout(dc::notice, "Thread started. Setting debug margin to \"" << margin << "\".");
+    Debug(libcw_do.margin().assign(margin));
+    pthread_setname_np(pthread_self(), thread_name.c_str());
+  }
+  else if (!first_thread)			// So far, the application has only one thread.  So don't add a thread id.
+  {
+    std::ostringstream margin;
     union { pthread_t pt; size_t size; } convert;
     convert.pt = pthread_self();
     // Set the thread id in the margin.
     margin << std::hex << std::setw(12) << convert.size << ' ';
-    Debug( libcw_do.margin().assign(margin.str()) );
+    Debug(libcw_do.margin().assign(margin.str()));
   }
   first_thread = false;
 }
