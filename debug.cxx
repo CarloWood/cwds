@@ -39,7 +39,6 @@
 
 #if LIBCWD_THREAD_SAFE
 pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
 
 namespace libcwd {
 namespace _private_ {
@@ -48,6 +47,7 @@ namespace _private_ {
 extern ::libcwd::_private_::TSD_st* main_thread_tsd;
 } // namespace _private_
 } // namespace libcwd
+#endif
 
 NAMESPACE_DEBUG_START
 
@@ -155,6 +155,7 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
           debugChannel.on();
     );
   }
+#if LIBCWD_THREAD_SAFE
   else if (thread_init == libcwd::copy_from_main)
   {
     // Turn on all debug channels that are turned on in the main thread.
@@ -163,6 +164,7 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
           debugChannel.on();
     );
   }
+#endif
 
   if (thread_init != libcwd::debug_off)
   {
@@ -182,7 +184,9 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
     std::string margin = thread_name.substr(0, 15) + std::string(16 - std::min(15UL, thread_name.length()), ' ');
     Dout(dc::notice, "Thread started. Setting debug margin to \"" << margin << "\".");
     Debug(libcw_do.margin().assign(margin));
+#if LIBCWD_THREAD_SAFE
     pthread_setname_np(pthread_self(), thread_name.c_str());
+#endif
   }
   else if (!first_thread)			// So far, the application has only one thread.  So don't add a thread id.
   {
