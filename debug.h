@@ -54,13 +54,19 @@
 
 /// @endcond
 
-#define DEBUG_ONLY(...)
-#define COMMA_DEBUG_ONLY(...)
+//! Remove arguments of these macros when CWDEBUG is not defined.
+#define CWDEBUG_ONLY(...)
+#define COMMA_CWDEBUG_ONLY(...)
+
+#ifdef DEBUG
+//! Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
+#define CW_DEBUG 1
 
 #include <cassert>
-#ifdef DEBUG
 #define ASSERT(x) assert(x)
+
 #else
+#define CW_DEBUG 0
 #define ASSERT(x) do { } while(0)
 #endif
 
@@ -68,14 +74,17 @@
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 
+//! Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
+#define CW_DEBUG 1
+
 //! Assert \a x, if debugging is turned on.
 #define ASSERT(x) LIBCWD_ASSERT(x)
 
 //! Insert debug code, only when debugging.
-#define DEBUG_ONLY(...) __VA_ARGS__
+#define CWDEBUG_ONLY(...) __VA_ARGS__
 
 //! Insert a comma followed by debug code, only when debugging.
-#define COMMA_DEBUG_ONLY(...) , __VA_ARGS__
+#define COMMA_CWDEBUG_ONLY(...) , __VA_ARGS__
 
 #ifndef NAMESPACE_DEBUG
 #define NAMESPACE_DEBUG debug
@@ -320,5 +329,17 @@ extern pthread_mutex_t cout_mutex;
   NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
 
 #endif // CWDEBUG
+
+#if CW_DEBUG
+
+#define DEBUG_ONLY(...) __VA_ARGS__
+#define COMMA_DEBUG_ONLY(...) , __VA_ARGS__
+
+#else
+
+#define DEBUG_ONLY(...)
+#define COMMA_DEBUG_ONLY(...)
+
+#endif
 
 #include "debug_ostream_operators.h"

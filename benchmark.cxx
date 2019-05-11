@@ -121,7 +121,7 @@ Stopwatch::~Stopwatch()
   {
     // Restore CPU affinity.
     size_t const cpu_set_size = CPU_ALLOC_SIZE(number_of_cpus);
-    DEBUG_ONLY(int err_num =) pthread_setaffinity_np(pthread_self(), cpu_set_size, m_cpuset);
+    CWDEBUG_ONLY(int err_num =) pthread_setaffinity_np(pthread_self(), cpu_set_size, m_cpuset);
     Dout(dc::warning(err_num), "Failed to restore cpu affinity.");
     CPU_FREE(m_cpuset);
   }
