@@ -185,7 +185,7 @@ class Stopwatch
   //   serializing instruction and a serializing instruction cannot pass any other instruction (read, write, instruction fetch,
   //   or I/O). For example, CPUID can be executed at any privilege level to serialize instruction execution with no effect
   //   on program flow, except that the EAX, EBX, ECX, and EDX registers are modified.
-  void start() __attribute__((__always_inline__))
+  [[gnu::always_inline]] void start()
   {
     asm volatile (
         "lfence\n\t"            // Finish all previous code locally, specifically all loads from memory.
@@ -201,7 +201,7 @@ class Stopwatch
   //
   // The RDTSCP instruction waits until all previous instructions have been executed before reading the counter.
   // However, subsequent instructions may begin execution before the read operation is performed.
-  void stop() __attribute__((__always_inline__))
+  [[gnu::always_inline]] void stop()
   {
     asm volatile (
         "rdtscp"                // Read Time Stamp Clock register after all previous code finished.
