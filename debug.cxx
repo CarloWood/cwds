@@ -160,7 +160,7 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
   {
     // Turn on all debug channels that are turned on in the main thread.
     ForAllDebugChannels(
-        if (!debugChannel.is_on(*libcwd::_private_::main_thread_tsd))
+        if (!debugChannel.is_on() && debugChannel.is_on(*libcwd::_private_::main_thread_tsd))
           debugChannel.on();
     );
   }
