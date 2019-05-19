@@ -163,6 +163,8 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
         if (!debugChannel.is_on() && debugChannel.is_on(*libcwd::_private_::main_thread_tsd))
           debugChannel.on();
     );
+    if (!libcwd::libcw_do.is_on(*libcwd::_private_::main_thread_tsd))
+      thread_init = libcwd::debug_off;
   }
 #endif
 
