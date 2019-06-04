@@ -237,15 +237,15 @@ class DebugBuf : public std::streambuf
     {
       if (c != traits_type::eof())
       {
-	if (c == '\n')
-	{
-	  Dout(dc::finish, "\e[42m\\n\e[0m");
-	  Dout(dc::notice|continued_cf, "");
-	}
-	else
-	{
-	  Dout(dc::continued, "\e[42m" << (char)c << "\e[0m");
-	}
+        if (c == '\n')
+        {
+          Dout(dc::finish, "\e[42m\\n\e[0m");
+          Dout(dc::notice|continued_cf, "");
+        }
+        else
+        {
+          Dout(dc::continued, "\e[42m" << (char)c << "\e[0m");
+        }
       }
       return c;
     }
@@ -313,20 +313,58 @@ extern pthread_mutex_t cout_mutex;
         on = (__libcwd_channel_set|cntrl).on;                                                                           \
       }                                                                                                                 \
       if (on)                                                                                                           \
-	do                                                                                                              \
-	{														\
-	  LIBCWD_ASSERT_NOT_INTERNAL;                                                                                   \
-	  LIBCWD_LibcwDoutScopeBegin_MARKER;                                                                            \
-	  ::libcwd::debug_ct& __libcwd_debug_object(::libcwd::libcw_do);                                                \
-	  LIBCWD_DO_TSD(__libcwd_debug_object).start(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);	\
-	  LibcwDoutStream << "Entering " << data;                                    				        \
-	  LIBCWD_DO_TSD(__libcwd_debug_object).finish(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);    \
-	} while(0);													\
+        do                                                                                                              \
+        {                                                                                                               \
+          LIBCWD_ASSERT_NOT_INTERNAL;                                                                                   \
+          LIBCWD_LibcwDoutScopeBegin_MARKER;                                                                            \
+          ::libcwd::debug_ct& __libcwd_debug_object(::libcwd::libcw_do);                                                \
+          LIBCWD_DO_TSD(__libcwd_debug_object).start(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);     \
+          LibcwDoutStream << "Entering " << data;                                                                       \
+          LIBCWD_DO_TSD(__libcwd_debug_object).finish(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);    \
+        } while(0);                                                                                                     \
       else                                                                                                              \
-        __cwds_debug_indentation = 0;                                                                    		\
+        __cwds_debug_indentation = 0;                                                                                   \
     }                                                                                                                   \
   }                                                                                                                     \
   NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
+
+// Allow printing of template parameter packs.
+//
+// Usage: Dout(dc::notice, join(" + ", args...));
+//
+// Which would print, for three arguments: "arg0 + arg1 + arg2".
+//
+
+#include <tuple>
+
+template<typename ...Args>
+struct Join
+{
+  char const* m_separator;
+  std::tuple<Args const&...> m_args;
+  Join(char const* separator, Args const&... args) : m_separator(separator), m_args(args...) { }
+  template<size_t ...I> void print_on(std::ostream& os, std::index_sequence<I...>);
+};
+
+template<typename ...Args>
+template<size_t ...I>
+void Join<Args...>::print_on(std::ostream& os, std::index_sequence<I...>)
+{
+  (..., (os << (I == 0 ? "" : m_separator) << std::get<I>(m_args)));
+}
+
+template<typename ...Args>
+std::ostream& operator<<(std::ostream& os, Join<Args...> comm)
+{
+  comm.print_on(os, std::make_index_sequence<sizeof...(Args)>());
+  return os;
+}
+
+template<typename ...Args>
+Join<Args...> join(char const* separator, Args const&... args)
+{
+  return { separator, args... };
+}
 
 #endif // CWDEBUG
 
