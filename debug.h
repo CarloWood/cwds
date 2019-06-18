@@ -123,12 +123,15 @@ enum thread_init_t {
 
 } // namespace libcwd
 
+#include <atomic>       // atomic_bool
+
 //! Debug specific code.
 NAMESPACE_DEBUG_START
 
 void init();                                                                            // Initialize debugging code, called once from main.
 extern libcwd::thread_init_t thread_init_default;
 void init_thread(std::string thread_name = "", libcwd::thread_init_t thread_init = libcwd::thread_init_default);      // Initialize debugging code, called once for each thread.
+extern std::atomic_bool threads_created;
 
 //! @brief Debug Channels (dc) namespace.
 //

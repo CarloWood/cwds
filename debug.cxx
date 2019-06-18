@@ -132,6 +132,7 @@ bool is_on_in_rcfile(char const* dc_label)
 
 // Initialize this in main once, before starting other threads.
 libcwd::thread_init_t thread_init_default = libcwd::from_rcfile;
+std::atomic_bool threads_created;
 
 /*! @brief Initialize debugging code from new threads.
  *
@@ -198,6 +199,7 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
     // Set the thread id in the margin.
     margin << std::hex << std::setw(12) << convert.size << ' ';
     Debug(libcw_do.margin().assign(margin.str()));
+    threads_created = true;
   }
   first_thread = false;
 }
