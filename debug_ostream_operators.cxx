@@ -36,7 +36,9 @@ std::ostream& operator<<(std::ostream& os, timeval const& time)
   return os << "{tv_sec:" << time.tv_sec << ", tv_usec:" << time.tv_usec << '}';
 }
 
-std::ostream& operator<<(std::ostream& os, NAMESPACE_DEBUG::PosixMode posix_mode)
+NAMESPACE_DEBUG_START
+
+std::ostream& operator<<(std::ostream& os, PosixMode posix_mode)
 {
   int pm = posix_mode.m_posix_mode;
 
@@ -87,5 +89,7 @@ std::ostream& operator<<(std::ostream& os, NAMESPACE_DEBUG::PosixMode posix_mode
     os << "|O_TRUNC";
   return os;
 }
+
+NAMESPACE_DEBUG_END
 
 #endif // CWDEBUG

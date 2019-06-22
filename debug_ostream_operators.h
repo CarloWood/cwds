@@ -59,13 +59,13 @@ struct PosixMode
   PosixMode(int posix_mode) : m_posix_mode(posix_mode) { }
 };
 
-NAMESPACE_DEBUG_END
+std::ostream& operator<<(std::ostream& os, PosixMode posix_mode);
 
-extern std::ostream& operator<<(std::ostream& os, NAMESPACE_DEBUG::PosixMode posix_mode);
+NAMESPACE_DEBUG_END
 
 struct timeval;
 
-extern std::ostream& operator<<(std::ostream& os, timeval const& time);                         //!< Print debug info for timeval instance \a time.
+std::ostream& operator<<(std::ostream& os, timeval const& time);                         //!< Print debug info for timeval instance \a time.
 
 #ifdef USE_LIBBOOST
 //! Print debug info for boost::shared_ptr&lt;T&gt;.
