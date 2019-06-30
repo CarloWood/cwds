@@ -185,8 +185,8 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
   if (!thread_name.empty())
   {
     std::string margin = thread_name.substr(0, 15) + std::string(16 - std::min(15UL, thread_name.length()), ' ');
-    Dout(dc::notice, "Thread started. Setting debug margin to \"" << margin << "\".");
     Debug(libcw_do.margin().assign(margin));
+    Dout(dc::notice, "Thread started. Set debug margin to \"" << margin << "\".");
 #if LIBCWD_THREAD_SAFE
     pthread_setname_np(pthread_self(), thread_name.c_str());
 #endif
