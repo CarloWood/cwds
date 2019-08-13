@@ -11,3 +11,5 @@ AC_SUBST(CW_EXTRA_CWDS_R_LIBS)
 if ! pkg-config --print-errors --atleast-version="1.1.1" libcwd_r; then
   AC_MSG_ERROR([Please upgrade libcwd.])
 fi
+
+dnl vim: filetype=config
