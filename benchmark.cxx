@@ -187,6 +187,13 @@ void Stopwatch::calibrate_overhead(size_t iterations, size_t minimum_of)
   }
 }
 
+std::ostream& operator<<(std::ostream& os, Stopwatch const& stopwatch)
+{
+  uint64_t diff_cycles = stopwatch.diff_cycles();
+  os << (diff_cycles / 3612059.050) << " ms";
+  return os;
+}
+
 // A value of zero means 'uninitialized' (it is impossible that the overhead is zero).
 int Stopwatch::s_stopwatch_overhead;
 

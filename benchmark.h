@@ -267,6 +267,8 @@ class Stopwatch
   }
 
   void calibrate_overhead(size_t iterations, size_t minimum_of);
+
+  friend std::ostream& operator<<(std::ostream& os, Stopwatch const& stopwatch);
 };
 
 } // namespace benchmark

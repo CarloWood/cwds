@@ -79,7 +79,9 @@ class Plot
   std::string m_header;
   std::mutex m_mutex;
   std::map<std::string, std::vector<boost::tuple<double, double, double>>> m_map;
+  std::vector<std::string> m_functions;
   std::vector<std::string> m_cmds;
+  std::vector<std::string> m_append;
   double m_x_min;
   double m_x_max;
   double m_y_min;
@@ -102,6 +104,8 @@ class Plot
 
   bool has_data() const { return !m_map.empty(); }
   void add(std::string const& str) { m_cmds.push_back(str); }
+  void append(std::string const str) { m_append.push_back(str); }
+  void function(std::string const str) { m_functions.push_back(str); }
   size_t points(std::string key) const { auto iter = m_map.find(key); return iter == m_map.end() ? 0 : iter->second.size(); }
 
   void show(std::string with = "")
@@ -131,9 +135,16 @@ class Plot
       gp << " title '" << e.first << "'";
       separator = ", ";
     }
+    for (auto&& e : m_functions)
+    {
+      gp << separator << e;
+    }
     gp << '\n';
     for (auto&& e : m_map)
       gp.send1d(e.second);
+    gp << '\n';
+    for (auto&& s : m_append)
+      gp << s << '\n';
     Dout(dc::finish|flush_cf, "done");
   }
 };
