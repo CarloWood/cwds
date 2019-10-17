@@ -156,7 +156,7 @@ class PlotHistogram : public Plot
   MinAvgMax<double> m_mam;
 
  public:
-  PlotHistogram(std::string title, std::string xlabel, std::string ylabel, int bucket_width = 1) : Plot(title, xlabel, ylabel), m_bucket_width(bucket_width) { }
+  PlotHistogram(std::string title, std::string xlabel, std::string ylabel, double bucket_width = 1) : Plot(title, xlabel, ylabel), m_bucket_width(bucket_width) { }
 
   template<typename T>
   void show(FrequencyCounter<T> const& frequence_counter, char const* key = "data")
