@@ -78,7 +78,7 @@ class Plot
   std::string m_ylabel;
   std::string m_header;
   std::mutex m_mutex;
-  std::map<std::string, std::vector<boost::tuple<double, double, double>>> m_map;
+  std::map<std::string, std::vector<std::tuple<double, double, double>>> m_map;
   std::vector<std::string> m_functions;
   std::vector<std::string> m_cmds;
   std::vector<std::string> m_append;
