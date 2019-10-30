@@ -132,7 +132,7 @@ bool is_on_in_rcfile(char const* dc_label)
 
 // Initialize this in main once, before starting other threads.
 libcwd::thread_init_t thread_init_default = libcwd::from_rcfile;
-std::atomic_bool threads_created;
+std::atomic_bool threads_created = ATOMIC_VAR_INIT(false);
 
 /*! @brief Initialize debugging code from new threads.
  *
