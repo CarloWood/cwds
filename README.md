@@ -6,6 +6,8 @@ providing standard-ish support code for applications that use [libcwd](https://g
 It provides the following features,
 * defines all libcwd debug macros as empty (with the exception of <tt>LibcwDoutFatal</tt>) when not compiling with debug support.
 * defines the extra helper macros:
+  * <tt>CWDEBUG_ONLY(...)</tt>
+  * <tt>COMMA_CWDEBUG_ONLY(...)</tt>
   * <tt>DEBUG_ONLY(...)</tt>
   * <tt>COMMA_DEBUG_ONLY(...)</tt>
   * <tt>ASSERT(expr)</tt>
@@ -19,18 +21,21 @@ It provides the following features,
   * <tt>NAMESPACE_DEBUG_CHANNELS_END</tt>
   * <tt>DoutEntering</tt>
 * Declares initialization functions for libcwd to be called from the top of <tt>main</tt> and the start of threads.
-* Provides a function to turn an address into a string with filename and line number.
-* Defines exception safe struct for indenting debug output (<tt>Indent</tt>) and making temporarily making allocation invisible (<tt>InvisibleAllocations</tt>).
-* Defines a streambuf class that can be used to turn background color of all debug output green.
 * Defines a global mutex to be used for <tt>std::cout</tt> (if you want output to std::cout not to interfer with debug output).
+* Defines a class tracked::Tracked<&name> that can be used to
+  track proper use of move/copy constructors and assignment operators.
+* Provides a function to turn an address into a string with filename and line number.
+* Provides code for benchmarking (declared in <tt>cwds/benchmark.h</tt>).
+* Support for plotting graphs (using gnuplot).
+* Defines exception safe struct for indenting debug output (<tt>Indent</tt>) and making temporarily making allocation invisible (<tt>InvisibleAllocations</tt>).
+* Provides a function to print simple variables from a signal handler (<tt>cwds/signal_safe_printf.h</tt>).
+* Defines a streambuf class that can be used to turn background color of all debug output green.
 * Defines ostream serializers for many types to pretty-print them easily to a debug stream, like
   * <tt>timeval</tt>
   * <tt>boost::shared_ptr&lt;T&gt;</tt>
   * <tt>boost::weak_ptr&lt;T&gt;</tt>
   * <tt>std::pair&lt;T1, T2&gt;</tt>
   * <tt>std::map&lt;T1, T2, T3&gt;</tt>
-* Defines a class tracked::Tracked<&name> that can be used to
-  track proper use of move/copy constructors and assignment operators.
 
 ## Checking out a project that uses the cwds submodule.
 
@@ -203,3 +208,6 @@ Finally, run
 </pre>
 
 to let cwm4 do its magic, and commit all the changes.
+
+There is a tutorial video on youtube that shows how to set up a project with
+cwds and libcwd [here](https://www.youtube.com/watch?v=53wWV0wqOMA&list=PLJzCXkV5Y8Ze6TtQWQSH6w5J-e-yIhgzP&index=2).
