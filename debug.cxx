@@ -69,7 +69,7 @@ using rcfile_dc_states_type = std::map<std::string, bool>;
  */
 rcfile_dc_states_type rcfile_dc_states;
 
-/*! @brief Set the default state of debug channel \a dc_label.
+/*! @brief Set the default state of debug channel @a dc_label.
  * @internal
  *
  * This function is called once for each debug channel.
@@ -110,12 +110,12 @@ void save_dc_states()
 /*! @brief Returns the the original state of a debug channel.
  * @internal
  *
- * For a given \a dc_label, which must be the exact name (<tt>channel_ct::get_label</tt>) of an
- * existing debug channel, this function returns \c true when the corresponding debug channel was
+ * For a given @a dc_label, which must be the exact name (<tt>channel_ct::get_label</tt>) of an
+ * existing debug channel, this function returns @c true when the corresponding debug channel was
  * <em>on</em> at the startup of the application, directly after reading the libcwd runtime
  * configuration file (.libcwdrc).
  *
- * If the label/channel did not exist at the start of the application, it will return \c false
+ * If the label/channel did not exist at the start of the application, it will return @c false
  * (note that libcwd disallows adding debug channels to modules - so this would probably
  * a bug).
  */

@@ -77,7 +77,7 @@
 //! Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
 #define CW_DEBUG 1
 
-//! Assert \a x, if debugging is turned on.
+//! Assert @a x, if debugging is turned on.
 #define ASSERT(x) LIBCWD_ASSERT(x)
 
 //! Insert debug code, only when debugging.
@@ -97,11 +97,11 @@
 #endif
 
 #ifndef DEBUGCHANNELS
-//! @brief The namespace in which the \c dc namespace is declared.
+//! @brief The namespace in which the @c dc namespace is declared.
 //
 // <A HREF="http://libcwd.sourceforge.net/">Libcwd</A> demands that this macro is defined
 // before <libcwd/debug.h> is included and must be the name of the namespace containing
-// the \c dc (Debug Channels) namespace.
+// the @c dc (Debug Channels) namespace.
 //
 // @sa debug::channels::dc
 #define DEBUGCHANNELS ::NAMESPACE_DEBUG::NAMESPACE_CHANNELS
@@ -157,7 +157,7 @@ std::string call_location(void const* return_addr);
 //
 // Creation of the object does nothing, you have to explicitly call
 // InvisibleAllocations::on.  Destruction of the object automatically
-// cancels any call to \c on of this object.  This makes it exception-
+// cancels any call to @c on of this object.  This makes it exception-
 // (stack unwinding) and recursive-safe.
 struct InvisibleAllocations {
   int M_on;             //!< The number of times that InvisibleAllocations::on() was called.
@@ -300,7 +300,7 @@ extern pthread_mutex_t cout_mutex;
 
 //! Debugging macro.
 //
-// Print "Entering " << \a data to channel \a cntrl and increment
+// Print "Entering " << @a data to channel @a cntrl and increment
 // debugging output indentation until the end of the current scope.
 #define DoutEntering(cntrl, data) \
   int __cwds_debug_indentation = 2;                                                                                     \

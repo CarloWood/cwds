@@ -65,7 +65,7 @@ NAMESPACE_DEBUG_END
 
 struct timeval;
 
-std::ostream& operator<<(std::ostream& os, timeval const& time);                         //!< Print debug info for timeval instance \a time.
+std::ostream& operator<<(std::ostream& os, timeval const& time);                         //!< Print debug info for timeval instance @a time.
 
 #ifdef USE_LIBBOOST
 //! Print debug info for boost::shared_ptr&lt;T&gt;.
@@ -88,7 +88,7 @@ std::ostream& operator<<(std::ostream& os, boost::weak_ptr<T> const& data)
 }
 #endif // USE_LIBBOOST
 
-//! Print debug info for std::pair&lt;&gt; instance \a data.
+//! Print debug info for std::pair&lt;&gt; instance @a data.
 template<typename T1, typename T2>
 std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data)
 {
