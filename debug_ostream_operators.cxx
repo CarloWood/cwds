@@ -30,7 +30,7 @@
 #include <fcntl.h>
 #include "debug.h"
 
-//! For debugging purposes. Write a timeval to @a os.
+/// For debugging purposes. Write a timeval to @a os.
 std::ostream& operator<<(std::ostream& os, timeval const& time)
 {
   return os << "{tv_sec:" << time.tv_sec << ", tv_usec:" << time.tv_usec << '}';

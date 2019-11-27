@@ -55,12 +55,16 @@ NAMESPACE_DEBUG_START
 // for Thead-safeness reasons.
 namespace {
 
-/*! @brief The type of rcfile_dc_states.
+/**
+ * The type of rcfile_dc_states.
+ *
  * @internal
  */
 using rcfile_dc_states_type = std::map<std::string, bool>;
 
-/*! @brief Map containing the default debug channel states used at the start of each new thread.
+/**
+ * Map containing the default debug channel states used at the start of each new thread.
+ *
  * @internal
  *
  * The first thread calls main, which calls NAMESPACE_DEBUG::init which will initialize this
@@ -69,7 +73,9 @@ using rcfile_dc_states_type = std::map<std::string, bool>;
  */
 rcfile_dc_states_type rcfile_dc_states;
 
-/*! @brief Set the default state of debug channel @a dc_label.
+/**
+ * Set the default state of debug channel @a dc_label.
+ *
  * @internal
  *
  * This function is called once for each debug channel.
@@ -83,7 +89,9 @@ void set_state(char const* dc_label, bool is_on)
   return;
 }
 
-/*! @brief Save debug channel states.
+/**
+ * Save debug channel states.
+ *
  * @internal
  *
  * One time initialization function of rcfile_dc_state.
@@ -107,7 +115,9 @@ void save_dc_states()
 
 } // anonymous namespace
 
-/*! @brief Returns the the original state of a debug channel.
+/**
+ * Returns the the original state of a debug channel.
+ *
  * @internal
  *
  * For a given @a dc_label, which must be the exact name (<tt>channel_ct::get_label</tt>) of an
@@ -134,7 +144,8 @@ bool is_on_in_rcfile(char const* dc_label)
 libcwd::thread_init_t thread_init_default = libcwd::from_rcfile;
 std::atomic_bool threads_created = ATOMIC_VAR_INIT(false);
 
-/*! @brief Initialize debugging code from new threads.
+/**
+ * Initialize debugging code from new threads.
  *
  * This function needs to be called at the start of each new thread,
  * because a new thread starts in a completely reset state.
@@ -204,7 +215,8 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
   first_thread = false;
 }
 
-/*! @brief Initialize debugging code from main.
+/**
+ * Initialize debugging code from main.
  *
  * This function initializes the debug code.
  */
@@ -278,7 +290,8 @@ void init()
 }
 
 #if CWDEBUG_LOCATION
-/*! @brief Return call location.
+/**
+ * Return call location.
  *
  * @param return_addr The return address of the call.
  */

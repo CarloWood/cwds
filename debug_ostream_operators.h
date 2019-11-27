@@ -51,7 +51,7 @@ inline char const* type_name_of()
 #endif
 }
 
-// Use to print human readable form of a POSIX mode (see man 2 open).
+/// Use to print human readable form of a POSIX mode (see man 2 open).
 struct PosixMode
 {
   int m_posix_mode;
@@ -65,10 +65,11 @@ NAMESPACE_DEBUG_END
 
 struct timeval;
 
-std::ostream& operator<<(std::ostream& os, timeval const& time);                         //!< Print debug info for timeval instance @a time.
+/// Print debug info for timeval instance @a time.
+std::ostream& operator<<(std::ostream& os, timeval const& time);
 
 #ifdef USE_LIBBOOST
-//! Print debug info for boost::shared_ptr&lt;T&gt;.
+/// Print debug info for boost::shared_ptr&lt;T&gt;.
 template<typename T>
 std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
 {
@@ -80,7 +81,7 @@ std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
   return os << "})";
 }
 
-//! Print debug info for boost::weak_ptr&lt;T&gt;.
+/// Print debug info for boost::weak_ptr&lt;T&gt;.
 template<typename T>
 std::ostream& operator<<(std::ostream& os, boost::weak_ptr<T> const& data)
 {
@@ -88,14 +89,14 @@ std::ostream& operator<<(std::ostream& os, boost::weak_ptr<T> const& data)
 }
 #endif // USE_LIBBOOST
 
-//! Print debug info for std::pair&lt;&gt; instance @a data.
+/// Print debug info for std::pair&lt;&gt; instance @a data.
 template<typename T1, typename T2>
 std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data)
 {
   return os << "{first:" << data.first << ", second:" << data.second << '}';
 }
 
-//! Print a whole map.
+/// Print a whole map.
 template<typename T1, typename T2, typename T3>
 std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
 {

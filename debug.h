@@ -54,12 +54,12 @@
 
 /// @endcond
 
-//! Remove arguments of these macros when CWDEBUG is not defined.
+/// Remove arguments of these macros when CWDEBUG is not defined.
 #define CWDEBUG_ONLY(...)
 #define COMMA_CWDEBUG_ONLY(...)
 
 #ifdef DEBUG
-//! Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
+/// Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
 #define CW_DEBUG 1
 
 #include <cassert>
@@ -74,16 +74,16 @@
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 
-//! Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
+/// Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
 #define CW_DEBUG 1
 
-//! Assert @a x, if debugging is turned on.
+/// Assert @a x, if debugging is turned on.
 #define ASSERT(x) LIBCWD_ASSERT(x)
 
-//! Insert debug code, only when debugging.
+/// Insert debug code, only when debugging.
 #define CWDEBUG_ONLY(...) __VA_ARGS__
 
-//! Insert a comma followed by debug code, only when debugging.
+/// Insert a comma followed by debug code, only when debugging.
 #define COMMA_CWDEBUG_ONLY(...) , __VA_ARGS__
 
 #ifndef NAMESPACE_DEBUG
@@ -97,13 +97,15 @@
 #endif
 
 #ifndef DEBUGCHANNELS
-//! @brief The namespace in which the @c dc namespace is declared.
-//
-// <A HREF="http://libcwd.sourceforge.net/">Libcwd</A> demands that this macro is defined
-// before <libcwd/debug.h> is included and must be the name of the namespace containing
-// the @c dc (Debug Channels) namespace.
-//
-// @sa debug::channels::dc
+/**
+ * The namespace in which the @c dc namespace is declared.
+ *
+ * <A HREF="http://libcwd.sourceforge.net/">Libcwd</A> demands that this macro is defined
+ * before <libcwd/debug.h> is included and must be the name of the namespace containing
+ * the @c dc (Debug Channels) namespace.
+ *
+ * @sa debug::channels::dc
+ */
 #define DEBUGCHANNELS ::NAMESPACE_DEBUG::NAMESPACE_CHANNELS
 #endif
 
@@ -125,7 +127,7 @@ enum thread_init_t {
 
 #include <atomic>       // atomic_bool
 
-//! Debug specific code.
+/// Debug specific code.
 NAMESPACE_DEBUG_START
 
 void init();                                                                            // Initialize debugging code, called once from main.
@@ -133,12 +135,14 @@ extern libcwd::thread_init_t thread_init_default;
 void init_thread(std::string thread_name = "", libcwd::thread_init_t thread_init = libcwd::thread_init_default);      // Initialize debugging code, called once for each thread.
 extern std::atomic_bool threads_created;
 
-//! @brief Debug Channels (dc) namespace.
-//
-// @sa debug::channels::dc
+/**
+ * Debug Channels (dc) namespace.
+ *
+ * @sa debug::channels::dc
+ */
 namespace NAMESPACE_CHANNELS {
 
-//! The namespace containing the actual debug channels.
+/// The namespace containing the actual debug channels.
 namespace dc {
 using namespace libcwd::channels::dc;
 using libcwd::channel_ct;
@@ -153,46 +157,64 @@ using libcwd::channel_ct;
 std::string call_location(void const* return_addr);
 #endif
 
-//! @brief Interface for marking scopes of invisible memory allocations.
-//
-// Creation of the object does nothing, you have to explicitly call
-// InvisibleAllocations::on.  Destruction of the object automatically
-// cancels any call to @c on of this object.  This makes it exception-
-// (stack unwinding) and recursive-safe.
-struct InvisibleAllocations {
-  int M_on;             //!< The number of times that InvisibleAllocations::on() was called.
-  //! Constructor.
+/**
+ * Interface for marking scopes of invisible memory allocations.
+ *
+ * Creation of the object does nothing, you have to explicitly call
+ * InvisibleAllocations::on. Destruction of the object automatically
+ * cancels any call to @c{on()} of this object. This makes it exception-
+ * (stack unwinding) and recursive-safe.
+ */
+struct InvisibleAllocations
+{
+  /// The number of times that InvisibleAllocations::on() was called.
+  int M_on;
+
+  /// Constructor.
   InvisibleAllocations() : M_on(0) { }
-  //! Destructor.
+
+  /// Destructor.
   ~InvisibleAllocations() { while (M_on > 0) off(); }
-  //! Set invisible allocations on. Can be called recursively.
+
+  /// Set invisible allocations on. Can be called recursively.
   void on() { libcwd::set_invisible_on(); ++M_on; }
-  //! Cancel one call to on().
+
+  /// Cancel one call to on().
   void off() { assert(M_on > 0); --M_on; libcwd::set_invisible_off(); }
 };
 
-//! @brief Interface for marking scopes with indented debug output.
-//
-// Creation of the object increments the debug indentation. Destruction
-// of the object automatically decrements the indentation again.
-struct Indent {
-  int M_indent;                 //!< The extra number of spaces that were added to the indentation.
-  //! Construct an Indent object.
+/**
+ * Interface for marking scopes with indented debug output.
+ *
+ * Creation of the object increments the debug indentation. Destruction
+ * of the object automatically decrements the indentation again.
+ */
+struct Indent
+{
+  /// The extra number of spaces that were added to the indentation.
+  int M_indent;
+
+  /// Construct an Indent object.
   Indent(int indent) : M_indent(indent) { if (M_indent > 0) libcwd::libcw_do.inc_indent(M_indent); }
-  //! Destructor.
+
+  /// Destructor.
   ~Indent() { if (M_indent > 0) libcwd::libcw_do.dec_indent(M_indent); }
 };
 
-//! @brief Interface for marking scopes with a marker character.
-//
-// Creation of the object appends the character and a space to
-// the current marker after first adding the current indentation
-// to it as spaces, and sets the indentation to zero. Destruction
-// restores things again.
+/**
+ * Interface for marking scopes with a marker character.
+ *
+ * Creation of the object appends the character and a space to
+ * the current marker after first adding the current indentation
+ * to it as spaces, and sets the indentation to zero. Destruction
+ * restores things again.
+ */
 struct Mark
 {
-  int M_indent;                 //!< The old indentation.
-  //! Construct a Mark object.
+  /// The old indentation.
+  int M_indent;
+
+  /// Construct a Mark object.
   Mark(char m = '|') : M_indent(libcwd::libcw_do.get_indent())
   {
     libcwd::libcw_do.push_marker();
@@ -207,8 +229,10 @@ struct Mark
     // This is basically a decrement of M_indent.
     libcwd::libcw_do.set_indent(0);
   }
-  //! Destructor.
+
+  /// Destructor.
   ~Mark() { end(); }
+
   void end()
   {
     if (M_indent != -1)
@@ -228,7 +252,7 @@ NAMESPACE_DEBUG_CHANNELS_START
 extern channel_ct system;
 NAMESPACE_DEBUG_CHANNELS_END
 
-//! @brief A debug streambuf that prints characters written to it with a green background.
+/// A debug streambuf that prints characters written to it with a green background.
 class DebugBuf : public std::streambuf
 {
   public:
@@ -254,7 +278,7 @@ class DebugBuf : public std::streambuf
     }
 };
 
-//! @brief A class that wraps a POSIX pipe(2). Helper class for DebugPipedOStringStream.
+/// A class that wraps a POSIX pipe(2). Helper class for DebugPipedOStringStream.
 class HelperPipeFDs
 {
  private:
@@ -267,7 +291,10 @@ class HelperPipeFDs
   int fd_in() const { return m_pipefd[1]; }   // The write end of the pipe.
 };
 
-//! @brief A class that wraps two __gnu_cxx::stdio_filebuf<char>'s. Helper class for DebugPipedOStringStream.
+/** A class that wraps two __gnu_cxx::stdio_filebuf<char>'s.
+ *
+ * Helper class for DebugPipedOStringStream.
+ */
 struct HelperPipeBufs : public HelperPipeFDs
 {
  private:
@@ -281,7 +308,7 @@ struct HelperPipeBufs : public HelperPipeFDs
   std::streambuf* ibuf() { return &m_ibuf; }
 
  public:
-  //! @brief Flush and close write-end of pipe. Unblocks DebugPipedOStringStream::str().
+  /// Flush and close write-end of pipe. Unblocks DebugPipedOStringStream::str().
   void close() { m_obuf.close(); }
 };
 
@@ -290,7 +317,7 @@ class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
  public:
   DebugPipedOStringStream() : std::ostream(obuf()) { }
 
-  //! @brief Read blocking from read-end of pipe until EOF. Call close() (after writing) to unblock.
+  /// Read blocking from read-end of pipe until EOF. Call close() (after writing) to unblock.
   std::string str();
 };
 
@@ -298,10 +325,12 @@ class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
 extern pthread_mutex_t cout_mutex;
 #endif
 
-//! Debugging macro.
-//
-// Print "Entering " << @a data to channel @a cntrl and increment
-// debugging output indentation until the end of the current scope.
+/**
+ * Debugging macro.
+ *
+ * Print "Entering " << @a data to channel @a cntrl and increment
+ * debugging output indentation until the end of the current scope.
+ */
 #define DoutEntering(cntrl, data) \
   int __cwds_debug_indentation = 2;                                                                                     \
   {                                                                                                                     \
