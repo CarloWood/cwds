@@ -2,7 +2,7 @@
  * @file
  * @brief This file contains the declaration of signal_safe_printf.
  *
- * Copyright (C) 2018  Carlo Wood.
+ * @Copyright (C) 2018  Carlo Wood.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published

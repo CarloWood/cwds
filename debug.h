@@ -2,7 +2,7 @@
  * @file
  * @brief This file contains the declaration of debug related macros, objects and functions.
  *
- * Copyright (C) 2016 - 2017 Carlo Wood
+ * @Copyright (C) 2016 - 2017 Carlo Wood
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -291,7 +291,8 @@ class HelperPipeFDs
   int fd_in() const { return m_pipefd[1]; }   // The write end of the pipe.
 };
 
-/** A class that wraps two __gnu_cxx::stdio_filebuf<char>'s.
+/**
+ * A class that wraps two __gnu_cxx::stdio_filebuf<char>'s.
  *
  * Helper class for DebugPipedOStringStream.
  */
