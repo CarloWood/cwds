@@ -1,0 +1,77 @@
+cmake_minimum_required( VERSION 3.12...3.16 )
+
+project( cwds
+         LANGUAGES CXX
+         DESCRIPTION "Application-side libcwd support code" )
+
+# Add the local cmake directory to CMAKE_MODULE_PATH.
+list( APPEND CMAKE_MODULE_PATH
+      "${CMAKE_CURRENT_SOURCE_DIR}/../cwm4/cmake" )
+
+include(AICxxProject)
+
+#==============================================================================
+# DEPENDENCIES
+#
+
+# debug_ostream_operators.h: #include <boost/shared_ptr.hpp>
+#                            #include <boost/weak_ptr.hpp>
+# tracked.h:                 #include <boost/range/adaptor/reversed.hpp>
+find_package( Boost REQUIRED )
+
+#==============================================================================
+# BUILD PROJECT
+#
+
+# This project is an OBJECT-library, used by other git submodules and the main project.
+add_library( cwds_ObjLib OBJECT )
+
+# Set SOURCE_DIR to the current directory.
+set_property(
+    TARGET     cwds_ObjLib
+    PROPERTY   SOURCE_DIR       "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+# The list of source files.
+target_sources( cwds_ObjLib
+    PRIVATE
+        "benchmark.cxx"
+        "debug.cxx"
+        "debug_ostream_operators.cxx"
+        "signal_safe_printf.cxx"
+        "sys.h"
+
+        "benchmark.h"
+        "debug.h"
+        "debug_ostream_operators.h"
+        "FrequencyCounter.h"
+        "gnuplot_tools.h"
+        "signal_safe_printf.h"
+        "tracked.h"
+)
+
+# Required include search-paths.
+target_include_directories( cwds_ObjLib
+    PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/.."        # For local sys.h and debug.h.
+        "${CMAKE_CURRENT_SOURCE_DIR}"           # For fall-back sys.h and debug.h.
+)
+
+# Require support for C++17.
+target_compile_features( cwds_ObjLib
+    PUBLIC cxx_std_17
+)
+
+# Add dependencies.
+target_link_libraries( cwds_ObjLib
+    PUBLIC
+        Boost::boost
+        Threads::Threads
+        Libcwd_r::Libcwd_r
+)
+
+# Create an ALIAS target.
+add_library( AICxx::cwds ALIAS cwds_ObjLib )
+
+# Prepend this object library to list.
+set( AICXX_OBJECTS_LIST AICxx::cwds ${AICXX_OBJECTS_LIST} CACHE INTERNAL "List of OBJECT libaries that this project uses." )
