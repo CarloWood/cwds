@@ -50,6 +50,9 @@ target_sources( cwds_ObjLib
         "tracked.h"
 )
 
+# Always compile benchmark.cxx with -O3.
+set_source_files_properties( "benchmark.cxx" PROPERTIES COMPILE_OPTIONS "-O3")
+
 # Required include search-paths.
 target_include_directories( cwds_ObjLib
     PUBLIC
@@ -67,8 +70,14 @@ target_link_libraries( cwds_ObjLib
     PUBLIC
         Boost::boost
         Threads::Threads
-        Libcwd_r::Libcwd_r
 )
+
+if (OptionEnableLibcwd)
+  target_link_libraries( cwds_ObjLib
+      PUBLIC
+          PkgConfig::Libcwd_r
+  )
+endif()
 
 # Create an ALIAS target.
 add_library( AICxx::cwds ALIAS cwds_ObjLib )
