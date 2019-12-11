@@ -4,11 +4,7 @@ project( cwds
          LANGUAGES CXX
          DESCRIPTION "Application-side libcwd support code" )
 
-# Add the local cmake directory to CMAKE_MODULE_PATH.
-list( APPEND CMAKE_MODULE_PATH
-      "${CMAKE_CURRENT_SOURCE_DIR}/../cwm4/cmake" )
-
-include(AICxxProject)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cwm4/cmake/AICxxProject.cmake)
 
 #==============================================================================
 # DEPENDENCIES
