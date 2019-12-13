@@ -45,9 +45,8 @@
 #endif
 
 #if LIBCWD_THREAD_SAFE
-pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 namespace libcwd {
+pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
 namespace _private_ {
 // Non-const pointer - but do NOT write to it.
 // main_thread_tsd is defined in libcwd v1.1.1 and higher (libcwd.so.5.1), or see libcwd github (added 23 apr 2019).
@@ -194,7 +193,7 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
   }
 
 #if LIBCWD_THREAD_SAFE
-  Debug( libcw_do.set_ostream(&std::cout, &cout_mutex) );
+  Debug( libcw_do.set_ostream(&std::cout, &libcwd::cout_mutex) );
 #else
   Debug( libcw_do.set_ostream(&std::cout) );
 #endif
