@@ -4,7 +4,7 @@ project( cwds
          LANGUAGES CXX
          DESCRIPTION "Application-side libcwd support code" )
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cwm4/cmake/AICxxProject.cmake)
+include( AICxxProject )
 
 #==============================================================================
 # DEPENDENCIES
@@ -73,7 +73,7 @@ if (OptionEnableLibcwd)
       PUBLIC
           PkgConfig::Libcwd_r
   )
-endif()
+endif ()
 
 # Create an ALIAS target.
 add_library( AICxx::cwds ALIAS cwds_ObjLib )
