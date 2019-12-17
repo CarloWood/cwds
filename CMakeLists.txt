@@ -78,5 +78,5 @@ endif ()
 # Create an ALIAS target.
 add_library( AICxx::cwds ALIAS cwds_ObjLib )
 
-# Prepend this object library to list.
+# Prepend this object library to the list.
 set( AICXX_OBJECTS_LIST AICxx::cwds ${AICXX_OBJECTS_LIST} CACHE INTERNAL "List of OBJECT libaries that this project uses." )
