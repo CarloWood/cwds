@@ -330,7 +330,9 @@ class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
 };
 
 #if LIBCWD_THREAD_SAFE
+namespace libcwd {
 extern pthread_mutex_t cout_mutex;
+} // namespace libcwd
 #endif
 
 /**
