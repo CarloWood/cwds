@@ -10,10 +10,23 @@ include( AICxxProject )
 # DEPENDENCIES
 #
 
+# We depend on these even when utils is not part of the project.
+
+# Compile with -pthread.
+find_package( Threads REQUIRED )
+
 # debug_ostream_operators.h: #include <boost/shared_ptr.hpp>
 #                            #include <boost/weak_ptr.hpp>
 # tracked.h:                 #include <boost/range/adaptor/reversed.hpp>
 find_package( Boost REQUIRED )
+
+# If utils is part of the project then we depend on it only if EnableDebugGlobal is ON.
+# However, utils depends on cwds. To avoid a circular dependency we do never include
+# the dependcy on AICxx::utils. This is ok because utils is an OBJECT library and
+# adding a dependency on it here would only cause its INTERFACE to be inherited,
+# which happens to be Threads and Boost, which we depend on anyway, which the include
+# directory of utils is the same as that for sys.h and debug.h, so we should get that
+# too already (this means however that utils MUST be in project root, as does cwds).
 
 #==============================================================================
 # BUILD PROJECT
