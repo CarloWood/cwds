@@ -4,7 +4,21 @@ project( cwds
          LANGUAGES CXX
          DESCRIPTION "Application-side libcwd support code" )
 
-include( AICxxProject )
+include( AICxxProject OPTIONAL RESULT_VARIABLE _module_path )
+if ( NOT _module_path )
+  message( FATAL_ERROR
+      "include could not find load file: AICxxProject\n"
+      "1) Make sure that you have the git submodule https://github.com/CarloWood/cwm4 in the top-level directory.\n"
+      "2) Use `include(cwm4/cmake/AICxxProject)` right below the `project(...)` command in your top-level CMakeLists.txt."
+  )
+endif ()
+
+if ( NOT AICxxSubmodules )
+  message( FATAL_ERROR
+      "Please do not use `add_subdirectory(...)` for any of the AICxx modules.\n"
+      "Instead, use `include(AICxxSubmodules)` in your top-level CMakeLists.txt."
+  )
+endif ()
 
 #==============================================================================
 # DEPENDENCIES
@@ -18,6 +32,7 @@ find_package( Threads REQUIRED )
 # debug_ostream_operators.h: #include <boost/shared_ptr.hpp>
 #                            #include <boost/weak_ptr.hpp>
 # tracked.h:                 #include <boost/range/adaptor/reversed.hpp>
+hunter_add_package( Boost )
 find_package( Boost REQUIRED )
 
 # If utils is part of the project then we depend on it only if EnableDebugGlobal is ON.
