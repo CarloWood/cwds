@@ -32,7 +32,6 @@ find_package( Threads REQUIRED )
 # debug_ostream_operators.h: #include <boost/shared_ptr.hpp>
 #                            #include <boost/weak_ptr.hpp>
 # tracked.h:                 #include <boost/range/adaptor/reversed.hpp>
-hunter_add_package( Boost )
 find_package( Boost REQUIRED )
 
 # If utils is part of the project then we depend on it only if EnableDebugGlobal is ON.
