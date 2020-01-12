@@ -76,7 +76,7 @@ Changes to <tt>configure.ac</tt> and <tt>Makefile.am</tt>
 are taken care of by <tt>cwm4</tt>, except for linking
 which works as usual.
 
-For example a module that defines a
+For example a module that defines
 
 <pre>
 bin_PROGRAMS = singlethreaded_foobar multithreaded_foobar
