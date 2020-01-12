@@ -37,7 +37,7 @@ It provides the following features,
   * <tt>std::pair&lt;T1, T2&gt;</tt>
   * <tt>std::map&lt;T1, T2, T3&gt;</tt>
 
-## Checking out a project that uses the cwds submodule.
+## Checking out a project that uses the cwds submodule
 
 To clone a project example-project that uses cwds simply run:
 
@@ -76,7 +76,7 @@ Changes to <tt>configure.ac</tt> and <tt>Makefile.am</tt>
 are taken care of by <tt>cwm4</tt>, except for linking
 which works as usual.
 
-For example a module that defines a
+For example a module that defines
 
 <pre>
 bin_PROGRAMS = singlethreaded_foobar multithreaded_foobar
