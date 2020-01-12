@@ -37,7 +37,7 @@ It provides the following features,
   * <tt>std::pair&lt;T1, T2&gt;</tt>
   * <tt>std::map&lt;T1, T2, T3&gt;</tt>
 
-## Checking out a project that uses the cwds submodule.
+## Checking out a project that uses the cwds submodule
 
 To clone a project example-project that uses cwds simply run:
 
