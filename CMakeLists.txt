@@ -20,6 +20,20 @@ if ( NOT AICxxSubmodules )
   )
 endif ()
 
+# We use hunter for Boost to get at least version 1.70, which is the first
+# version that supports CONFIG (see find_package below).
+#
+# The root project must use 'FILEPATH "cwm4/cmake/hunter-config.cmake"' in its HunterGate call. For example,
+#
+# HunterGate(
+#    GIT_REPOSITORY "https://github.com/CarloWood/hunter.git"
+#    SHA1 "d4ead376bf58b0872eb158acf54f9fb7fa2fa5b4"
+#     FILEPATH "cwm4/cmake/hunter-config.cmake"
+#         # This is relative to the CMAKE_CURRENT_SOURCE_DIR
+#         # (the directory containing this CMakeLists.txt).
+# )
+hunter_add_package( Boost )
+
 #==============================================================================
 # DEPENDENCIES
 #
@@ -32,7 +46,7 @@ find_package( Threads REQUIRED )
 # debug_ostream_operators.h: #include <boost/shared_ptr.hpp>
 #                            #include <boost/weak_ptr.hpp>
 # tracked.h:                 #include <boost/range/adaptor/reversed.hpp>
-find_package( Boost REQUIRED )
+find_package( Boost CONFIG REQUIRED )
 
 # If utils is part of the project then we depend on it only if EnableDebugGlobal is ON.
 # However, utils depends on cwds. To avoid a circular dependency we do never include
