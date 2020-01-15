@@ -20,20 +20,6 @@ if ( NOT AICxxSubmodules )
   )
 endif ()
 
-# We use hunter for Boost to get at least version 1.70, which is the first
-# version that supports CONFIG (see find_package below).
-#
-# The root project must use 'FILEPATH "cwm4/cmake/hunter-config.cmake"' in its HunterGate call. For example,
-#
-# HunterGate(
-#    GIT_REPOSITORY "https://github.com/CarloWood/hunter.git"
-#    SHA1 "........................................"
-#     FILEPATH "cwm4/cmake/hunter-config.cmake"
-#         # This is relative to the CMAKE_CURRENT_SOURCE_DIR
-#         # (the directory containing this CMakeLists.txt).
-# )
-hunter_add_package( Boost )
-
 #==============================================================================
 # DEPENDENCIES
 #
