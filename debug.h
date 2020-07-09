@@ -370,6 +370,8 @@ extern pthread_mutex_t cout_mutex;
   }                                                                                                                     \
   NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
 
+#ifdef __cpp_fold_expressions
+
 // Allow printing of template parameter packs.
 //
 // Usage: Dout(dc::notice, join(" + ", args...));
@@ -417,6 +419,8 @@ Join<char const*, Args...> join_more(char const* separator, Args const&... args)
   static char const* const empty_prefix = "";
   return { separator, empty_prefix, args... };
 }
+
+#endif // __cpp_fold_expressions
 
 #endif // CWDEBUG
 
