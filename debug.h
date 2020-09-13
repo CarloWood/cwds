@@ -202,7 +202,7 @@ struct Indent
   int M_indent;
 
   /// Construct an Indent object.
-  Indent(int indent) : M_indent(indent) { if (M_indent > 0) libcwd::libcw_do.inc_indent(M_indent); }
+  explicit Indent(int indent) : M_indent(indent) { if (M_indent > 0) libcwd::libcw_do.inc_indent(M_indent); }
 
   /// Destructor.
   ~Indent() { if (M_indent > 0) libcwd::libcw_do.dec_indent(M_indent); }
@@ -222,14 +222,14 @@ struct Mark
   int M_indent;
 
   /// Construct a Mark object.
-  Mark(char m = '|') : M_indent(libcwd::libcw_do.get_indent())
+  explicit Mark(char m = '|') : M_indent(libcwd::libcw_do.get_indent())
   {
     libcwd::libcw_do.push_marker();
     libcwd::libcw_do.marker().append(std::string(M_indent, ' ') + m + ' ');
     // This is basically a decrement of M_indent.
     libcwd::libcw_do.set_indent(0);
   }
-  Mark(char const* utf8_m) : M_indent(libcwd::libcw_do.get_indent())
+  explicit Mark(char const* utf8_m) : M_indent(libcwd::libcw_do.get_indent())
   {
     libcwd::libcw_do.push_marker();
     libcwd::libcw_do.marker().append(std::string(M_indent, ' ') + utf8_m + ' ');

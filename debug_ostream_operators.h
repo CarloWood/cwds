@@ -63,7 +63,7 @@ struct PosixMode
 {
   int m_posix_mode;
 
-  PosixMode(int posix_mode) : m_posix_mode(posix_mode) { }
+  explicit PosixMode(int posix_mode) : m_posix_mode(posix_mode) { }
 };
 
 std::ostream& operator<<(std::ostream& os, PosixMode posix_mode);
