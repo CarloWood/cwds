@@ -75,6 +75,11 @@ struct timeval;
 /// Print debug info for timeval instance @a time.
 std::ostream& operator<<(std::ostream& os, timeval const& time);
 
+struct tm;
+
+/// Print debug info for tm instance @a date_time.
+std::ostream& operator<<(std::ostream& os, tm const& date_time);
+
 #ifdef USE_LIBBOOST
 /// Print debug info for boost::shared_ptr&lt;T&gt;.
 template<typename T>

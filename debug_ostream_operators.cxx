@@ -35,12 +35,20 @@
 #include <sys/stat.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
+#include <time.h>
 #include "debug.h"
 
 /// For debugging purposes. Write a timeval to @a os.
 std::ostream& operator<<(std::ostream& os, timeval const& time)
 {
   return os << "{tv_sec:" << time.tv_sec << ", tv_usec:" << time.tv_usec << '}';
+}
+
+std::ostream& operator<<(std::ostream& os, tm const& date_time)
+{
+  return os << "{tm_isdst:" << date_time.tm_isdst << ", tm_yday:" << date_time.tm_yday << ", tm_wday:" << date_time.tm_wday <<
+    ", tm_year:" << date_time.tm_year << ", tm_mon:" << date_time.tm_mon << ", tm_mday:" << date_time.tm_mday <<
+    ", tm_hour:" << date_time.tm_hour << ", tm_min:" << date_time.tm_min << ", tm_sec:" << date_time.tm_sec << "}";
 }
 
 NAMESPACE_DEBUG_START
