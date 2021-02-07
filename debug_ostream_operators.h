@@ -52,7 +52,7 @@ template<typename T>
 inline char const* type_name_of()
 {
 #if CWDEBUG_LOCATION
-  return libcwd::type_info_of<T>().demangled_name();
+  return ::libcwd::type_info_of<T>().demangled_name();
 #else
   return typeid(T).name();
 #endif
