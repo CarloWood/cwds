@@ -380,6 +380,7 @@ extern pthread_mutex_t cout_mutex;
 //
 
 #include <tuple>
+#include <type_traits>
 
 template<typename ...Args>
 struct Join
@@ -390,10 +391,32 @@ struct Join
   template<size_t ...I> void print_on(std::ostream& os, std::index_sequence<I...>);
 };
 
+namespace ostream_serializer_catch_all {
+
+template<typename, typename = std::ostream&>
+struct has_ostream_serializer : std::false_type
+{
+};
+
+template<typename T>
+struct has_ostream_serializer<T, decltype(std::cout << std::declval<T>())> : std::true_type
+{
+};
+
+template<typename T>
+auto operator<<(std::ostream& os, T const& x) -> typename std::enable_if<!has_ostream_serializer<T>::value, std::ostream&>::type
+{
+  os.write("...", 3);
+  return os;
+}
+
+} // namespace ostream_serializer_catch_all
+
 template<typename ...Args>
 template<size_t ...I>
 void Join<Args...>::print_on(std::ostream& os, std::index_sequence<I...>)
 {
+  using ostream_serializer_catch_all::operator<<;
   (..., (os << (I == 0 ? "" : m_separator) << std::get<I>(m_args)));
 }
 
