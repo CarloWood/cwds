@@ -1,21 +1,28 @@
 /**
+ * cwds -- Application-side libcwd support code.
+ *
  * @file
  * @brief This file contains the declaration of debug serializers.
  *
- * Copyright (C) 2016 Carlo Wood.
+ * @Copyright (C) 2016  Carlo Wood.
  *
- * This program is free software: you can redistribute it and/or modify
+ * RSA-1024 0x624ACAD5 1997-01-26                    Sign & Encrypt
+ * Fingerprint16 = 32 EC A7 B6 AC DB 65 A6  F6 F6 55 DD 1C DC FF 61
+ *
+ * This file is part of cwds.
+ *
+ * Cwds is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Cwds is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cwds.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -26,8 +33,10 @@
 #include <iosfwd>                       // std::ostream&
 #include <utility>                      // std::pair
 #include <map>
+#ifdef USE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
+#endif
 #if CWDEBUG_LOCATION
 #include <libcwd/type_info.h>
 #else
@@ -43,20 +52,36 @@ template<typename T>
 inline char const* type_name_of()
 {
 #if CWDEBUG_LOCATION
-  return libcwd::type_info_of<T>().demangled_name();
+  return ::libcwd::type_info_of<T>().demangled_name();
 #else
   return typeid(T).name();
 #endif
 }
 
+/// Use to print human readable form of a POSIX mode (see man 2 open).
+struct PosixMode
+{
+  int m_posix_mode;
+
+  explicit PosixMode(int posix_mode) : m_posix_mode(posix_mode) { }
+};
+
+std::ostream& operator<<(std::ostream& os, PosixMode posix_mode);
+
 NAMESPACE_DEBUG_END
 
 struct timeval;
 
-extern std::ostream& operator<<(std::ostream& os, timeval const& time);                         //!< Print debug info for timeval instance \a time.
+/// Print debug info for timeval instance @a time.
+std::ostream& operator<<(std::ostream& os, timeval const& time);
+
+struct tm;
+
+/// Print debug info for tm instance @a date_time.
+std::ostream& operator<<(std::ostream& os, tm const& date_time);
 
 #ifdef USE_LIBBOOST
-//! Print debug info for boost::shared_ptr&lt;T&gt;.
+/// Print debug info for boost::shared_ptr&lt;T&gt;.
 template<typename T>
 std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
 {
@@ -68,7 +93,7 @@ std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
   return os << "})";
 }
 
-//! Print debug info for boost::weak_ptr&lt;T&gt;.
+/// Print debug info for boost::weak_ptr&lt;T&gt;.
 template<typename T>
 std::ostream& operator<<(std::ostream& os, boost::weak_ptr<T> const& data)
 {
@@ -76,14 +101,14 @@ std::ostream& operator<<(std::ostream& os, boost::weak_ptr<T> const& data)
 }
 #endif // USE_LIBBOOST
 
-//! Print debug info for std::pair&lt;&gt; instance \a data.
+/// Print debug info for std::pair&lt;&gt; instance @a data.
 template<typename T1, typename T2>
 std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data)
 {
   return os << "{first:" << data.first << ", second:" << data.second << '}';
 }
 
-//! Print a whole map.
+/// Print a whole map.
 template<typename T1, typename T2, typename T3>
 std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
 {

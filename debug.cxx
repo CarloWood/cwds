@@ -1,21 +1,28 @@
 /**
+ * cwds -- Application-side libcwd support code.
+ *
  * @file
  * @brief This file contains the definitions of debug related objects and functions.
  *
- * Copyright (C) 2016 Carlo Wood.
+ * @Copyright (C) 2016  Carlo Wood.
  *
- * This program is free software: you can redistribute it and/or modify
+ * RSA-1024 0x624ACAD5 1997-01-26                    Sign & Encrypt
+ * Fingerprint16 = 32 EC A7 B6 AC DB 65 A6  F6 F6 55 DD 1C DC FF 61
+ *
+ * This file is part of cwds.
+ *
+ * Cwds is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Cwds is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cwds.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <sys.h>                        // Needed for platform-specific code
@@ -28,13 +35,24 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include <debug.h>                      // Include the projects debug.h if it exists.
+#include "debug.h"
+#include <unistd.h>                     // Needed for pipe
 #ifdef USE_LIBCW
 #include <libcw/memleak.h>		// memleak_filter
 #endif
+#ifdef DEBUGGLOBAL
+#include "utils/Singleton.h"            // This header is part of git submodule https://github.com/CarloWood/ai-utils
+#endif
 
 #if LIBCWD_THREAD_SAFE
+namespace libcwd {
 pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
+namespace _private_ {
+// Non-const pointer - but do NOT write to it.
+// main_thread_tsd is defined in libcwd v1.1.1 and higher (libcwd.so.5.1), or see libcwd github (added 23 apr 2019).
+extern ::libcwd::_private_::TSD_st* main_thread_tsd;
+} // namespace _private_
+} // namespace libcwd
 #endif
 
 NAMESPACE_DEBUG_START
@@ -43,21 +61,27 @@ NAMESPACE_DEBUG_START
 // for Thead-safeness reasons.
 namespace {
 
-/*! @brief The type of rcfile_dc_states.
+/**
+ * The type of rcfile_dc_states.
+ *
  * @internal
  */
 using rcfile_dc_states_type = std::map<std::string, bool>;
 
-/*! @brief Map containing the default debug channel states used at the start of each new thread.
+/**
+ * Map containing the default debug channel states used at the start of each new thread.
+ *
  * @internal
  *
- * The first thread calls main, which calls debug::init which will initialize this
+ * The first thread calls main, which calls NAMESPACE_DEBUG::init which will initialize this
  * map with all debug channel labels and whether or not they were turned on in the
  * rcfile or not.
  */
 rcfile_dc_states_type rcfile_dc_states;
 
-/*! @brief Set the default state of debug channel \a dc_label.
+/**
+ * Set the default state of debug channel @a dc_label.
+ *
  * @internal
  *
  * This function is called once for each debug channel.
@@ -71,11 +95,13 @@ void set_state(char const* dc_label, bool is_on)
   return;
 }
 
-/*! @brief Save debug channel states.
+/**
+ * Save debug channel states.
+ *
  * @internal
  *
  * One time initialization function of rcfile_dc_state.
- * This must be called from debug::init after reading the rcfile.
+ * This must be called from NAMESPACE_DEBUG::init after reading the rcfile.
  */
 void save_dc_states()
 {
@@ -95,15 +121,17 @@ void save_dc_states()
 
 } // anonymous namespace
 
-/*! @brief Returns the the original state of a debug channel.
+/**
+ * Returns the the original state of a debug channel.
+ *
  * @internal
  *
- * For a given \a dc_label, which must be the exact name (<tt>channel_ct::get_label</tt>) of an
- * existing debug channel, this function returns \c true when the corresponding debug channel was
+ * For a given @a dc_label, which must be the exact name (<tt>channel_ct::get_label</tt>) of an
+ * existing debug channel, this function returns @c true when the corresponding debug channel was
  * <em>on</em> at the startup of the application, directly after reading the libcwd runtime
  * configuration file (.libcwdrc).
  *
- * If the label/channel did not exist at the start of the application, it will return \c false
+ * If the label/channel did not exist at the start of the application, it will return @c false
  * (note that libcwd disallows adding debug channels to modules - so this would probably
  * a bug).
  */
@@ -118,7 +146,12 @@ bool is_on_in_rcfile(char const* dc_label)
   return iter->second;
 }
 
-/*! @brief Initialize debugging code from new threads.
+// Initialize this in main once, before starting other threads.
+libcwd::thread_init_t thread_init_default = libcwd::from_rcfile;
+std::atomic_bool threads_created = ATOMIC_VAR_INIT(false);
+
+/**
+ * Initialize debugging code from new threads.
  *
  * This function needs to be called at the start of each new thread,
  * because a new thread starts in a completely reset state.
@@ -128,41 +161,86 @@ bool is_on_in_rcfile(char const* dc_label)
  * Furthermore it initializes the debug ostream, its mutex and the
  * margin of the default debug object (Dout).
  */
-void init_thread()
+void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
 {
-  // Turn on all debug channels that are turned on as per rcfile configuration.
-  ForAllDebugChannels(
-      if (!debugChannel.is_on() && is_on_in_rcfile(debugChannel.get_label()))
-        debugChannel.on();
-  );
-
-  // Turn on debug output.
-  Debug( libcw_do.on() );
+  if (thread_init == libcwd::thread_init_default)
+    thread_init = thread_init_default;
+  if (thread_init == libcwd::from_rcfile)
+  {
+    // Turn on all debug channels that are turned on as per rcfile configuration.
+    ForAllDebugChannels(
+        if (!debugChannel.is_on() && is_on_in_rcfile(debugChannel.get_label()))
+          debugChannel.on();
+    );
+  }
 #if LIBCWD_THREAD_SAFE
-  Debug( libcw_do.set_ostream(&std::cout, &cout_mutex) );
+  else if (thread_init == libcwd::copy_from_main)
+  {
+    // Turn on all debug channels that are turned on in the main thread.
+    ForAllDebugChannels(
+        if (!debugChannel.is_on() && debugChannel.is_on(*libcwd::_private_::main_thread_tsd))
+          debugChannel.on();
+    );
+    if (!libcwd::libcw_do.is_on(*libcwd::_private_::main_thread_tsd))
+      thread_init = libcwd::debug_off;
+  }
+#endif
+
+  if (thread_init != libcwd::debug_off)
+  {
+    // Turn on debug output.
+    Debug( libcw_do.on() );
+  }
+
+#if LIBCWD_THREAD_SAFE
+  Debug( libcw_do.set_ostream(&std::cout, &libcwd::cout_mutex) );
 #else
   Debug( libcw_do.set_ostream(&std::cout) );
 #endif
 
   static bool first_thread = true;
-  if (!first_thread)			// So far, the application has only one thread.  So don't add a thread id.
+  if (!thread_name.empty())
   {
-    std::stringstream margin;
+    std::string margin = thread_name.substr(0, 15) + std::string(16 - std::min(15UL, thread_name.length()), ' ');
+    Debug(libcw_do.margin().assign(margin));
+    Dout(dc::notice, "Thread started. Set debug margin to \"" << margin << "\".");
+#if LIBCWD_THREAD_SAFE
+    pthread_setname_np(pthread_self(), thread_name.c_str());
+#endif
+  }
+  else if (!first_thread)			// So far, the application has only one thread.  So don't add a thread id.
+  {
+    std::ostringstream margin;
     union { pthread_t pt; size_t size; } convert;
     convert.pt = pthread_self();
     // Set the thread id in the margin.
     margin << std::hex << std::setw(12) << convert.size << ' ';
-    Debug( libcw_do.margin().assign(margin.str()) );
+    Debug(libcw_do.margin().assign(margin.str()));
+    threads_created = true;
   }
   first_thread = false;
 }
 
-/*! @brief Initialize debugging code from main.
+/**
+ * Initialize debugging code from main.
  *
  * This function initializes the debug code.
  */
 void init()
 {
+#ifdef DEBUGGLOBAL
+  // This has to be done at the very start of main().
+  // By moving this here, the line
+  //     Debug(NAMESPACE_DEBUG::init());
+  // must be done at the very start of main().
+  // If that is a problem then you can start main() with,
+  // #ifdef DEBUGGLOBAL
+  //   GlobalObjectManager::main_entered();
+  // #endif
+  // And call init() later when the call here will be skipped.
+  if (!Singleton<GlobalObjectManager>::instantiate().is_after_global_constructors())
+    GlobalObjectManager::main_entered();
+#endif
 #if CWDEBUG_ALLOC && defined(USE_LIBCW)
   // Tell the memory leak detector which parts of the code are
   // expected to leak so that we won't get an alarm for those.
@@ -184,14 +262,16 @@ void init()
   memleak_filter().set_flags(libcwd::show_objectfile|libcwd::show_function);
 #endif
 
-#ifndef NO_SYNC_WITH_STDIO
-  // The following call allocated the filebuf's of cin, cout, cerr, wcin, wcout and wcerr.
+#ifdef NO_SYNC_WITH_STDIO_FALSE
+#warning "NO_SYNC_WITH_STDIO_FALSE is now the default."
+#endif
+#ifdef SYNC_WITH_STDIO_FALSE        // By defining this you will no longer synchronize with the standard C streams.
+  // The following call allocates the filebuf's of cin, cout, cerr, wcin, wcout and wcerr.
   // Because this causes a memory leak being reported, make them invisible.
   Debug(set_invisible_on());
 
-  // You want this, unless you mix streams output with C output.
-  // Read  http://gcc.gnu.org/onlinedocs/libstdc++/27_io/howto.html#8 for an explanation.
-  std::ios::sync_with_stdio(true);
+  // Read http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio for more information.
+  std::ios::sync_with_stdio(false);
 
   // Cancel previous call to set_invisible_on.
   Debug(set_invisible_off());
@@ -216,7 +296,8 @@ void init()
 }
 
 #if CWDEBUG_LOCATION
-/*! @brief Return call location.
+/**
+ * Return call location.
  *
  * @param return_addr The return address of the call.
  */
@@ -230,5 +311,27 @@ std::string call_location(void const* return_addr)
 #endif
 
 NAMESPACE_DEBUG_END
+
+HelperPipeFDs::HelperPipeFDs()
+{
+  if (pipe(m_pipefd) == -1)
+  {
+    perror("pipe");
+    exit(1);
+  }
+}
+
+std::string DebugPipedOStringStream::str()
+{
+  std::string result{std::istreambuf_iterator<char>(ibuf()), std::istreambuf_iterator<char>()};
+  if (result.back() == '\n')
+    result.pop_back();
+  return result;
+}
+
+NAMESPACE_DEBUG_CHANNELS_START
+channel_ct tracked("TRACKED");
+channel_ct system("SYSTEM");    // Intended to be used for system calls.
+NAMESPACE_DEBUG_CHANNELS_END
 
 #endif // CWDEBUG

@@ -19,15 +19,22 @@ SOURCES = \
 	debug.h \
 	debug_ostream_operators.cxx \
 	debug_ostream_operators.h \
+	signal_safe_printf.cxx \
+	signal_safe_printf.h \
+	benchmark.cxx \
+	benchmark.h \
 	tracked.h
 
 libcwds_la_SOURCES = ${SOURCES}
-libcwds_la_CXXFLAGS = -std=c++11 @LIBCWD_FLAGS@
-libcwds_la_LIBADD = @LIBCWD_LIBS@
+libcwds_la_CXXFLAGS = @LIBCWD_FLAGS@
+libcwds_la_LIBADD = @CW_EXTRA_CWDS_LIBS@ @LIBCWD_LIBS@
 
 libcwds_r_la_SOURCES = ${SOURCES}
-libcwds_r_la_CXXFLAGS = -std=c++11 @LIBCWD_R_FLAGS@
-libcwds_r_la_LIBADD = @LIBCWD_R_LIBS@
+libcwds_r_la_CXXFLAGS = @LIBCWD_R_FLAGS@
+libcwds_r_la_LIBADD = @CW_EXTRA_CWDS_R_LIBS@ @LIBCWD_R_LIBS@
+
+# Always compile benchmark.cxx with -O3.
+libcwds_la-benchmark.lo libcwds_r_la-benchmark.lo: CXXFLAGS += -O3
 
 # --------------- Maintainer's Section
 

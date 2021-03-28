@@ -1,21 +1,28 @@
 /**
+ * cwds -- Application-side libcwd support code.
+ *
  * @file
  * @brief This file contains the definition of debug serializers.
  *
- * Copyright (C) 2016, 2017  Carlo Wood.
+ * @Copyright (C) 2016, 2017  Carlo Wood.
  *
- * This program is free software: you can redistribute it and/or modify
+ * RSA-1024 0x624ACAD5 1997-01-26                    Sign & Encrypt
+ * Fingerprint16 = 32 EC A7 B6 AC DB 65 A6  F6 F6 55 DD 1C DC FF 61
+ *
+ * This file is part of cwds.
+ *
+ * Cwds is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Cwds is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cwds.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <sys.h>        // Put this outside the #ifdef CWDEBUG .. #endif in order
@@ -24,12 +31,80 @@
 #ifdef CWDEBUG
 
 #include <ostream>
-#include <debug.h>      // Include the projects debug.h if it exists.
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/epoll.h>
+#include <fcntl.h>
+#include <time.h>
+#include "debug.h"
 
-//! For debugging purposes. Write a timeval to \a os.
+/// For debugging purposes. Write a timeval to @a os.
 std::ostream& operator<<(std::ostream& os, timeval const& time)
 {
   return os << "{tv_sec:" << time.tv_sec << ", tv_usec:" << time.tv_usec << '}';
 }
+
+std::ostream& operator<<(std::ostream& os, tm const& date_time)
+{
+  return os << "{tm_isdst:" << date_time.tm_isdst << ", tm_yday:" << date_time.tm_yday << ", tm_wday:" << date_time.tm_wday <<
+    ", tm_year:" << date_time.tm_year << ", tm_mon:" << date_time.tm_mon << ", tm_mday:" << date_time.tm_mday <<
+    ", tm_hour:" << date_time.tm_hour << ", tm_min:" << date_time.tm_min << ", tm_sec:" << date_time.tm_sec << "}";
+}
+
+NAMESPACE_DEBUG_START
+
+std::ostream& operator<<(std::ostream& os, PosixMode posix_mode)
+{
+  int pm = posix_mode.m_posix_mode;
+
+  if ((pm & 3) == 0)
+    os << "O_RDONLY";
+  else if ((pm & 3) == 1)
+    os << "O_WRONLY";
+  else if ((pm & 3) == 2)
+    os << "O_RDWR";
+  else
+  {
+    os << "<ERROR MODE>";
+    return os;
+  }
+  if ((pm & O_APPEND))
+    os << "|O_APPEND";
+  if ((pm & O_ASYNC))
+    os << "|O_ASYNC";
+  if ((pm & O_CLOEXEC))
+    os << "|O_CLOEXEC";
+  if ((pm & O_CREAT))
+    os << "|O_CREAT";
+  if ((pm & O_DIRECT))
+    os << "|O_DIRECT";
+  if ((pm & O_DIRECTORY))
+    os << "|O_DIRECTORY";
+  if ((pm & O_DSYNC))
+    os << "|O_DSYNC";
+  if ((pm & O_EXCL))
+    os << "|O_EXCL";
+  if ((pm & O_LARGEFILE))
+    os << "|O_LARGEFILE";
+  if ((pm & O_NOATIME))
+    os << "|O_NOATIME";
+  if ((pm & O_NOCTTY))
+    os << "|O_NOCTTY";
+  if ((pm & O_NOFOLLOW))
+    os << "|O_NOFOLLOW";
+  if ((pm & O_NONBLOCK))
+    os << "|O_NONBLOCK";
+  if ((pm & O_PATH))
+    os << "|O_PATH";
+  if ((pm & O_SYNC))
+    os << "|O_SYNC";
+  if ((pm & O_TMPFILE))
+    os << "|O_TMPFILE";
+  if ((pm & O_TRUNC))
+    os << "|O_TRUNC";
+  return os;
+}
+
+NAMESPACE_DEBUG_END
 
 #endif // CWDEBUG
