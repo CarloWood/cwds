@@ -72,6 +72,7 @@ target_sources(cwds_ObjLib
     "gnuplot_tools.h"
     "signal_safe_printf.h"
     "tracked.h"
+    "tracked_intrusive_ptr.h"
 )
 
 # Always compile benchmark.cxx with -O3.
