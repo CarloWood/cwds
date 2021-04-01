@@ -28,7 +28,9 @@ class intrusive_ptr<Foo> : public tracked::intrusive_ptr<Foo>
 //
 #if EXAMPLE_CODE
 
+#ifdef CWDEBUG
 DECLARE_TRACKED_BOOST_INTRUSIVE_PTR(Foo)
+#endif
 
 #endif // EXAMPLE_CODE
 //
