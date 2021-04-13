@@ -72,11 +72,14 @@
 #include <cassert>
 #define ASSERT(x) assert(x)
 #define AI_NEVER_REACHED do { assert(false); __builtin_unreachable(); } while(0);
+#define AI_REACHED_ONCE do { static std::atomic_flag s_reached = ATOMIC_FLAG_INIT; assert(!s_reached.test_and_set(std::memory_order_relaxed)); } while(0)
 
 #else
 #define CW_DEBUG 0
 #define ASSERT(x) do { } while(0)
 #define AI_NEVER_REACHED __builtin_unreachable();
+#define AI_REACHED_ONCE do { } while(0)
+
 #endif
 
 #else // CWDEBUG
@@ -89,6 +92,7 @@
 /// Assert @a x, if debugging is turned on.
 #define ASSERT(x) LIBCWD_ASSERT(x)
 #define AI_NEVER_REACHED do { LIBCWD_ASSERT(false); __builtin_unreachable(); } while(0);
+#define AI_REACHED_ONCE do { static std::atomic_flag s_reached = ATOMIC_FLAG_INIT; LIBCWD_ASSERT(!s_reached.test_and_set(std::memory_order_relaxed)); } while(0)
 
 /// Insert debug code, only when debugging.
 #define CWDEBUG_ONLY(...) __VA_ARGS__
