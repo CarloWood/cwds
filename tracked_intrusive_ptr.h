@@ -10,23 +10,11 @@
 // Usage:
 //
 #if EXAMPLE_CODE
-
-// Specialize boost::intrusive_ptr<Foo>.
-namespace boost {
-
-template<>
-class intrusive_ptr<Foo> : public tracked::intrusive_ptr<Foo>
+// In the header file that defines Foo.
+class Foo
 {
-  using tracked::intrusive_ptr<Foo>::intrusive_ptr;
+  ...
 };
-
-} // namespace boost
-
-#endif // EXAMPLE_CODE
-//
-// or simply
-//
-#if EXAMPLE_CODE
 
 #ifdef CWDEBUG
 DECLARE_TRACKED_BOOST_INTRUSIVE_PTR(Foo)
@@ -37,10 +25,6 @@ DECLARE_TRACKED_BOOST_INTRUSIVE_PTR(Foo)
 // One can then call tracked::intrusive_ptr<Foo>::for_each([](tracked::intrusive_ptr<Foo> const* ptr){ ... })
 // to run over all currently existing instances of this type.
 //
-
-// Definition of convenience macro.
-#define DECLARE_TRACKED_BOOST_INTRUSIVE_PTR(T) \
-  namespace boost { template<> class intrusive_ptr<T> : public tracked::intrusive_ptr<T> { using tracked::intrusive_ptr<T>::intrusive_ptr; }; }
 
 namespace tracked {
 
@@ -56,43 +40,97 @@ class intrusive_ptr : public utils::InstanceTracker<intrusive_ptr<T>>
  public:
   typedef T element_type;
 
-  BOOST_CONSTEXPR intrusive_ptr() BOOST_SP_NOEXCEPT : px(0) {}
+  intrusive_ptr() : px(0), return_address(nullptr) { }
 
-  intrusive_ptr(T* p, bool add_ref = true) : px(p)
+  [[gnu::noinline]] intrusive_ptr(T* p, bool add_ref = true) : px(p), return_address(nullptr)
   {
-    if (px != 0 && add_ref) intrusive_ptr_add_ref(px);
+    if (px != 0)
+    {
+      return_address = __builtin_return_address(0);
+      if (add_ref)
+        intrusive_ptr_add_ref(px);
+    }
+  }
+
+  intrusive_ptr(T* p, void* ra, bool add_ref = true) : px(p), return_address(nullptr)
+  {
+    if (px != 0)
+    {
+      return_address = ra;
+      if (add_ref)
+        intrusive_ptr_add_ref(px);
+    }
   }
 
   template <class U>
-  intrusive_ptr(intrusive_ptr<U> const& rhs, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty())
-      : px(rhs.get())
+  [[gnu::noinline]] intrusive_ptr(intrusive_ptr<U> const& rhs, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty())
+      : px(rhs.get()), return_address(nullptr)
   {
-    if (px != 0) intrusive_ptr_add_ref(px);
+    if (px != 0)
+    {
+      return_address = __builtin_return_address(0);
+      intrusive_ptr_add_ref(px);
+    }
   }
 
-  intrusive_ptr(intrusive_ptr const& rhs) : px(rhs.px)
+  template <class U>
+  intrusive_ptr(intrusive_ptr<U> const& rhs, void* ra, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty())
+      : px(rhs.get()), return_address(nullptr)
   {
-    if (px != 0) intrusive_ptr_add_ref(px);
+    if (px != 0)
+    {
+      return_address = ra;
+      intrusive_ptr_add_ref(px);
+    }
+  }
+
+  [[gnu::noinline]] intrusive_ptr(intrusive_ptr const& rhs) : px(rhs.px), return_address(nullptr)
+  {
+    if (px != 0)
+    {
+      return_address = __builtin_return_address(0);
+      intrusive_ptr_add_ref(px);
+    }
+  }
+
+  intrusive_ptr(intrusive_ptr const& rhs, void* ra) : px(rhs.px), return_address(nullptr)
+  {
+    if (px != 0)
+    {
+      return_address = ra;
+      intrusive_ptr_add_ref(px);
+    }
   }
 
   ~intrusive_ptr()
   {
     if (px != 0) intrusive_ptr_release(px);
+    return_address = (void*)0xdeaddead;
   }
 
   template <class U>
-  intrusive_ptr& operator=(intrusive_ptr<U> const& rhs)
+  [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr<U> const& rhs)
   {
-    this_type(rhs).swap(*this);
+    this_type(rhs, __builtin_return_address(0)).swap(*this);
     return *this;
   }
 
   // Move support
-  intrusive_ptr(intrusive_ptr&& rhs) BOOST_SP_NOEXCEPT : px(rhs.px) { rhs.px = 0; }
-
-  intrusive_ptr& operator=(intrusive_ptr&& rhs) BOOST_SP_NOEXCEPT
+  [[gnu::noinline]] intrusive_ptr(intrusive_ptr&& rhs) BOOST_SP_NOEXCEPT : px(rhs.px), return_address(nullptr)
   {
-    this_type(static_cast<intrusive_ptr&&>(rhs)).swap(*this);
+    if (px != 0) return_address = __builtin_return_address(0);
+    rhs.px = 0;
+  }
+
+  intrusive_ptr(intrusive_ptr&& rhs, void* ra) BOOST_SP_NOEXCEPT : px(rhs.px), return_address(nullptr)
+  {
+    if (px != 0) return_address = ra;
+    rhs.px = 0;
+  }
+
+  [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr&& rhs) BOOST_SP_NOEXCEPT
+  {
+    this_type(std::move(rhs), __builtin_return_address(0)).swap(*this);
     return *this;
   }
 
@@ -100,38 +138,61 @@ class intrusive_ptr : public utils::InstanceTracker<intrusive_ptr<T>>
   friend class intrusive_ptr;
 
   template <class U>
-  intrusive_ptr(intrusive_ptr<U>&& rhs, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty())
-      : px(rhs.px)
+  [[gnu::noinline]] intrusive_ptr(intrusive_ptr<U>&& rhs, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty())
+      : px(rhs.px), return_address(nullptr)
   {
+    if (px != 0) return_address = __builtin_return_address(0);
     rhs.px = 0;
+    rhs.return_address = nullptr;
   }
 
   template <class U>
-  intrusive_ptr& operator=(intrusive_ptr<U>&& rhs) BOOST_SP_NOEXCEPT
+  intrusive_ptr(intrusive_ptr<U>&& rhs, void* ra, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty())
+      : px(rhs.px), return_address(nullptr)
   {
-    this_type(static_cast<intrusive_ptr<U>&&>(rhs)).swap(*this);
+    if (px != 0) return_address = ra;
+    rhs.px = 0;
+    rhs.return_address = nullptr;
+  }
+
+  template <class U>
+  [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr<U>&& rhs) BOOST_SP_NOEXCEPT
+  {
+    this_type(std::move(rhs), __builtin_return_address(0)).swap(*this);
     return *this;
   }
 
-  intrusive_ptr& operator=(intrusive_ptr const& rhs)
+  [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr const& rhs)
   {
-    this_type(rhs).swap(*this);
+    this_type(rhs, __builtin_return_address(0)).swap(*this);
     return *this;
   }
 
-  intrusive_ptr& operator=(T* rhs)
+  [[gnu::noinline]] intrusive_ptr& operator=(T* rhs)
   {
-    this_type(rhs).swap(*this);
+    this_type(rhs, __builtin_return_address(0)).swap(*this);
     return *this;
   }
 
-  void reset() { this_type().swap(*this); }
+  void reset()
+  {
+    this_type().swap(*this);
+  }
 
-  void reset(T* rhs) { this_type(rhs).swap(*this); }
+  void reset(T* rhs)
+  {
+    this_type(rhs, __builtin_return_address(0)).swap(*this);
+  }
 
-  void reset(T* rhs, bool add_ref) { this_type(rhs, add_ref).swap(*this); }
+  void reset(T* rhs, bool add_ref)
+  {
+    this_type(rhs, __builtin_return_address(0), add_ref).swap(*this);
+  }
 
-  T* get() const BOOST_SP_NOEXCEPT { return px; }
+  T* get() const BOOST_SP_NOEXCEPT
+  {
+    return px;
+  }
 
   T* detach() BOOST_SP_NOEXCEPT
   {
@@ -158,12 +219,119 @@ class intrusive_ptr : public utils::InstanceTracker<intrusive_ptr<T>>
   void swap(intrusive_ptr& rhs) BOOST_SP_NOEXCEPT
   {
     T* tmp = px;
+    void* ra = return_address;
     px     = rhs.px;
+    return_address = rhs.return_address;
     rhs.px = tmp;
+    rhs.return_address = ra;
+  }
+
+  void print_tracker_info_on(std::ostream& os) const
+  {
+    if (return_address)
+    {
+#ifdef CWDEBUG_LOCATION
+      os << libcwd::location_ct((char*)return_address + libcwd::builtin_return_address_offset);
+#else
+      os << return_address;
+#endif
+    }
   }
 
  private:
   T* px;
+  void* return_address;
 };
 
 } // namespace tracked
+
+// Definition of convenience macro.
+#define DECLARE_TRACKED_BOOST_INTRUSIVE_PTR(T) \
+  namespace boost { \
+  template<> \
+  class intrusive_ptr<T> : public tracked::intrusive_ptr<T> \
+  { \
+   private: \
+    using this_type = intrusive_ptr; \
+    \
+   public: \
+    intrusive_ptr() = default; \
+    \
+    [[gnu::noinline]] intrusive_ptr(T* p, bool add_ref = true) \
+        : tracked::intrusive_ptr<T>(p, __builtin_return_address(0), add_ref) { } \
+    \
+    intrusive_ptr(T* p, void* ra, bool add_ref = true) \
+        : tracked::intrusive_ptr<T>(p, ra, add_ref) { } \
+    \
+    template <class U> \
+    [[gnu::noinline]] intrusive_ptr(intrusive_ptr<U> const& rhs, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty()) \
+        : tracked::intrusive_ptr<T>(rhs, __builtin_return_address(0)) { } \
+    \
+    [[gnu::noinline]] intrusive_ptr(intrusive_ptr const& rhs) \
+        : tracked::intrusive_ptr<T>(rhs, __builtin_return_address(0)) { } \
+    \
+    intrusive_ptr(intrusive_ptr const& rhs, void* ra) \
+        : tracked::intrusive_ptr<T>(rhs, ra) { } \
+    \
+    [[gnu::noinline]] intrusive_ptr(intrusive_ptr&& rhs) BOOST_SP_NOEXCEPT \
+        : tracked::intrusive_ptr<T>(std::move(rhs), __builtin_return_address(0)) { } \
+    \
+    intrusive_ptr(intrusive_ptr&& rhs, void* ra) BOOST_SP_NOEXCEPT \
+        : tracked::intrusive_ptr<T>(std::move(rhs), ra) { } \
+    \
+    template <class U> \
+    [[gnu::noinline]] intrusive_ptr(intrusive_ptr<U>&& rhs, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty()) \
+        : tracked::intrusive_ptr<T>(std::move(rhs), __builtin_return_address(0)) { } \
+    \
+    template <class U> \
+    intrusive_ptr(intrusive_ptr<U>&& rhs, void* ra, typename boost::detail::sp_enable_if_convertible<U, T>::type = boost::detail::sp_empty()) \
+        : tracked::intrusive_ptr<T>(std::move(rhs), ra) { } \
+    \
+    template <class U> \
+    [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr<U> const& rhs) \
+    { \
+      this_type(rhs, __builtin_return_address(0)).swap(*this); \
+      return *this; \
+    } \
+    \
+    [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr&& rhs) BOOST_SP_NOEXCEPT \
+    { \
+      this_type(std::move(rhs), __builtin_return_address(0)).swap(*this); \
+      return *this; \
+    } \
+    \
+    template <class U> \
+    [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr<U>&& rhs) BOOST_SP_NOEXCEPT \
+    { \
+      this_type(std::move(rhs), __builtin_return_address(0)).swap(*this); \
+      return *this; \
+    } \
+    \
+    [[gnu::noinline]] intrusive_ptr& operator=(intrusive_ptr const& rhs) \
+    { \
+      this_type(rhs, __builtin_return_address(0)).swap(*this); \
+      return *this; \
+    } \
+    \
+    [[gnu::noinline]] intrusive_ptr& operator=(T* rhs) \
+    { \
+      this_type(rhs, __builtin_return_address(0)).swap(*this); \
+      return *this; \
+    } \
+    \
+    void reset() \
+    { \
+      this_type().swap(*this); \
+    } \
+    \
+    void reset(T* rhs) \
+    { \
+      this_type(rhs, __builtin_return_address(0)).swap(*this); \
+    } \
+    \
+    void reset(T* rhs, bool add_ref) \
+    { \
+      this_type(rhs, __builtin_return_address(0), add_ref).swap(*this); \
+    } \
+  }; \
+  } // namespace boost
