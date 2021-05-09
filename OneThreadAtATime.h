@@ -46,17 +46,22 @@ class OneThreadAtATime
 {
  private:
   std::atomic<std::thread::id> m_owner;
+  int m_recursive;
 
  public:
+  OneThreadAtATime() : m_recursive(0) { }
+
   void lock()
   {
     std::thread::id previous_owner = m_owner.exchange(std::this_thread::get_id(), std::memory_order_relaxed);
     ASSERT(previous_owner == std::thread::id() || previous_owner == std::this_thread::get_id());
+    ++m_recursive;
   }
 
   void unlock()
   {
-    m_owner.store(std::thread::id(), std::memory_order_relaxed);
+    if (--m_recursive == 0)
+      m_owner.store(std::thread::id(), std::memory_order_relaxed);
   }
 };
 #endif // CW_DEBUG
