@@ -33,6 +33,7 @@
 #include <iosfwd>                       // std::ostream&
 #include <utility>                      // std::pair
 #include <map>
+#include <chrono>
 #ifdef USE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
@@ -119,6 +120,31 @@ std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
   for (typename map_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
     os << '{' << *iter << '}';
   return os << '}';
+}
+
+template<std::intmax_t resolution>
+std::ostream& operator<<(
+    std::ostream& os,
+    std::chrono::duration<std::intmax_t, std::ratio<std::intmax_t(1), resolution>> const& duration)
+{
+  std::intmax_t const ticks = duration.count();
+  os << (ticks / resolution) << '.';
+  std::intmax_t div = resolution;
+  std::intmax_t frac = ticks;
+  for (;;)
+  {
+    frac %= div;
+    if (frac == 0) break;
+    div /= 10;
+    os << frac / div;
+  }
+  return os;
+}
+
+template<typename Clock, typename Duration>
+std::ostream& operator<<(std::ostream& os, std::chrono::time_point<Clock, Duration> const& timepoint)
+{
+  return os << timepoint.time_since_epoch();
 }
 
 #endif // CWDEBUG
