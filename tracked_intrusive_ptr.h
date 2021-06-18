@@ -1,5 +1,9 @@
 #pragma once
 
+// This header requires submodules
+// https://github.com/CarloWood/ai-utils and
+// https://github.com/CarloWood/ai-threadsafe to be installed.
+
 #include "utils/InstanceTracker.h"
 #include <boost/intrusive_ptr.hpp>
 
