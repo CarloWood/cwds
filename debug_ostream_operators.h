@@ -69,6 +69,18 @@ struct PosixMode
 
 std::ostream& operator<<(std::ostream& os, PosixMode posix_mode);
 
+struct QuotedString
+{
+  char const* m_ptr;
+};
+
+std::ostream& operator<<(std::ostream& os, QuotedString str);
+
+inline QuotedString print_string(char const* str)
+{
+  return { str };
+}
+
 NAMESPACE_DEBUG_END
 
 struct timeval;

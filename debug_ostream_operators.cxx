@@ -105,6 +105,13 @@ std::ostream& operator<<(std::ostream& os, PosixMode posix_mode)
   return os;
 }
 
+std::ostream& operator<<(std::ostream& os, QuotedString str)
+{
+  if (!str.m_ptr)
+    return os << "nullptr";
+  return os << '"' << str.m_ptr << '"';
+}
+
 NAMESPACE_DEBUG_END
 
 #endif // CWDEBUG
