@@ -81,6 +81,31 @@ inline QuotedString print_string(char const* str)
   return { str };
 }
 
+template<typename ENUM_CLASS>
+struct EnumClassMask
+{
+  uint32_t m_mask;
+};
+
+template<typename ENUM_CLASS>
+std::ostream& operator<<(std::ostream& os, EnumClassMask<ENUM_CLASS> mask)
+{
+  char prefix = '{';
+  for (uint32_t bit = 1; bit > 0; bit <<= 1)
+    if ((mask.m_mask & bit))
+    {
+      os << prefix << static_cast<ENUM_CLASS>(bit);
+      prefix = '|';
+    }
+  return os << '}';
+}
+
+template<typename ENUM_CLASS1, typename ENUM_CLASS2>
+inline EnumClassMask<ENUM_CLASS1> print_flags(ENUM_CLASS2 mask)
+{
+  return { static_cast<uint32_t>(mask) };
+}
+
 NAMESPACE_DEBUG_END
 
 struct timeval;
