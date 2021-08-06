@@ -81,12 +81,6 @@ inline QuotedString print_string(char const* str)
   return { str };
 }
 
-template<typename ENUM_CLASS>
-struct EnumClassMask
-{
-  uint32_t m_mask;
-};
-
 NAMESPACE_DEBUG_END
 
 struct timeval;
