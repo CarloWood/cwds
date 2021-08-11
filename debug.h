@@ -243,6 +243,9 @@ struct Mark
     // This is basically a decrement of M_indent.
     libcwd::libcw_do.set_indent(0);
   }
+#ifdef __cpp_char8_t
+  explicit Mark(char8_t const* utf8_m) : Mark(reinterpret_cast<char const*>(utf8_m)) { }
+#endif
 
   /// Destructor.
   ~Mark() { end(); }
