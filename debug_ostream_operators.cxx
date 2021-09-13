@@ -112,6 +112,20 @@ std::ostream& operator<<(std::ostream& os, QuotedString str)
   return os << '"' << str.m_ptr << '"';
 }
 
+std::ostream& operator<<(std::ostream& os, ArgvList argv)
+{
+  if (!argv.m_argv)
+    return os << "nullptr";
+  os << '{';
+  int i = 0;
+  while (argv.m_argv[i])
+  {
+    os << '"' << argv.m_argv[i] << "\", ";
+    ++i;
+  }
+  return os << "NULL }";
+}
+
 NAMESPACE_DEBUG_END
 
 #endif // CWDEBUG

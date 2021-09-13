@@ -81,6 +81,18 @@ inline QuotedString print_string(char const* str)
   return { str };
 }
 
+struct ArgvList
+{
+  char const* const* m_argv;
+};
+
+std::ostream& operator<<(std::ostream& os, ArgvList argv);
+
+inline ArgvList print_argv(char const* const* argv)
+{
+  return { argv };
+}
+
 NAMESPACE_DEBUG_END
 
 struct timeval;
@@ -158,5 +170,7 @@ std::ostream& operator<<(std::ostream& os, std::chrono::time_point<Clock, Durati
 {
   return os << timepoint.time_since_epoch();
 }
+
+
 
 #endif // CWDEBUG
