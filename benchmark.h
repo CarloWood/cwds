@@ -147,7 +147,7 @@ class Stopwatch
   static int s_stopwatch_overhead;      // The overhead of calling start()/stop(), in clock cycles.
 
  public:
-  static unsigned int constexpr cpu_any = 0xffffffff;  // This value means: keep running on whatever cpu this thread is running.
+  static constexpr unsigned int cpu_any = 0xffffffff;  // This value means: keep running on whatever cpu this thread is running.
 
   Stopwatch(unsigned int cpu_nr = cpu_any);
   ~Stopwatch();
