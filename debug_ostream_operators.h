@@ -76,6 +76,7 @@ struct QuotedString
 
 std::ostream& operator<<(std::ostream& os, QuotedString str);
 
+// Prints nullptr if str == nullptr, otherwise put double quotes around the string.
 inline QuotedString print_string(char const* str)
 {
   return { str };
