@@ -26,8 +26,12 @@ DECLARE_TRACKED_BOOST_INTRUSIVE_PTR(Foo)
 
 #endif // EXAMPLE_CODE
 //
-// One can then call tracked::intrusive_ptr<Foo>::for_each([](tracked::intrusive_ptr<Foo> const* ptr){ ... })
-// to run over all currently existing instances of this type.
+// One can then call
+//
+//  tracked::intrusive_ptr<Foo>::for_each_instance([](tracked::intrusive_ptr<Foo> const* ptr){
+//     Dout(dc::notice, print_using(ptr, &tracked::intrusive_ptr<Foo>::print_tracker_info_on)); });
+//
+// to print out the tracker info of each intrusive_ptr instance.
 //
 
 namespace tracked {
