@@ -310,6 +310,33 @@ std::string call_location(void const* return_addr)
 }
 #endif
 
+// Detect if the application is running inside a debugger.
+//
+// Usage:
+//
+// #ifdef CWDEBUG
+//   if (NAMESPACE_DEBUG::being_traced())
+//     DoutFatal(dc::core, "Trap point");
+// #endif
+//
+bool being_traced()
+{
+  std::ifstream sf("/proc/self/status");
+  std::string s;
+  while (sf >> s)
+  {
+    if (s == "TracerPid:")
+    {
+      int pid;
+      sf >> pid;
+      return pid != 0;
+    }
+    std::getline(sf, s);
+  }
+
+  return false;
+}
+
 NAMESPACE_DEBUG_END
 
 HelperPipeFDs::HelperPipeFDs()

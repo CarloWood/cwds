@@ -170,6 +170,7 @@ using libcwd::channel_ct;
 #if CWDEBUG_LOCATION
 std::string call_location(void const* return_addr);
 #endif
+bool being_traced();
 
 /**
  * Interface for marking scopes of invisible memory allocations.
