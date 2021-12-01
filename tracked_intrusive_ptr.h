@@ -247,6 +247,9 @@ class intrusive_ptr : public utils::InstanceTracker<intrusive_ptr<T>>
   }
 
  private:
+  template<class U>
+  friend class ::boost::intrusive_ptr;
+
   T* px;
   void* return_address;
 };
