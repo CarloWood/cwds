@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "utils/has_print_on.h"
 #include <map>
 #include <array>
 #include <cstdlib>
@@ -34,6 +35,7 @@
 #include "debug.h"
 
 namespace eda {
+using utils::has_print_on::operator<<;
 
 struct FrequencyCounterResult
 {
