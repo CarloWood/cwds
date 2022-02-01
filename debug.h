@@ -448,7 +448,7 @@ template<typename ...Args>
 Join<char const*, Args...> join_more(char const* separator, Args const&... args)
 {
   // We must use a static here because the tuple binds with a const& (aka, stores a char const* const& to empty_prefix).
-  // Using a string literal directly results in a reference to a temporary chat const* pointing to the char[1] of the literal.
+  // Using a string literal directly results in a reference to a temporary char const* pointing to the char[1] of the literal.
   // Thanks to aschepler for this analysis (see https://stackoverflow.com/a/57342183/1487069).
   static char const* const empty_prefix = "";
   return { separator, empty_prefix, args... };
