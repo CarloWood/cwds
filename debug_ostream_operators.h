@@ -172,6 +172,18 @@ std::ostream& operator<<(std::ostream& os, std::chrono::time_point<Clock, Durati
   return os << timepoint.time_since_epoch();
 }
 
+namespace std {
 
+template<typename... Args>
+ostream& operator<<(ostream& os, tuple<Args...> const& t)
+{
+  bool first = true;
+  os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
+  first = true;
+  apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
+  return os << ')';
+}
+
+} // namespace std
 
 #endif // CWDEBUG

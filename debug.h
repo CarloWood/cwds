@@ -399,6 +399,7 @@ struct Join
   char const* m_separator;
   std::tuple<Args const&...> m_args;
   Join(char const* separator, Args const&... args) : m_separator(separator), m_args(args...) { }
+  Join(char const* separator, std::tuple<Args const&...>&& args) : m_separator(separator), m_args(std::move(args)) { }
   template<size_t ...I> void print_on(std::ostream& os, std::index_sequence<I...>);
 };
 
@@ -442,6 +443,12 @@ template<typename ...Args>
 Join<Args...> join(char const* separator, Args const&... args)
 {
   return { separator, args... };
+}
+
+template<typename ...Args>
+Join<Args...> join_from_tuple(char const* separator, std::tuple<Args...>&& args)
+{
+  return { separator, std::move(args) };
 }
 
 template<typename ...Args>
