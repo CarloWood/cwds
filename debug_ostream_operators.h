@@ -177,6 +177,7 @@ namespace std {
 template<typename... Args>
 ostream& operator<<(ostream& os, tuple<Args...> const& t)
 {
+  using ostream_serializer_catch_all::operator<<;
   bool first = true;
   os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
   first = true;
