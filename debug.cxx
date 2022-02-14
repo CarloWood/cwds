@@ -310,6 +310,13 @@ std::string call_location(void const* return_addr)
 }
 #endif
 
+static int s_being_traced = 0;
+
+void ignore_being_traced()
+{
+  s_being_traced = 1;
+}
+
 // Detect if the application is running inside a debugger.
 //
 // Usage:
@@ -321,6 +328,9 @@ std::string call_location(void const* return_addr)
 //
 bool being_traced()
 {
+  if (s_being_traced == 1)
+    return false;
+
   std::ifstream sf("/proc/self/status");
   std::string s;
   while (sf >> s)
@@ -329,11 +339,13 @@ bool being_traced()
     {
       int pid;
       sf >> pid;
+      s_being_traced = (pid != 0) ? 2 : 1;
       return pid != 0;
     }
     std::getline(sf, s);
   }
 
+  s_being_traced = 1;
   return false;
 }
 

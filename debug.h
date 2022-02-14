@@ -264,6 +264,8 @@ struct Mark
   }
 };
 
+void ignore_being_traced();
+
 NAMESPACE_DEBUG_END
 
 NAMESPACE_DEBUG_CHANNELS_START
