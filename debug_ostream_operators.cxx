@@ -128,4 +128,15 @@ std::ostream& operator<<(std::ostream& os, ArgvList argv)
 
 NAMESPACE_DEBUG_END
 
+namespace std {
+
+std::ostream& operator<<(std::ostream& os, std::u8string_view utf8_sv)
+{
+  os << "u8\"";
+  os.write(reinterpret_cast<char const*>(utf8_sv.data()), utf8_sv.length());
+  return os << '"';
+}
+
+} // namespace std
+
 #endif // CWDEBUG

@@ -185,6 +185,9 @@ ostream& operator<<(ostream& os, tuple<Args...> const& t)
   return os << ')';
 }
 
+// Add support for printing std::u8string to debug output.
+std::ostream& operator<<(std::ostream& os, std::u8string_view utf8_sv);
+
 } // namespace std
 
 #endif // CWDEBUG
