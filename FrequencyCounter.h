@@ -63,6 +63,8 @@ class FrequencyCounter
   std::array<iterator, nk> m_max_iters;
   FrequencyCounterResult m_result;
 
+  size_t get_count(int k);
+
  public:
   FrequencyCounter() : m_hint(m_counters.end())
   {
@@ -103,6 +105,12 @@ void FrequencyCounter<T, nk>::print_on(std::ostream& os) const
 }
 
 template<typename T, int nk>
+size_t FrequencyCounter<T, nk>::get_count(int k)
+{
+  return m_max_iters[k] == m_counters.end() ? 0 : m_max_iters[k]->second.count;
+}
+
+template<typename T, int nk>
 bool FrequencyCounter<T, nk>::add(T value)
 {
   m_hint = m_counters.emplace_hint(m_hint, value, Data{0, -1});
@@ -111,7 +119,7 @@ bool FrequencyCounter<T, nk>::add(T value)
   if (k == -1)
   {
     k = nk - 1;
-    if (m_max_iters[k] == m_counters.end() || count > m_max_iters[k]->second.count)
+    if (get_count(k) < count)
     {
       while (k > 0 && (m_max_iters[k - 1] == m_counters.end() || m_max_iters[k - 1]->second.count == count - 1))
         --k;
@@ -134,7 +142,7 @@ bool FrequencyCounter<T, nk>::add(T value)
     }
   }
   int m2;
-  for (int i = 0; i < nk - 1 && m_max_iters[i + 1] != m_counters.end() && (m2 = m_max_iters[i + 1]->second.count) > 10; ++i)
+  for (int i = 0; i < nk - 1 && ((m2 = get_count(i + 1)) > 10 || get_count(i) >= 31); ++i)
   {
     int m1 = m_max_iters[i]->second.count;
     ASSERT(m1 >= m2);

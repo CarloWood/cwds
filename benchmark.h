@@ -126,7 +126,7 @@ int main()
 namespace benchmark {
 
 unsigned int constexpr cache_line_size = 64;    // grep cache_alignment /proc/cpuinfo
-unsigned int constexpr number_of_cpus = 8;      // See /proc/cpuinfo
+unsigned int constexpr number_of_cpus = 32;     // See /proc/cpuinfo
 
 // For this to work reliably, grep '^flags' /proc/cpuinfo must contain rdtscp, constant_tsc and nonstop_tsc.
 // You should also turn off all power optimization, Intel Hyper-Threading technology, frequency scaling and
@@ -255,8 +255,8 @@ class Stopwatch
   }
 
   // Same as above but correct for loop and stopwatch overhead (call calibrate_overhead() first!),
-  // as well as repeat calling get_minimum_of() until we are 99.9% sure which what measurement
-  // occurs most often (to get something that will reproduce extremely well).
+  // as well as repeat calling get_minimum_of() until we are 99.9% sure what measurement occurs
+  // most often (to get something that will reproduce extremely well).
   template<int nk = 3, class T>
   eda::FrequencyCounterResult measure(unsigned int iterations, T const functor, unsigned int minimum_of = 3)
   {
