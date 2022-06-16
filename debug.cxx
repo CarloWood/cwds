@@ -43,6 +43,9 @@
 #ifdef DEBUGGLOBAL
 #include "utils/Singleton.h"            // This header is part of git submodule https://github.com/CarloWood/ai-utils
 #endif
+#ifdef TRACY_ENABLE
+#include <common/TracySystem.hpp>
+#endif
 
 #if LIBCWD_THREAD_SAFE
 namespace libcwd {
@@ -204,7 +207,9 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
     std::string margin = thread_name.substr(0, 15) + std::string(16 - std::min(15UL, thread_name.length()), ' ');
     Debug(libcw_do.margin().assign(margin));
     Dout(dc::notice, "Thread started. Set debug margin to \"" << margin << "\".");
-#if LIBCWD_THREAD_SAFE
+#ifdef TRACY_ENABLE
+    tracy::SetThreadName(thread_name.c_str());
+#elif LIBCWD_THREAD_SAFE
     pthread_setname_np(pthread_self(), thread_name.c_str());
 #endif
   }
