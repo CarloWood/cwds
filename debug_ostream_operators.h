@@ -38,13 +38,13 @@
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
 #endif
+#ifndef NAMESPACE_DEBUG
+#include <debug.h>                      // NAMESPACE_DEBUG*, CWDEBUG_LOCATION
+#endif
 #if CWDEBUG_LOCATION
 #include <libcwd/type_info.h>
 #else
 #include <typeinfo>
-#endif
-#ifndef NAMESPACE_DEBUG
-#include <debug.h>                      // NAMESPACE_DEBUG
 #endif
 
 NAMESPACE_DEBUG_START
