@@ -107,9 +107,11 @@ struct tm;
 std::ostream& operator<<(std::ostream& os, tm const& date_time);
 
 #ifdef USE_LIBBOOST
+namespace boost {
+
 /// Print debug info for boost::shared_ptr&lt;T&gt;.
 template<typename T>
-std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
+std::ostream& operator<<(std::ostream& os, shared_ptr<T> const& data)
 {
   os << "(boost::shared_ptr<" << NAMESPACE_DEBUG::type_name_of<T>() << ">)({";
   if (data.get())
@@ -121,22 +123,26 @@ std::ostream& operator<<(std::ostream& os, boost::shared_ptr<T> const& data)
 
 /// Print debug info for boost::weak_ptr&lt;T&gt;.
 template<typename T>
-std::ostream& operator<<(std::ostream& os, boost::weak_ptr<T> const& data)
+std::ostream& operator<<(std::ostream& os, weak_ptr<T> const& data)
 {
-  return os << "(boost::weak_ptr<" << NAMESPACE_DEBUG::type_name_of<T>() << ">)({ " << *boost::shared_ptr<T>(data) << "})";
+  return os << "(boost::weak_ptr<" << NAMESPACE_DEBUG::type_name_of<T>() << ">)({ " << *shared_ptr<T>(data) << "})";
 }
+
+} // namespace boost
 #endif // USE_LIBBOOST
+
+namespace std {
 
 /// Print debug info for std::pair&lt;&gt; instance @a data.
 template<typename T1, typename T2>
-std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data)
+std::ostream& operator<<(std::ostream& os, pair<T1, T2> const& data)
 {
   return os << "{first:" << data.first << ", second:" << data.second << '}';
 }
 
 /// Print a whole map.
 template<typename T1, typename T2, typename T3>
-std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
+std::ostream& operator<<(std::ostream& os, map<T1, T2, T3> const& data)
 {
   os << "{map<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
       ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
@@ -147,10 +153,26 @@ std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
   return os << '}';
 }
 
+template<typename... Args>
+std::ostream& operator<<(std::ostream& os, tuple<Args...> const& t)
+{
+  using ostream_serializer_catch_all::operator<<;
+  bool first = true;
+  os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
+  first = true;
+  apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
+  return os << ')';
+}
+
+// Add support for printing std::u8string to debug output.
+std::ostream& operator<<(std::ostream& os, u8string_view utf8_sv);
+
+namespace chrono {
+
 template<std::intmax_t resolution>
 std::ostream& operator<<(
     std::ostream& os,
-    std::chrono::duration<std::intmax_t, std::ratio<std::intmax_t(1), resolution>> const& duration)
+    duration<std::intmax_t, std::ratio<std::intmax_t(1), resolution>> const& duration)
 {
   std::intmax_t const ticks = duration.count();
   os << (ticks / resolution) << '.';
@@ -167,26 +189,12 @@ std::ostream& operator<<(
 }
 
 template<typename Clock, typename Duration>
-std::ostream& operator<<(std::ostream& os, std::chrono::time_point<Clock, Duration> const& timepoint)
+std::ostream& operator<<(std::ostream& os, time_point<Clock, Duration> const& timepoint)
 {
   return os << timepoint.time_since_epoch();
 }
 
-namespace std {
-
-template<typename... Args>
-ostream& operator<<(ostream& os, tuple<Args...> const& t)
-{
-  using ostream_serializer_catch_all::operator<<;
-  bool first = true;
-  os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
-  first = true;
-  apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
-  return os << ')';
-}
-
-// Add support for printing std::u8string to debug output.
-std::ostream& operator<<(std::ostream& os, std::u8string_view utf8_sv);
+} // namespace chrono
 
 } // namespace std
 
