@@ -33,6 +33,8 @@
 #include <iosfwd>                       // std::ostream&
 #include <utility>                      // std::pair
 #include <map>
+#include <set>
+#include <vector>
 #include <chrono>
 #ifdef USE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
@@ -150,6 +152,37 @@ std::ostream& operator<<(std::ostream& os, map<T1, T2, T3> const& data)
   using map_type = std::map<T1, T2, T3>;
   for (typename map_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
     os << '{' << *iter << '}';
+  return os << '}';
+}
+
+/// Print a whole set.
+template<typename T1, typename T2, typename T3>
+std::ostream& operator<<(std::ostream& os, set<T1, T2, T3> const& data)
+{
+  os << "{set<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
+  using set_type = std::set<T1, T2, T3>;
+  char const* prefix = "";
+  for (typename set_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
+  {
+    os << prefix << '{' << *iter << '}';
+    prefix = ", ";
+  }
+  return os << '}';
+}
+
+/// Print a vector.
+template<typename T>
+std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
+{
+  os << '{';
+  char const* prefix = "";
+  for (auto&& element : v)
+  {
+    os << prefix << element;
+    prefix = ", ";
+  }
   return os << '}';
 }
 
