@@ -172,18 +172,48 @@ std::ostream& operator<<(std::ostream& os, set<T1, T2, T3> const& data)
   return os << '}';
 }
 
-/// Print a vector.
+namespace detail {
+
+/// Print an array.
 template<typename T>
-std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
+void print_on(std::ostream& os, T const* data, size_t len)
 {
   os << '{';
   char const* prefix = "";
-  for (auto&& element : v)
+  for (size_t i = 0; i < len; ++i)
   {
-    os << prefix << element;
+    os << prefix << data[i];
     prefix = ", ";
   }
-  return os << '}';
+  os << '}';
+}
+
+} // namespace detail
+
+/// Print a vector.
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
+{
+  if constexpr (std::is_same_v<T, bool>)
+  {
+    char const* prefix = "";
+    for (bool b : v)
+    {
+      os << prefix << std::boolalpha << b;
+      prefix = ", ";
+    }
+  }
+  else
+    detail::print_on(os, v.data(), v.size());
+  return os;
+}
+
+/// Print an array.
+template<typename T, size_t N>
+inline std::ostream& operator<<(std::ostream& os, std::array<T, N> const& v)
+{
+  detail::print_on(os, v.data(), v.size());
+  return os;
 }
 
 template<typename... Args>
