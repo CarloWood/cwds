@@ -140,6 +140,7 @@ enum thread_init_t {
 } // namespace libcwd
 
 #include <atomic>       // atomic_bool
+#include <utility>
 
 /// Debug specific code.
 NAMESPACE_DEBUG_START
@@ -265,6 +266,22 @@ struct Mark
 };
 
 void ignore_being_traced();
+
+template <typename T>
+concept ConceptAlwaysFalse = false;
+
+template <ConceptAlwaysFalse T>
+bool static_print(T&& = {})
+{
+  return false;
+};
+
+// Usage:
+//
+// DEBUG_STATIC_PRINT_TYPE(decltype(Class::element));
+//
+#define DEBUG_STATIC_PRINT_TYPE(type) \
+  auto __dummy = NAMESPACE_DEBUG::static_print<decltype(TopPosition::v)>();
 
 NAMESPACE_DEBUG_END
 
