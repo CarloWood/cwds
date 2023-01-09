@@ -63,8 +63,9 @@ target_sources(cwds_ObjLib
     "debug.cxx"
     "debug_ostream_operators.cxx"
     "signal_safe_printf.cxx"
-    "sys.h"
+    "UsageDetector.cxx"
 
+    "sys.h"
     "benchmark.h"
     "debug.h"
     "debug_ostream_operators.h"
@@ -73,6 +74,7 @@ target_sources(cwds_ObjLib
     "signal_safe_printf.h"
     "tracked.h"
     "tracked_intrusive_ptr.h"
+    "UsageDetector.h"
 )
 
 # Always compile benchmark.cxx with -O3.
