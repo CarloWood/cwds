@@ -12,9 +12,12 @@
 #endif
 
 // Used when building with cmake, because cmake isn't using a project-root config.h for its definitions.
-// Currently only the submodule utils has config.h (todo: automate this too).
+// Currently only the submodules utils and threadpool have a config.h (todo: automate this too).
 #ifdef HAVE_UTILS_CONFIG_H
 #include "utils/config.h"
+#endif
+#ifdef HAVE_THREADPOOL_CONFIG_H
+#include "threadpool/config.h"
 #endif
 
 #define UNUSED_ARG(x)
