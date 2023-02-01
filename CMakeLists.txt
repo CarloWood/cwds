@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12...3.16)
+cmake_minimum_required(VERSION 3.12...3.25)
 
 project(cwds
   LANGUAGES CXX
@@ -87,9 +87,9 @@ target_include_directories(cwds_ObjLib
     "${CMAKE_CURRENT_SOURCE_DIR}"           # For fall-back sys.h and debug.h.
 )
 
-# Require support for C++17.
+# Require support for C++20.
 target_compile_features(cwds_ObjLib
-  PUBLIC cxx_std_17
+  PUBLIC cxx_std_20
 )
 
 # Add dependencies.
