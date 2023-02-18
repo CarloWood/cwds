@@ -124,6 +124,7 @@
 #endif
 
 #include <libcwd/debug.h>
+#include <libcwd/char2str.h>
 
 #define NAMESPACE_DEBUG_CHANNELS_START NAMESPACE_DEBUG_START namespace NAMESPACE_CHANNELS { namespace dc {
 #define NAMESPACE_DEBUG_CHANNELS_END } } NAMESPACE_DEBUG_END
@@ -309,6 +310,43 @@ class DebugBuf : public std::streambuf
         else
         {
           Dout(dc::continued, "\e[42m" << (char)c << "\e[0m");
+        }
+      }
+      return c;
+    }
+};
+
+/// A debug streambuf that prints characters written to it to a given debug channel.
+class DebugStreamBuf : public std::streambuf
+{
+  private:
+    libcwd::channel_ct const& m_debug_channel;
+
+  public:
+    DebugStreamBuf(libcwd::channel_ct const& debug_channel) : m_debug_channel(debug_channel)
+    {
+      Dout(debug_channel|continued_cf, "");
+      setp(0, 0);
+    }
+
+    ~DebugStreamBuf()
+    {
+      Dout(dc::finish, "");
+    }
+
+    /// Implement std::streambuf::overflow.
+    int_type overflow(int_type c = traits_type::eof()) override
+    {
+      if (c != traits_type::eof())
+      {
+        if (c == '\n')
+        {
+          Dout(dc::finish, "\\n");
+          Dout(m_debug_channel|continued_cf, "");
+        }
+        else
+        {
+          Dout(dc::continued, char2str(c));
         }
       }
       return c;
