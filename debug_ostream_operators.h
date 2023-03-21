@@ -35,6 +35,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <deque>
 #include <chrono>
 #ifdef USE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
@@ -196,12 +197,14 @@ inline std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
 {
   if constexpr (std::is_same_v<T, bool>)
   {
+    os << '{';
     char const* prefix = "";
     for (bool b : v)
     {
       os << prefix << std::boolalpha << b;
       prefix = ", ";
     }
+    os << '}';
   }
   else
     detail::print_on(os, v.data(), v.size());
@@ -213,6 +216,24 @@ template<typename T, size_t N>
 inline std::ostream& operator<<(std::ostream& os, std::array<T, N> const& v)
 {
   detail::print_on(os, v.data(), v.size());
+  return os;
+}
+
+/// Print a deque.
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, std::deque<T> const& v)
+{
+  os << '{';
+  char const* prefix = "";
+  for (T const& e : v)
+  {
+    if constexpr (std::is_same_v<T, bool>)
+      os << prefix << std::boolalpha << e;
+    else
+      os << prefix << e;
+    prefix = ", ";
+  }
+  os << '}';
   return os;
 }
 
