@@ -1,5 +1,8 @@
 #pragma once
 
+// UsageDetector requires -std=c++2b or higher.
+#if __cplusplus >= 202101L
+
 #include "utils/Array.h"
 #include <vector>
 #include "debug.h"
@@ -110,18 +113,18 @@ class UsageDetector<std::vector<T, Allocator>> : protected std::vector<T, Alloca
   char const* m_debug_name;
 
  public:
-  using value_type = _UDBase::value_type;
-  using allocator_type = _UDBase::allocator_type;
-  using size_type = _UDBase::size_type;
-  using difference_type = _UDBase::difference_type;
-  using reference = _UDBase::reference;
-  using const_reference = _UDBase::const_reference;
-  using pointer = _UDBase::pointer;
-  using const_pointer = _UDBase::const_pointer;
-  using iterator = _UDBase::iterator;
-  using const_iterator = _UDBase::const_iterator;
-  using reverse_iterator = _UDBase::reverse_iterator;
-  using const_reverse_iterator = _UDBase::const_reverse_iterator;
+  using value_type = typename _UDBase::value_type;
+  using allocator_type = typename _UDBase::allocator_type;
+  using size_type = typename _UDBase::size_type;
+  using difference_type = typename _UDBase::difference_type;
+  using reference = typename _UDBase::reference;
+  using const_reference = typename _UDBase::const_reference;
+  using pointer = typename _UDBase::pointer;
+  using const_pointer = typename _UDBase::const_pointer;
+  using iterator = typename _UDBase::iterator;
+  using const_iterator = typename _UDBase::const_iterator;
+  using reverse_iterator = typename _UDBase::reverse_iterator;
+  using const_reverse_iterator = typename _UDBase::const_reverse_iterator;
 
   // Constructors
   constexpr UsageDetector(char const* debug_name) noexcept(noexcept(Allocator())) : _UDBase(), m_debug_name(debug_name)
@@ -499,19 +502,19 @@ class UsageDetector<utils::Vector<T, _Index, _Alloc>> : protected utils::Vector<
   char const* m_debug_name;
 
  public:
-  using value_type = _UDBase::value_type;
-  using allocator_type = _UDBase::allocator_type;
-  using size_type = _UDBase::size_type;
-  using difference_type = _UDBase::difference_type;
-  using reference = _UDBase::reference;
-  using const_reference = _UDBase::const_reference;
-  using pointer = _UDBase::pointer;
-  using const_pointer = _UDBase::const_pointer;
-  using iterator = _UDBase::iterator;
-  using const_iterator = _UDBase::const_iterator;
-  using reverse_iterator = _UDBase::reverse_iterator;
-  using const_reverse_iterator = _UDBase::const_reverse_iterator;
-  using index_type = _UDBase::index_type;
+  using value_type = typename _UDBase::value_type;
+  using allocator_type = typename _UDBase::allocator_type;
+  using size_type = typename _UDBase::size_type;
+  using difference_type = typename _UDBase::difference_type;
+  using reference = typename _UDBase::reference;
+  using const_reference = typename _UDBase::const_reference;
+  using pointer = typename _UDBase::pointer;
+  using const_pointer = typename _UDBase::const_pointer;
+  using iterator = typename _UDBase::iterator;
+  using const_iterator = typename _UDBase::const_iterator;
+  using reverse_iterator = typename _UDBase::reverse_iterator;
+  using const_reverse_iterator = typename _UDBase::const_reverse_iterator;
+  using index_type = typename _UDBase::index_type;
 
   // Constructors
   constexpr UsageDetector(char const* debug_name) noexcept(noexcept(_Alloc())) : _UDBase(), m_debug_name(debug_name)
@@ -922,23 +925,23 @@ class UsageDetector<std::map<Key, T, Compare, Allocator>> : protected std::map<K
   char const* m_debug_name;
 
  public:
-  using key_type = _UDBase::key_type;
-  using mapped_type = _UDBase::mapped_type;
-  using key_compare = _UDBase::key_compare;
-  using node_type = _UDBase::node_type;
-  using insert_return_type = _UDBase::insert_return_type;
-  using value_type = _UDBase::value_type;
-  using allocator_type = _UDBase::allocator_type;
-  using size_type = _UDBase::size_type;
-  using difference_type = _UDBase::difference_type;
-  using reference = _UDBase::reference;
-  using const_reference = _UDBase::const_reference;
-  using pointer = _UDBase::pointer;
-  using const_pointer = _UDBase::const_pointer;
-  using iterator = _UDBase::iterator;
-  using const_iterator = _UDBase::const_iterator;
-  using reverse_iterator = _UDBase::reverse_iterator;
-  using const_reverse_iterator = _UDBase::const_reverse_iterator;
+  using key_type = typename _UDBase::key_type;
+  using mapped_type = typename _UDBase::mapped_type;
+  using key_compare = typename _UDBase::key_compare;
+  using node_type = typename _UDBase::node_type;
+  using insert_return_type = typename _UDBase::insert_return_type;
+  using value_type = typename _UDBase::value_type;
+  using allocator_type = typename _UDBase::allocator_type;
+  using size_type = typename _UDBase::size_type;
+  using difference_type = typename _UDBase::difference_type;
+  using reference = typename _UDBase::reference;
+  using const_reference = typename _UDBase::const_reference;
+  using pointer = typename _UDBase::pointer;
+  using const_pointer = typename _UDBase::const_pointer;
+  using iterator = typename _UDBase::iterator;
+  using const_iterator = typename _UDBase::const_iterator;
+  using reverse_iterator = typename _UDBase::reverse_iterator;
+  using const_reverse_iterator = typename _UDBase::const_reverse_iterator;
 
   // Constructors
   UsageDetector(char const* debug_name) : _UDBase(), m_debug_name(debug_name)
@@ -1464,3 +1467,5 @@ typename std::map<Key, T, Compare, Alloc>::size_type erase_if(UsageDetector<std:
 }
 
 NAMESPACE_DEBUG_END
+
+#endif // __cplusplus >= 202101L
