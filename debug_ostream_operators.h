@@ -34,8 +34,6 @@
 #include <utility>                      // std::pair
 #include <map>
 #include <set>
-#include <vector>
-#include <deque>
 #include <chrono>
 #ifdef USE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
@@ -175,62 +173,31 @@ std::ostream& operator<<(std::ostream& os, set<T1, T2, T3> const& data)
 
 namespace detail {
 
-/// Print an array.
-template<typename T>
-void print_on(std::ostream& os, T const* data, size_t len)
-{
-  os << '{';
-  char const* prefix = "";
-  for (size_t i = 0; i < len; ++i)
-  {
-    os << prefix << data[i];
-    prefix = ", ";
-  }
-  os << '}';
-}
+template <typename T>
+concept ConceptNonCharContainer = requires(T v) {
+  typename T::value_type;
+  typename T::iterator;
+  { v.begin() } -> std::same_as<typename T::iterator>;
+  { v.end() } -> std::same_as<typename T::iterator>;
+  { std::declval<typename T::iterator>() != std::declval<typename T::iterator>() } -> std::same_as<bool>;
+  { *std::declval<typename T::iterator>() } -> std::same_as<typename T::value_type&>;
+  requires !std::same_as<typename T::value_type, char>; // Exclude containers with value_type char
+};
 
 } // namespace detail
 
-/// Print a vector.
-template<typename T>
-inline std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
-{
-  if constexpr (std::is_same_v<T, bool>)
-  {
-    os << '{';
-    char const* prefix = "";
-    for (bool b : v)
-    {
-      os << prefix << std::boolalpha << b;
-      prefix = ", ";
-    }
-    os << '}';
-  }
-  else
-    detail::print_on(os, v.data(), v.size());
-  return os;
-}
-
-/// Print an array.
-template<typename T, size_t N>
-inline std::ostream& operator<<(std::ostream& os, std::array<T, N> const& v)
-{
-  detail::print_on(os, v.data(), v.size());
-  return os;
-}
-
-/// Print a deque.
-template<typename T>
-inline std::ostream& operator<<(std::ostream& os, std::deque<T> const& v)
+/// Print a container.
+template<detail::ConceptNonCharContainer CONTAINER>
+inline std::ostream& operator<<(std::ostream& os, CONTAINER const& v)
 {
   os << '{';
   char const* prefix = "";
-  for (T const& e : v)
+  for (auto& val : v)
   {
-    if constexpr (std::is_same_v<T, bool>)
-      os << prefix << std::boolalpha << e;
+    if constexpr (std::is_same_v<typename CONTAINER::value_type, bool>)
+      os << prefix << std::boolalpha << val;
     else
-      os << prefix << e;
+      os << prefix << val;
     prefix = ", ";
   }
   os << '}';
