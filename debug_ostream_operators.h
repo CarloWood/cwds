@@ -181,7 +181,8 @@ concept ConceptNonCharContainer = requires(T v) {
   { v.end() } -> std::same_as<typename T::iterator>;
   { std::declval<typename T::iterator>() != std::declval<typename T::iterator>() } -> std::same_as<bool>;
   { *std::declval<typename T::iterator>() } -> std::same_as<typename T::value_type&>;
-  requires !std::same_as<typename T::value_type, char>; // Exclude containers with value_type char
+  requires !std::same_as<typename T::value_type, char>;
+  requires !std::same_as<typename T::value_type, char8_t>;
 };
 
 } // namespace detail
