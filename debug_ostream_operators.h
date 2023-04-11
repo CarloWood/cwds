@@ -35,6 +35,7 @@
 #include <map>
 #include <set>
 #include <chrono>
+#include <type_traits>
 #ifdef USE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
@@ -174,7 +175,8 @@ std::ostream& operator<<(std::ostream& os, set<T1, T2, T3> const& data)
 namespace detail {
 
 template <typename T>
-concept ConceptNonCharContainer = requires(T v) {
+concept ConceptNonCharContainer = requires(T v)
+{
   typename T::value_type;
   typename T::iterator;
   { v.begin() } -> std::same_as<typename T::iterator>;
@@ -188,8 +190,8 @@ concept ConceptNonCharContainer = requires(T v) {
 } // namespace detail
 
 /// Print a container.
-template<detail::ConceptNonCharContainer CONTAINER>
-inline std::ostream& operator<<(std::ostream& os, CONTAINER const& v)
+template<typename ch, typename char_traits, detail::ConceptNonCharContainer CONTAINER>
+inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, char_traits>& os, CONTAINER const& v)
 {
   os << '{';
   char const* prefix = "";
