@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12...3.25)
+cmake_minimum_required(VERSION 3.26)
 
 project(cwds
   LANGUAGES CXX
@@ -15,7 +15,7 @@ if (NOT _module_path)
 endif ()
 
 if (NOT AICxxSubmodules)
-  message( FATAL_ERROR
+  message(FATAL_ERROR
       "Please do not use `add_subdirectory(...)` for any of the AICxx modules.\n"
       "Instead, use `include(AICxxSubmodules)` in your top-level CMakeLists.txt."
   )
@@ -23,10 +23,10 @@ endif ()
 
 # Check if the compiler supports the benchmark assembly code.
 try_compile(BENCHMARK_SUPPORTED
-  SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/cmake_benchmark_test.cpp ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cxx
-  LOG_DESCRIPTION "Checking if benchmark asm is supported"
+  SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/cmake_benchmark_test.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cxx"
   CXX_STANDARD 20
   CMAKE_FLAGS "-DCMAKE_BUILD_TYPE=Release" "-DINCLUDE_DIRECTORIES=${CMAKE_SOURCE_DIR}"
+  LOG_DESCRIPTION "Checking if benchmark asm is supported"
   OUTPUT_VARIABLE OUTPUT)
 
 if (BENCHMARK_SUPPORTED)
