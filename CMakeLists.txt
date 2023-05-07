@@ -21,6 +21,21 @@ if (NOT AICxxSubmodules)
   )
 endif ()
 
+# Check if the compiler supports the benchmark assembly code.
+try_compile(BENCHMARK_SUPPORTED
+  SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/cmake_benchmark_test.cpp ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cxx
+  LOG_DESCRIPTION "Checking if benchmark asm is supported"
+  CXX_STANDARD 20
+  CMAKE_FLAGS "-DCMAKE_BUILD_TYPE=Release" "-DINCLUDE_DIRECTORIES=${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE OUTPUT)
+
+if (BENCHMARK_SUPPORTED)
+  message(STATUS "Benchmark code enabled")
+else ()
+  message(STATUS "Benchmark code disabled")
+  message(DEBUG "Compiling cmake_benchmark_test.cpp failed with ${OUTPUT}")
+endif ()
+
 #==============================================================================
 # DEPENDENCIES
 #
@@ -59,14 +74,12 @@ set_property(
 # The list of source files.
 target_sources(cwds_ObjLib
   PRIVATE
-    "benchmark.cxx"
     "debug.cxx"
     "debug_ostream_operators.cxx"
     "signal_safe_printf.cxx"
     "UsageDetector.cxx"
 
     "sys.h"
-    "benchmark.h"
     "debug.h"
     "debug_ostream_operators.h"
     "FrequencyCounter.h"
@@ -77,8 +90,23 @@ target_sources(cwds_ObjLib
     "UsageDetector.h"
 )
 
+if (BENCHMARK_SUPPORTED)
+
+# Add the benchmark files to the project.
+target_sources(cwds_ObjLib
+  PRIVATE
+    "benchmark.cxx"
+    "benchmark.h"
+)
+
 # Always compile benchmark.cxx with -O3.
 set_source_files_properties("benchmark.cxx" PROPERTIES COMPILE_OPTIONS "-O3")
+
+else (BENCHMARK_SUPPORTED)
+
+target_compile_definitions(cwds_ObjLib INTERFACE BENCHMARK_UNSUPPORTED)
+
+endif (BENCHMARK_SUPPORTED)
 
 # Required include search-paths.
 target_include_directories(cwds_ObjLib

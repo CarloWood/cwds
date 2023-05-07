@@ -33,6 +33,11 @@
 #include <cstdlib>
 #include <limits>
 
+#if defined(BENCHMARK_UNSUPPORTED)
+// Do not #include <benchmark.h> when BENCHMARK_UNSUPPORTED is defined.
+#error benchmark.h included while BENCHMARK_UNSUPPORTED is defined!
+#endif
+
 #if !defined(__OPTIMIZE__)
 #error benchmark.h included without using optimization!
 #endif
