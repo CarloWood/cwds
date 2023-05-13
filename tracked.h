@@ -23,7 +23,7 @@ namespace tracked {
 
 // Usage:
 //
-// DEFINE_TRACKED(B);
+// DECLARE_TRACKED(B);
 //
 // after which using B will print debug info about
 // construction, destruction, copying, moving, assignment,
