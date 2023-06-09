@@ -134,6 +134,17 @@ if (OptionEnableLibcwd)
   )
 endif ()
 
+# This wasn't set as OptionEnableDebugGlobal yet because
+# cwds is configured before utils, so cw_option for this
+# option wasn't called yet.
+if (EnableDebugGlobal)
+  # Add a dependency on AICxx::utils because we need to include utils/config.h to get DEBUGGLOBAL.
+  target_link_libraries(cwds_ObjLib
+    PUBLIC
+      AICxx::utils
+  )
+endif ()
+
 # Create an ALIAS target.
 add_library(AICxx::cwds ALIAS cwds_ObjLib)
 
