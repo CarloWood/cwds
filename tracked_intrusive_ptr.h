@@ -2,7 +2,7 @@
 
 // This header requires submodules
 // https://github.com/CarloWood/ai-utils and
-// https://github.com/CarloWood/ai-threadsafe to be installed.
+// https://github.com/CarloWood/threadsafe to be installed.
 
 #include "utils/InstanceTracker.h"
 #include <boost/intrusive_ptr.hpp>
