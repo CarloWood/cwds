@@ -83,28 +83,28 @@ struct Tracked {
   Tracked()
   {
     make_entry();
-    Dout(dc::tracked, *this << '*');
+    Dout(dc::tracked, *this << "* [" << this << ']');
   }
 
   Tracked(Tracked const& lvalue)
   {
     lvalue.assert_status_below(Entry::pillaged, "copy");
     make_entry();
-    Dout(dc::tracked, *this << "*(" << lvalue << ')');
+    Dout(dc::tracked, *this << "*(" << lvalue << ") [" << this << ']');
   }
 
   Tracked(Tracked&& rvalue)
   {
     rvalue.assert_status_below(Entry::pillaged, "move");
     make_entry();
-    Dout(dc::tracked, rvalue << "=>" << *this << '*');
+    Dout(dc::tracked, rvalue << "=>" << *this << "* [" << this << ']');
     rvalue.entry()->set_status(Entry::pillaged);
   }
 
   ~Tracked()
   {
     assert_status_below(Entry::destructed, "re-destruct");
-    Dout(dc::tracked, *this << '~');
+    Dout(dc::tracked, *this << "~ [" << this << ']');
     entry()->set_status(Entry::destructed);
   }
 
@@ -112,7 +112,7 @@ struct Tracked {
   {
     assert_status_below(Entry::destructed, "assign to");
     r.assert_status_below(Entry::pillaged, "assign from");
-    Dout(dc::tracked, *this << '=' << r);
+    Dout(dc::tracked, *this << '=' << r << " [" << this << ']');
     entry()->set_status(Entry::fresh);
   }
 
@@ -121,7 +121,7 @@ struct Tracked {
     assert_status_below(Entry::destructed, "move-assign to");
     r.assert_status_below(Entry::pillaged, "move");
     entry()->set_status(Entry::fresh);
-    Dout(dc::tracked, r << "=>" << *this);
+    Dout(dc::tracked, r << "=>" << *this << " [" << this << ']');
     r.entry()->set_status(Entry::pillaged);
   }
 
@@ -129,7 +129,7 @@ struct Tracked {
   {
     assert_status_below(Entry::destructed, "refresh");
     entry()->set_status(Entry::fresh);
-    Dout(dc::tracked, "Revived " << *this);
+    Dout(dc::tracked, "Revived " << *this << " [" << this << ']');
   }
 
   void* operator new(std::size_t const s)
@@ -200,7 +200,7 @@ void Tracked<NAME>::make_entry() const
 {
   if (Entry* const e = entry())
     if (!e->status_destructed())
-      Dout(dc::tracked, "leaked: " << e << '.');
+      Dout(dc::tracked, "leaked: " << e << " [" << this << ']');
   Entry::entries().emplace_back(this);
 }
 
@@ -228,7 +228,7 @@ void* Tracked<NAME>::op_new(std::size_t, bool const array, void* const r)
 {
   if (!r)
     return 0;
-  Dout(dc::tracked, "new(" << *NAME << (array ? "[]" : "") << ")");
+  Dout(dc::tracked, "new(" << *NAME << (array ? "[]" : "") << ") [" << this << "]");
   return r;
 }
 
@@ -240,7 +240,7 @@ void Tracked<NAME>::op_delete(void* const p, std::size_t const s)
   for (auto&& e : Entry::entries())
     if (!(e < p) && e < static_cast<char*>(p) + s)
     {
-      Dout(dc::tracked, "delete(" << e << ")");
+      Dout(dc::tracked, "delete(" << e << ") [" << this << ']');
       e.set_status(Entry::deleted);
       return;
     }
@@ -262,7 +262,7 @@ void Tracked<NAME>::op_array_delete(void* const p, std::size_t const s)
       Dout(dc::continued, e);
       e.set_status(Entry::deleted);
     }
-  Dout(dc::finish, ']');
+  Dout(dc::finish, "] [" << this << "]");
 }
 
 //static
@@ -286,7 +286,7 @@ void Tracked<NAME>::atexit()
 
   if (!first)
   {
-    Dout(dc::finish, ".");
+    Dout(dc::finish, '.');
   }
 }
 
