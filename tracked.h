@@ -237,6 +237,7 @@ void Tracked<NAME>::op_delete(void* const p, std::size_t const s)
 {
   ::operator delete(p);
 
+PRAGMA_DIAGNOSTIC_PUSH_IGNORED("-Wuse-after-free")
   for (auto&& e : Entry::entries())
     if (!(e < p) && e < static_cast<char*>(p) + s)
     {
@@ -244,6 +245,7 @@ void Tracked<NAME>::op_delete(void* const p, std::size_t const s)
       e.set_status(Entry::deleted);
       return;
     }
+PRAGMA_DIAGNOSTIC_POP
 }
 
 template<char const* const* NAME>
