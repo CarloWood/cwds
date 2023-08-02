@@ -237,7 +237,11 @@ void Tracked<NAME>::op_delete(void* const p, std::size_t const s)
 {
   ::operator delete(p);
 
-PRAGMA_DIAGNOSTIC_PUSH_IGNORED("-Wuse-after-free")
+#if defined(__GNUC__) && !defined(__clang__) // clang doesn't have a -Wuse-after-free warning.
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wuse-after-free\"")
+#endif
+
   for (auto&& e : Entry::entries())
     if (!(e < p) && e < static_cast<char*>(p) + s)
     {
@@ -245,7 +249,10 @@ PRAGMA_DIAGNOSTIC_PUSH_IGNORED("-Wuse-after-free")
       e.set_status(Entry::deleted);
       return;
     }
-PRAGMA_DIAGNOSTIC_POP
+
+#if defined(__GNUC__) && !defined(__clang__)
+_Pragma("GCC diagnostic push")
+#endif
 }
 
 template<char const* const* NAME>
