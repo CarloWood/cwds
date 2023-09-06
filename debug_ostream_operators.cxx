@@ -128,6 +128,8 @@ std::ostream& operator<<(std::ostream& os, ArgvList argv)
 
 NAMESPACE_DEBUG_END
 
+#if __cplusplus >= 202002L      // Only add this when C++20 is supported.
+
 namespace std {
 
 std::ostream& operator<<(std::ostream& os, std::u8string_view utf8_sv)
@@ -138,5 +140,7 @@ std::ostream& operator<<(std::ostream& os, std::u8string_view utf8_sv)
 }
 
 } // namespace std
+
+#endif // __cplusplus >= 202002L
 
 #endif // CWDEBUG

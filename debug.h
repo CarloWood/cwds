@@ -268,6 +268,8 @@ struct Mark
 
 void ignore_being_traced();
 
+#if __cplusplus >= 202002L      // Only add this when C++20 is supported.
+
 template <typename T>
 concept ConceptAlwaysFalse = false;
 
@@ -283,6 +285,8 @@ bool static_print(T&& = {})
 //
 #define DEBUG_STATIC_PRINT_TYPE(type) \
   auto __dummy = NAMESPACE_DEBUG::static_print<decltype(TopPosition::v)>();
+
+#endif // __cplusplus >= 202002L
 
 NAMESPACE_DEBUG_END
 

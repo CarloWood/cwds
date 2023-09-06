@@ -172,6 +172,19 @@ std::ostream& operator<<(std::ostream& os, set<T1, T2, T3> const& data)
   return os << '}';
 }
 
+template<typename... Args>
+std::ostream& operator<<(std::ostream& os, tuple<Args...> const& t)
+{
+  using ostream_serializer_catch_all::operator<<;
+  bool first = true;
+  os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
+  first = true;
+  apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
+  return os << ')';
+}
+
+#if __cplusplus >= 202002L      // Only add this when C++20 is supported.
+
 namespace detail {
 
 template <typename T>
@@ -207,19 +220,10 @@ inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, ch
   return os;
 }
 
-template<typename... Args>
-std::ostream& operator<<(std::ostream& os, tuple<Args...> const& t)
-{
-  using ostream_serializer_catch_all::operator<<;
-  bool first = true;
-  os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
-  first = true;
-  apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
-  return os << ')';
-}
-
 // Add support for printing std::u8string to debug output.
 std::ostream& operator<<(std::ostream& os, u8string_view utf8_sv);
+
+#endif // __cplusplus >= 202002L
 
 namespace chrono {
 

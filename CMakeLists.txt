@@ -115,9 +115,9 @@ target_include_directories(cwds_ObjLib
     "${CMAKE_CURRENT_SOURCE_DIR}"           # For fall-back sys.h and debug.h.
 )
 
-# Require support for C++20.
+# Require support for at least C++17.
 target_compile_features(cwds_ObjLib
-  PUBLIC cxx_std_20
+  PUBLIC cxx_std_17
 )
 
 # Add dependencies.
