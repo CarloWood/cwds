@@ -50,20 +50,12 @@ To clone a project example-project that uses cwds simply run:
 The <tt>--recursive</tt> is optional because <tt>./autogen.sh</tt> will fix
 it when you forgot it.
 
-Afterwards you probably want to use <tt>--enable-mainainer-mode</tt>
-as option to the generated <tt>configure</tt> script. Note that <tt>--enable-mainainer-mode</tt>
-enables debugging by default (<tt>--enable-debug</tt>), and will try to use libcwd when
-available; <tt>configure</tt> will check for the existence of libcwd and use it when
-found. If you want to use maintainer-mode without debugging then configure
-using <tt>--enable-mainainer-mode --disable-debug</tt>, or if you want to enforce
-using libcwd, with or without maintainer-mode, then use <tt>--enable-libcwd</tt>.
-
 ## Adding the cwds submodule to a project
 
 To add this submodule to a project, that project should already
 be set up to use [cwm4](https://github.com/CarloWood/cwm4).
 
-Simply execute the following in the root of that project:
+Then simply execute the following in the root of that project:
 
 <pre>
 git submodule add https://github.com/CarloWood/cwds.git
@@ -72,36 +64,31 @@ git submodule add https://github.com/CarloWood/cwds.git
 This should clone cwds into the subdirectory <tt>cwds</tt>, or
 if you already cloned it there, it should add it.
 
-Changes to <tt>configure.ac</tt> and <tt>Makefile.am</tt>
-are taken care of by <tt>cwm4</tt>, except for linking
-which works as usual.
-
-For example a module that defines
+Typically you should use [gitache](https://github.com/CarloWood/gitache) to install libcwd itself.
+In that case, set the <tt>GITACHE_ROOT</tt> environment variable as described in the documentation
+of gitache and add the following to the root <tt>CMakeLists.txt</tt> file of your project:
 
 <pre>
-bin_PROGRAMS = singlethreaded_foobar multithreaded_foobar
+ ... [cmake_minimum_required, project and CMAKE_CXX_STANDARD]
+# Begin of gitache configuration.
+set(GITACHE_PACKAGES libcwd_r)
+include(cwm4/cmake/StableGitache)
+# End of gitache configuration.
+
+# This project uses aicxx modules.
+include(cwm4/cmake/AICxxProject)
+
+include(AICxxSubmodules)
+ ...
 </pre>
 
-would also define
+And add <tt>${AICXX_OBJECTS_LIST}</tt> to every target that uses cwds (aka, debugging).
+For example,
 
 <pre>
-singlethreaded_foobar_SOURCES = singlethreaded_foobar.cpp
-singlethreaded_foobar_CXXFLAGS = @LIBCWD_FLAGS@
-singlethreaded_foobar_LDADD = $(top_builddir)/cwds/libcwds.la
-
-multithreaded_foobar_SOURCES = multithreaded_foobar.cpp
-multithreaded_foobar_CXXFLAGS = @LIBCWD_R_FLAGS@
-multithreaded_foobar_LDADD = $(top_builddir)/cwds/libcwds_r.la
+add_executable(sum_first_n_primes sum_first_n_primes.cxx)
+target_link_libraries(sum_first_n_primes PRIVATE ${AICXX_OBJECTS_LIST})
 </pre>
-
-or whatever the path to `cwds` etc. is, to link with cwds and libcwd.
-
-The availability of libcwds.la and/or libcwds_r.la is determined by the second
-parameter of the <tt>CW_OPG_CXXFLAGS</tt> macro in <tt>configure.ac</tt>;
-which can be <tt>[no]</tt> (single-threaded) in which case only <tt>libcwds.la</tt>
-is available, <tt>[yes]</tt> (multi-threaded) in which case only <tt>libcwds_r.la</tt>
-is available, or <tt>[both]</tt> in which case both are available.
-See the [cwm4](https://github.com/CarloWood/cwm4) submodule for more details.
 
 As described in the documentation of [libcwd](https://github.com/CarloWood/libcwd),
 each (C++) source file must begin with <tt>#include "sys.h"</tt> and
@@ -134,14 +121,12 @@ This is the case when directly including the <tt>debug.h</tt> provided
 by this submodule. Hence, a library should provide yet another debug.h
 file and make sure that is first in the include path. Other submodules,
 which don't know if such a debug.h is provided should therefore use
-in their <tt>Makefile.am</tt>:
-
-<pre>
-AM_CPPFLAGS = -iquote $(top_builddir) -iquote $(top_srcdir) -iquote $(top_srcdir)/cwds
-</pre>
+the following order of include paths: first the top build directory,
+then the top source directory and last the <tt>cwds</tt> directory in
+the top source directory.
 
 So that library projects (or applications) can put a <tt>debug.h</tt>
-in <tt>$(top_srcdir)</tt> that contains something like
+in their top source directory that contains something like
 
 <pre>
 #pragma once
@@ -162,7 +147,7 @@ NAMESPACE_DEBUG_CHANNELS_END
 </pre>
 
 or if they don't, that then <tt>cwds/debug.h</tt> will be included
-directly. The <tt>-iquote $(top_builddir)</tt> is needed to find
+directly. The top build directory include is needed to find
 any generated header files, most notably <tt>sys.h</tt>.
 
 Debug channels that are only used in a single compilation unit can be
