@@ -90,7 +90,7 @@ add_executable(sum_first_n_primes sum_first_n_primes.cxx)
 target_link_libraries(sum_first_n_primes PRIVATE ${AICXX_OBJECTS_LIST})
 </pre>
 
-To use gitache for libcwd you also have to create the file <tt>`<project_root>`/cmake/gitache-configs/libcwd_r.cmake</tt>
+To use gitache for libcwd you also have to create the file <tt>`<project_root>/`cmake/gitache-configs/libcwd_r.cmake</tt>
 with normally the following content (see [gitache](https://github.com/CarloWood/gitache) for more information):
 
 <pre>
