@@ -90,6 +90,20 @@ add_executable(sum_first_n_primes sum_first_n_primes.cxx)
 target_link_libraries(sum_first_n_primes PRIVATE ${AICXX_OBJECTS_LIST})
 </pre>
 
+To use gitache for libcwd you also have to create the file <tt>cmake/gitache-configs/libcwd_r.cmake</tt>
+with normally the following content (see [gitache](https://github.com/CarloWood/gitache) for more information):
+
+<pre>
+gitache_config(
+  GIT_REPOSITORY
+    "https://github.com/CarloWood/libcwd.git"
+  GIT_TAG
+    "master"
+  CMAKE_ARGS
+    "-DEnableLibcwdAlloc:BOOL=OFF -DEnableLibcwdLocation:BOOL=ON"
+)
+</pre>
+
 As described in the documentation of [libcwd](https://github.com/CarloWood/libcwd),
 each (C++) source file must begin with <tt>#include "sys.h"</tt> and
 use <tt>#include "debug.h"</tt> when containing any debug code.
