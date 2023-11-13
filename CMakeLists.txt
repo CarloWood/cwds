@@ -21,19 +21,24 @@ if (NOT AICxxSubmodules)
   )
 endif ()
 
-# Check if the compiler supports the benchmark assembly code.
-try_compile(BENCHMARK_SUPPORTED
-  SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/cmake_benchmark_test.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cxx"
-  CXX_STANDARD 20
-  CMAKE_FLAGS "-DCMAKE_BUILD_TYPE=Release" "-DINCLUDE_DIRECTORIES=${CMAKE_SOURCE_DIR}"
-  LOG_DESCRIPTION "Checking if benchmark asm is supported"
-  OUTPUT_VARIABLE OUTPUT)
+# Is the utils submodule installed?
+if (EXISTS "${CMAKE_SOURCE_DIR}/utils/has_print_on.h")
+  # Check if the compiler supports the benchmark assembly code.
+  try_compile(BENCHMARK_SUPPORTED
+    SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/cmake_benchmark_test.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cxx"
+    CXX_STANDARD 20
+    CMAKE_FLAGS "-DCMAKE_BUILD_TYPE=Release" "-DINCLUDE_DIRECTORIES=${CMAKE_SOURCE_DIR}"
+    LOG_DESCRIPTION "Checking if benchmark asm is supported"
+    OUTPUT_VARIABLE OUTPUT)
 
-if (BENCHMARK_SUPPORTED)
-  message(STATUS "Benchmark code enabled")
+  if (BENCHMARK_SUPPORTED)
+    message(STATUS "Benchmark code enabled")
+  else ()
+    message(STATUS "Benchmark code disabled")
+    message(DEBUG "Compiling cmake_benchmark_test.cpp failed with ${OUTPUT}")
+  endif ()
 else ()
-  message(STATUS "Benchmark code disabled")
-  message(DEBUG "Compiling cmake_benchmark_test.cpp failed with ${OUTPUT}")
+  message(STATUS "Benchmark code disabled: utils not present.")
 endif ()
 
 #==============================================================================
