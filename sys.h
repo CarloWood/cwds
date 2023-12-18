@@ -22,5 +22,8 @@
 #ifdef HAVE_FASTPRIMES_CONFIG_H
 #include "fastprimes/config.h"
 #endif
+#ifdef HAVE_CAIROWINDOW_CONFIG_H
+#include "cairowindow/config.h"
+#endif
 
 #define UNUSED_ARG(x)
