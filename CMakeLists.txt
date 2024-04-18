@@ -70,12 +70,6 @@ find_package(Boost REQUIRED)
 # This project is an OBJECT-library, used by other git submodules and the main project.
 add_library(cwds_ObjLib OBJECT)
 
-# Set SOURCE_DIR to the current directory.
-set_property(
-  TARGET cwds_ObjLib
-  PROPERTY SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 # The list of source files.
 target_sources(cwds_ObjLib
   PRIVATE
