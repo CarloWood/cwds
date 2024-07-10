@@ -42,6 +42,15 @@ else ()
 endif ()
 
 #==============================================================================
+# POLICIES
+#
+if (POLICY CMP0167)
+  # Use boost provided BoostConfig.cmake (requires boost version 1.70 or higher).
+  # This policy was introduced in cmake 3.30.
+  cmake_policy(SET CMP0167 NEW)
+endif ()
+
+#==============================================================================
 # DEPENDENCIES
 #
 
