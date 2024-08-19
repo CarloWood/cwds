@@ -376,6 +376,7 @@ std::string DebugPipedOStringStream::str()
 NAMESPACE_DEBUG_CHANNELS_START
 channel_ct tracked("TRACKED");
 channel_ct system("SYSTEM");    // Intended to be used for system calls.
+channel_ct restart("RESTART");   // Used by debug::Restart.
 NAMESPACE_DEBUG_CHANNELS_END
 
 #endif // CWDEBUG
