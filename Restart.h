@@ -59,4 +59,7 @@ bool Restart<Id>::s_restarting;
 
 #define RESTART debug::Restart<0> restart_dummy_0;
 
+// Instantiate s_restarting.
+template bool Restart<0>::s_restarting;
+
 } // namespace debug
