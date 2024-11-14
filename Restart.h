@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef CWDEBUG
 #include "debug.h"
 
 // This utility is not threadsafe.
@@ -63,3 +64,6 @@ bool Restart<Id>::s_restarting;
 template bool Restart<0>::s_restarting;
 
 } // namespace debug
+#else
+#define RESTART
+#endif
