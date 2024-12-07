@@ -62,7 +62,7 @@ find_package(Threads REQUIRED)
 # debug_ostream_operators.h: #include <boost/shared_ptr.hpp>
 #                            #include <boost/weak_ptr.hpp>
 # tracked.h:                 #include <boost/range/adaptor/reversed.hpp>
-find_package(Boost REQUIRED)
+find_package(Boost CONFIG REQUIRED)
 
 # If utils is part of the project then we depend on it only if EnableDebugGlobal is ON.
 # However, utils depends on cwds. To avoid a circular dependency we do never include
