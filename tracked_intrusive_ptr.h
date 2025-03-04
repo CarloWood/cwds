@@ -6,6 +6,7 @@
 
 #include "utils/InstanceTracker.h"
 #include <boost/intrusive_ptr.hpp>
+#include <boost/core/explicit_operator_bool.hpp>
 
 // tracked::intrusive_ptr<T>
 //
@@ -221,8 +222,12 @@ class intrusive_ptr : public utils::InstanceTracker<intrusive_ptr<T>>
     return px;
   }
 
-// implicit conversion to "bool"
-#include <boost/smart_ptr/detail/operator_bool.hpp>
+  bool operator! () const BOOST_SP_NOEXCEPT
+  {
+    return px == nullptr;
+  }
+
+  BOOST_EXPLICIT_OPERATOR_BOOL()
 
   void swap(intrusive_ptr& rhs) BOOST_SP_NOEXCEPT
   {
