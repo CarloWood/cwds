@@ -413,7 +413,7 @@ extern pthread_mutex_t cout_mutex;
  * Print "Entering " << @a data to channel @a cntrl and increment
  * debugging output indentation until the end of the current scope.
  */
-#define DoutEntering(cntrl, data) \
+#define DoutEntering(cntrl, ...) \
   int __cwds_debug_indentation = 2;                                                                                     \
   {                                                                                                                     \
     LIBCWD_TSD_DECLARATION;                                                                                             \
@@ -433,7 +433,7 @@ extern pthread_mutex_t cout_mutex;
           LIBCWD_LibcwDoutScopeBegin_MARKER;                                                                            \
           ::libcwd::debug_ct& __libcwd_debug_object(::libcwd::libcw_do);                                                \
           LIBCWD_DO_TSD(__libcwd_debug_object).start(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);     \
-          LibcwDoutStream << "Entering " << data;                                                                       \
+          LibcwDoutStream << "Entering " << __VA_ARGS__;                                                                \
           LIBCWD_DO_TSD(__libcwd_debug_object).finish(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);    \
         } while(0);                                                                                                     \
       else                                                                                                              \
