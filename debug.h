@@ -85,6 +85,7 @@
 #else // CWDEBUG
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
+#include "config.h"
 
 /// Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
 #define CW_DEBUG 1
@@ -102,7 +103,9 @@
 
 #ifndef NAMESPACE_DEBUG
 #define NAMESPACE_DEBUG debug
-#define NAMESPACE_DEBUG_START namespace debug {
+#endif
+#ifndef NAMESPACE_DEBUG_START
+#define NAMESPACE_DEBUG_START namespace NAMESPACE_DEBUG {
 #define NAMESPACE_DEBUG_END }
 #endif
 

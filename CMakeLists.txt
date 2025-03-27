@@ -73,6 +73,25 @@ find_package(Boost CONFIG REQUIRED)
 # already (this means however that utils MUST be in project root, as does cwds).
 
 #==============================================================================
+# OPTIONS
+#
+
+message(STATUS "  in: NamespaceDebug = ${NamespaceDebug}")
+set(OptionColorBuildType "${OptionColorYay}")
+
+if (NOT "${NamespaceDebug}" STREQUAL "debug")
+  set(NAMESPACE_DEBUG ${NamespaceDebug})
+  set(OptionColorBuildType "${OptionColorAlert}")
+endif ()
+
+message(STATUS "${Option} ${OptionColor}NamespaceDebug${ColourReset} (value of NAMESPACE_DEBUG) =\n\t${OptionColorBuildType}${NamespaceDebug}${ColourReset}")
+
+# Specify cwds specific configure file.
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/config.h
+               @ONLY)
+
+#==============================================================================
 # BUILD PROJECT
 #
 
@@ -121,6 +140,7 @@ target_include_directories(cwds_ObjLib
   PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/.."        # For local sys.h and debug.h.
     "${CMAKE_CURRENT_SOURCE_DIR}"           # For fall-back sys.h and debug.h.
+    "${top_objdir}/cwds"                    # For cwds/config.h.
 )
 
 # Require support for at least C++17.
