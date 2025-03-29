@@ -151,7 +151,7 @@ std::ostream& operator<<(std::ostream& os, map<T1, T2, T3> const& data)
       ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
   using map_type = std::map<T1, T2, T3>;
   for (typename map_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
-    os << '{' << *iter << '}';
+    os << *iter;
   return os << '}';
 }
 

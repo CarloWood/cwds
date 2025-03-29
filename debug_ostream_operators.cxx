@@ -123,7 +123,7 @@ std::ostream& operator<<(std::ostream& os, ArgvList argv)
     os << '"' << argv.m_argv[i] << "\", ";
     ++i;
   }
-  return os << "NULL }";
+  return os << "nullptr}";
 }
 
 NAMESPACE_DEBUG_END
