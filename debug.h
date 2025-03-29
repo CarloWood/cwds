@@ -129,8 +129,9 @@
 #include <libcwd/debug.h>
 #include <libcwd/char2str.h>
 
-#define NAMESPACE_DEBUG_CHANNELS_START NAMESPACE_DEBUG_START namespace NAMESPACE_CHANNELS { namespace dc {
-#define NAMESPACE_DEBUG_CHANNELS_END } } NAMESPACE_DEBUG_END
+// Nested namespace definitions are already a part of C++17.
+#define NAMESPACE_DEBUG_CHANNELS_START namespace NAMESPACE_DEBUG::NAMESPACE_CHANNELS::dc {
+#define NAMESPACE_DEBUG_CHANNELS_END }
 
 namespace libcwd {
 
@@ -416,33 +417,11 @@ extern pthread_mutex_t cout_mutex;
  * Print "Entering " << @a data to channel @a cntrl and increment
  * debugging output indentation until the end of the current scope.
  */
-#define DoutEntering(cntrl, ...) \
-  int __cwds_debug_indentation = 2;                                                                                     \
-  {                                                                                                                     \
-    LIBCWD_TSD_DECLARATION;                                                                                             \
-    if (LIBCWD_DO_TSD_MEMBER_OFF(::libcwd::libcw_do) < 0)                                                               \
-    {                                                                                                                   \
-      using namespace ::libcwd;                                                                                         \
-      ::libcwd::channel_set_bootstrap_st __libcwd_channel_set(LIBCWD_DO_TSD(::libcwd::libcw_do) LIBCWD_COMMA_TSD);      \
-      bool on;                                                                                                          \
-      {                                                                                                                 \
-        using namespace LIBCWD_DEBUGCHANNELS;                                                                           \
-        on = (__libcwd_channel_set|cntrl).on;                                                                           \
-      }                                                                                                                 \
-      if (on)                                                                                                           \
-        do                                                                                                              \
-        {                                                                                                               \
-          LIBCWD_ASSERT_NOT_INTERNAL;                                                                                   \
-          LIBCWD_LibcwDoutScopeBegin_MARKER;                                                                            \
-          ::libcwd::debug_ct& __libcwd_debug_object(::libcwd::libcw_do);                                                \
-          LIBCWD_DO_TSD(__libcwd_debug_object).start(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);     \
-          LibcwDoutStream << "Entering " << __VA_ARGS__;                                                                \
-          LIBCWD_DO_TSD(__libcwd_debug_object).finish(__libcwd_debug_object, __libcwd_channel_set LIBCWD_COMMA_TSD);    \
-        } while(0);                                                                                                     \
-      else                                                                                                              \
-        __cwds_debug_indentation = 0;                                                                                   \
-    }                                                                                                                   \
-  }                                                                                                                     \
+#define DoutEntering(cntrl, ...)                                                \
+  int __cwds_debug_indentation = 2;                                             \
+  LibcwDoutScopeBegin(DEBUGCHANNELS, ::libcwd::libcw_do, cntrl)                 \
+  LibcwDoutStream << "Entering " << __VA_ARGS__;                                \
+  LibcwDoutScopeEnd;                                                            \
   NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
 
 #ifdef __cpp_fold_expressions
