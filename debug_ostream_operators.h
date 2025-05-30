@@ -223,6 +223,16 @@ inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, ch
 // Add support for printing std::u8string to debug output.
 std::ostream& operator<<(std::ostream& os, u8string_view utf8_sv);
 
+// Add support for printing enum's by name that have a to_string defined.
+template<typename Enum>
+requires
+  std::is_enum_v<Enum> &&
+  requires(Enum e) { to_string(e); }
+std::ostream& operator<<(std::ostream& os, Enum e)
+{
+  return os << to_string(e);
+}
+
 #endif // __cplusplus >= 202002L
 
 namespace chrono {
