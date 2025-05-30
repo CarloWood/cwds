@@ -58,7 +58,7 @@ Stopwatch::Stopwatch(unsigned int cpu_nr)
   char const* err_str;
   int err_num;
 
-  std::memset(this, 0, sizeof(Stopwatch));
+  std::memset((void*)this, 0, sizeof(Stopwatch));
   do
   {
     // Pin main thread to a cpu 'cpu_nr'.
