@@ -76,15 +76,25 @@ find_package(Boost CONFIG REQUIRED)
 # OPTIONS
 #
 
-message(STATUS "  in: NamespaceDebug = ${NamespaceDebug}")
-set(OptionColorBuildType "${OptionColorYay}")
+# If the main project wants to use a different NAMESPACE_DEBUG, it must do:
+#   # Tell cwds that we want to use another namespace.
+#   set(NamespaceDebug other_namespace)
+# in CMakeLists.txt in the root of the project.
 
+message(STATUS "  in: NamespaceDebug = ${NamespaceDebug}")
+set(OptionColorNamespaceDebug "${OptionColorYay}")
+if (NamespaceDebug)
+  set(OptionDefaultNamespaceDebug "")
+else ()
+  set(NamespaceDebug "debug")
+  set(OptionDefaultNamespaceDebug " (default)")
+endif ()
 if (NOT "${NamespaceDebug}" STREQUAL "debug")
   set(NAMESPACE_DEBUG ${NamespaceDebug})
-  set(OptionColorBuildType "${OptionColorAlert}")
+  set(OptionColorNamespaceDebug "${OptionColorAlert}")
 endif ()
 
-message(STATUS "${Option} ${OptionColor}NamespaceDebug${ColourReset} (value of NAMESPACE_DEBUG) =\n\t${OptionColorBuildType}${NamespaceDebug}${ColourReset}")
+message(STATUS "${Option} ${OptionColor}NamespaceDebug${ColourReset} (value of NAMESPACE_DEBUG) =\n\t${OptionColorNamespaceDebug}${NamespaceDebug}${ColourReset}${OptionDefaultNamespaceDebug}")
 
 # Specify cwds specific configure file.
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
