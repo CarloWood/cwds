@@ -200,6 +200,11 @@ concept ConceptNonCharContainer = requires(T v)
   requires !std::same_as<typename T::value_type, char8_t>;
 };
 
+struct ConvertibleFromOstream {
+  std::ostream& os_;
+  ConvertibleFromOstream(std::ostream& os) : os_(os) { }
+};
+
 } // namespace detail
 
 /// Print a container.
@@ -228,9 +233,9 @@ template<typename Enum>
 requires
   std::is_enum_v<Enum> &&
   requires(Enum e) { to_string(e); }
-std::ostream& operator<<(std::ostream& os, Enum e)
+std::ostream& operator<<(detail::ConvertibleFromOstream os, Enum e)
 {
-  return os << to_string(e);
+  return os.os_ << to_string(e);
 }
 
 #endif // __cplusplus >= 202002L
