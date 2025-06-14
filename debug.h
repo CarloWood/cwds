@@ -462,7 +462,7 @@ struct has_ostream_serializer<T, decltype(std::cout << std::declval<T>())> : std
 template<typename T>
 auto operator<<(std::ostream& os, T const&) -> typename std::enable_if<!has_ostream_serializer<T>::value, std::ostream&>::type
 {
-  os.write("...", 3);
+  os.write("¿￼ ?", 4);
   return os;
 }
 
