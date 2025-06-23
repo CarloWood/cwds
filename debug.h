@@ -40,14 +40,14 @@
 #define AllocTag_dynamic_description(p, x)
 #define AllocTag(p, x)
 #define Debug(x) do { } while(0)
-#define Dout(a, b) do { } while(0)
-#define DoutEntering(a, b)
-#define DoutFatal(a, b) LibcwDoutFatal(::std, , a, b)
+#define Dout(a, ...) do { } while(0)
+#define DoutEntering(a, ...)
+#define DoutFatal(a, ...) LibcwDoutFatal(::std, , a, __VA_ARGS__)
 #define ForAllDebugChannels(STATEMENT)
 #define ForAllDebugObjects(STATEMENT)
 #define LibcwDebug(dc_namespace, x)
-#define LibcwDout(a, b, c, d)
-#define LibcwDoutFatal(a, b, c, d) do { ::std::cerr << d << ::std::endl; ::std::exit(EXIT_FAILURE); } while (1)
+#define LibcwDout(a, b, c, ...)
+#define LibcwDoutFatal(a, b, c, ...) do { ::std::cerr << __VA_ARGS__ << ::std::endl; ::std::exit(EXIT_FAILURE); } while (1)
 #define NEW(x) new x
 #define CWDEBUG_ALLOC 0
 #define CWDEBUG_MAGIC 0
