@@ -226,7 +226,13 @@ inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, ch
 }
 
 // Add support for printing std::u8string to debug output.
-std::ostream& operator<<(std::ostream& os, u8string_view utf8_sv);
+// Use a template to allow an exact definition to take precedence.
+std::ostream& operator<<(std::ostream& os, std::same_as<std::u8string_view> auto utf8_sv)
+{
+  os << "u8\"";
+  os.write(reinterpret_cast<char const*>(utf8_sv.data()), utf8_sv.length());
+  return os << '"';
+}
 
 #endif // __cplusplus >= 202002L
 
