@@ -133,55 +133,57 @@ std::ostream& operator<<(std::ostream& os, weak_ptr<T> const& data)
 } // namespace boost
 #endif // USE_LIBBOOST
 
-namespace std {
+// This namespace is used in LIBCWD_USING_OSTREAM_PRELUDE.
+// Put overloads for types in namespace std here, as defining them in namespace std is UB.
+namespace libcwd::ostream_operators {
 
-/// Print debug info for std::pair&lt;&gt; instance @a data.
-template<typename T1, typename T2>
-std::ostream& operator<<(std::ostream& os, pair<T1, T2> const& data)
+// Add support for printing std::u8string to debug output.
+// Use a template accepting arguments that are convertible to std::u8string_view in order
+// to allow an exact definition to take precedence.
+std::ostream& operator<<(std::ostream& os, std::convertible_to<std::u8string_view> auto utf8_sv)
 {
-  return os << "{first:" << data.first << ", second:" << data.second << '}';
+  os << "u8\"";
+  os.write(reinterpret_cast<char const*>(utf8_sv.data()), utf8_sv.length());
+  return os << '"';
 }
 
-/// Print a whole map.
-template<typename T1, typename T2, typename T3>
-std::ostream& operator<<(std::ostream& os, map<T1, T2, T3> const& data)
+template<std::intmax_t resolution>
+std::ostream& operator<<(
+    std::ostream& os,
+    std::chrono::duration<std::intmax_t, std::ratio<std::intmax_t(1), resolution>> const& duration)
 {
-  os << "{map<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
-      ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
-      ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
-  using map_type = std::map<T1, T2, T3>;
-  for (typename map_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
-    os << *iter;
-  return os << '}';
-}
-
-/// Print a whole set.
-template<typename T1, typename T2, typename T3>
-std::ostream& operator<<(std::ostream& os, set<T1, T2, T3> const& data)
-{
-  os << "{set<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
-      ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
-      ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
-  using set_type = std::set<T1, T2, T3>;
-  char const* prefix = "";
-  for (typename set_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
+  std::intmax_t const ticks = duration.count();
+  os << (ticks / resolution) << '.';
+  std::intmax_t div = resolution;
+  std::intmax_t frac = ticks;
+  for (;;)
   {
-    os << prefix << '{' << *iter << '}';
-    prefix = ", ";
+    frac %= div;
+    if (frac == 0) break;
+    div /= 10;
+    os << frac / div;
   }
-  return os << '}';
+  return os;
 }
+
+template<typename Clock, typename Duration>
+std::ostream& operator<<(std::ostream& os, std::chrono::time_point<Clock, Duration> const& timepoint)
+{
+  return os << timepoint.time_since_epoch();
+}
+
+// Forward declarations.
+template<typename T1, typename T2>
+std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data);
+
+template<typename T1, typename T2, typename T3>
+std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data);
+
+template<typename T1, typename T2, typename T3>
+std::ostream& operator<<(std::ostream& os, std::set<T1, T2, T3> const& data);
 
 template<typename... Args>
-std::ostream& operator<<(std::ostream& os, tuple<Args...> const& t)
-{
-  using ostream_serializer_catch_all::operator<<;
-  bool first = true;
-  os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
-  first = true;
-  apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
-  return os << ')';
-}
+std::ostream& operator<<(std::ostream& os, std::tuple<Args...> const& t);
 
 #if __cplusplus >= 202002L      // Only add this when C++20 is supported.
 
@@ -225,46 +227,56 @@ inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, ch
   return os;
 }
 
-// Add support for printing std::u8string to debug output.
-// Use a template to allow an exact definition to take precedence.
-std::ostream& operator<<(std::ostream& os, std::same_as<std::u8string_view> auto utf8_sv)
-{
-  os << "u8\"";
-  os.write(reinterpret_cast<char const*>(utf8_sv.data()), utf8_sv.length());
-  return os << '"';
-}
-
 #endif // __cplusplus >= 202002L
 
-namespace chrono {
-
-template<std::intmax_t resolution>
-std::ostream& operator<<(
-    std::ostream& os,
-    duration<std::intmax_t, std::ratio<std::intmax_t(1), resolution>> const& duration)
+/// Print debug info for std::pair&lt;&gt; instance @a data.
+template<typename T1, typename T2>
+std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data)
 {
-  std::intmax_t const ticks = duration.count();
-  os << (ticks / resolution) << '.';
-  std::intmax_t div = resolution;
-  std::intmax_t frac = ticks;
-  for (;;)
+  return os << "{first:" << data.first << ", second:" << data.second << '}';
+}
+
+/// Print a whole map.
+template<typename T1, typename T2, typename T3>
+std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
+{
+  os << "{map<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
+  using map_type = std::map<T1, T2, T3>;
+  for (typename map_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
+    os << *iter;
+  return os << '}';
+}
+
+/// Print a whole set.
+template<typename T1, typename T2, typename T3>
+std::ostream& operator<<(std::ostream& os, std::set<T1, T2, T3> const& data)
+{
+  os << "{set<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
+  using set_type = std::set<T1, T2, T3>;
+  char const* prefix = "";
+  for (typename set_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
   {
-    frac %= div;
-    if (frac == 0) break;
-    div /= 10;
-    os << frac / div;
+    os << prefix << '{' << *iter << '}';
+    prefix = ", ";
   }
-  return os;
+  return os << '}';
 }
 
-template<typename Clock, typename Duration>
-std::ostream& operator<<(std::ostream& os, time_point<Clock, Duration> const& timepoint)
+template<typename... Args>
+std::ostream& operator<<(std::ostream& os, std::tuple<Args...> const& t)
 {
-  return os << timepoint.time_since_epoch();
+  using ostream_serializer_catch_all::operator<<;
+  bool first = true;
+  os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
+  first = true;
+  apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
+  return os << ')';
 }
 
-} // namespace chrono
-
-} // namespace std
+} // libcwd::debug_ostream_operators
 
 #endif // CWDEBUG
