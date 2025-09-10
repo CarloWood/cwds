@@ -65,16 +65,23 @@
 #define CWDEBUG_ONLY(...)
 #define COMMA_CWDEBUG_ONLY(...)
 
-#ifdef DEBUG
-/// Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
+#ifndef NDEBUG
+/// Define this macro as 1 when either CWDEBUG is defined or NDEBUG is not defined, otherwise as 0.
 #define CW_DEBUG 1
 
 #include <cassert>
-#include <utility>
 #include <atomic>
+
 #define ASSERT(x) assert(x)
-#define AI_NEVER_REACHED do { std::unreachable(); } while(0);
-#define AI_REACHED_ONCE do { static std::atomic_flag s_reached = ATOMIC_FLAG_INIT; assert(!s_reached.test_and_set(std::memory_order_relaxed)); } while(0)
+#if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable >= 202202L
+#include <utility>
+#define AI_NEVER_REACHED do { ::std::unreachable(); } while(0);
+#else
+#define AI_NEVER_REACHED __builtin_unreachable();
+#endif
+#define AI_REACHED_ONCE do { \
+  static ::std::atomic_flag s_reached = ATOMIC_FLAG_INIT; assert(!s_reached.test_and_set(::std::memory_order_relaxed)); \
+} while(0)
 
 #else
 #define CW_DEBUG 0
@@ -89,7 +96,7 @@
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 #include "config.h"
 
-/// Define this macro as 1 when either CWDEBUG or DEBUG is defined, otherwise as 0.
+/// Define this macro as 1 when either CWDEBUG is defined or NDEBUG is not defined, otherwise as 0.
 #define CW_DEBUG 1
 
 /// Assert @a x, if debugging is turned on.
