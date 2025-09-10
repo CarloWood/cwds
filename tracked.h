@@ -313,7 +313,7 @@ inline void unmute()
 
 } // namespace tracked;
 
-#if 0
+#ifdef EXAMPLE_CODE
 DECLARE_TRACKED(B);
 
 int main()

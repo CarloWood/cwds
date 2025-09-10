@@ -1,8 +1,10 @@
 define rerun_commands
   set variable debug::Restart<0>::s_restarting = false
+  set non-stop off
   finish
   finish
   enable
+  set scheduler-locking step
   printf "==> debug::Restart<0>::s_count is now %lu\n", $saved_count
 end
 
@@ -22,7 +24,7 @@ define rerun
 if grep -q 'restart_dummy_0' /tmp/gdb.restart.locals.txt; then \
   echo "set \$saved_count = restart_dummy_0.count" > /tmp/gdb.restart.command; \
 else \
-  echo "set \$saved_count = '::debug::Restart<0>'::s_count" > /tmp/gdb.restart.command; \
+  echo "set \$saved_count = '::debug::Restart<0>'::s_count._M_i" > /tmp/gdb.restart.command; \
 fi
 
     source /tmp/gdb.restart.command
@@ -33,7 +35,8 @@ fi
   tbreak debug::Restart<0>::Restart
   commands
     silent
-    eval "tbreak debug::Restart<0>::test_break if s_count == %lu", $saved_count
+    eval "set variable debug::Restart<0>::s_target_count = %lu", $saved_count
+    tbreak debug::Restart<0>::test_break
     commands
       rerun_commands
     end

@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef CWDEBUG
+#include <atomic>
 #include "debug.h"
 
 // This utility is not threadsafe.
@@ -40,28 +41,36 @@ template<int Id>
 struct Restart
 {
   unsigned long count;
-  static unsigned long s_count;
+  static std::atomic<unsigned long> s_count;
   static bool s_restarting;
+  static unsigned long s_target_count;
 
   void test_break() { }
 
   Restart() {
     count = ++s_count;
     Dout(dc::restart, "Restart::s_count = " << count);
-    test_break();
+    if (count == s_target_count)
+      test_break();
   }
 };
 
 template<int Id>
-unsigned long Restart<Id>::s_count;
+std::atomic<unsigned long> Restart<Id>::s_count;
 
 template<int Id>
 bool Restart<Id>::s_restarting;
+
+template<int Id>
+unsigned long Restart<Id>::s_target_count = static_cast<unsigned long>(-1L);
 
 #define RESTART debug::Restart<0> restart_dummy_0;
 
 // Instantiate s_restarting.
 template bool Restart<0>::s_restarting;
+
+// Force instantiation of s_count (for gdb).
+static volatile void* force_symbol = &debug::Restart<0>::s_count;
 
 } // namespace debug
 #else
