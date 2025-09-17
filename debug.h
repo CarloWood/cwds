@@ -94,7 +94,7 @@
 #else // CWDEBUG
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
-#include "config.h"
+#include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
 
 /// Define this macro as 1 when either CWDEBUG is defined or NDEBUG is not defined, otherwise as 0.
 #define CW_DEBUG 1

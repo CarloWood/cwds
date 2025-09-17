@@ -148,9 +148,9 @@ endif (BENCHMARK_SUPPORTED)
 # Required include search-paths.
 target_include_directories(cwds_ObjLib
   PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/.."        # For local sys.h and debug.h.
-    "${CMAKE_CURRENT_SOURCE_DIR}"           # For fall-back sys.h and debug.h.
-    "${top_objdir}/cwds"                    # For cwds/config.h.
+    "${top_objdir}"                             # Generated sys.h, debug.h and/or config.h, as well as for cwds/config.h.
+    "${top_srcdir}"                             # For local sys.h and debug.h.
+    "${CMAKE_CURRENT_SOURCE_DIR}"               # For fall-back sys.h and debug.h.
 )
 
 # Require support for at least C++17.
