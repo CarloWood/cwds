@@ -133,6 +133,10 @@ std::ostream& operator<<(std::ostream& os, weak_ptr<T> const& data)
 } // namespace boost
 #endif // USE_LIBBOOST
 
+#ifdef QT_CORE_LIB
+#include <QString>
+#endif
+
 // This namespace is used in LIBCWD_USING_OSTREAM_PRELUDE.
 // Put overloads for types in namespace std here, as defining them in namespace std is UB.
 namespace libcwd::ostream_operators {
@@ -146,6 +150,16 @@ std::ostream& operator<<(std::ostream& os, std::convertible_to<std::u8string_vie
   os.write(reinterpret_cast<char const*>(utf8_sv.data()), utf8_sv.length());
   return os << '"';
 }
+
+#ifdef QT_CORE_LIB
+// Add support for printing QString to debug output.
+//std::ostream& operator<<(std::ostream& os, std::convertible_to<QString> auto qstring)
+template <typename T, typename = std::enable_if_t<std::is_convertible_v<T, QString> && !std::is_convertible_v<T, std::string>>>
+std::ostream& operator<<(std::ostream& os, T const& qstring)
+{
+  return os << NAMESPACE_DEBUG::print_string(qstring.toUtf8().constData());
+}
+#endif
 
 template<std::intmax_t resolution>
 std::ostream& operator<<(
@@ -200,6 +214,9 @@ concept ConceptNonCharContainer = requires(T v)
   { *std::declval<typename T::iterator>() } -> std::same_as<typename T::value_type&>;
   requires !std::same_as<typename T::value_type, char>;
   requires !std::same_as<typename T::value_type, char8_t>;
+#ifdef QT_CORE_LIB
+  requires !std::same_as<typename T::value_type, QChar>;
+#endif
 };
 
 struct ConvertibleFromOstream {
