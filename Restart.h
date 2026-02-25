@@ -11,10 +11,10 @@
 // Add the following to your .gdbinit file:
 /*
 
-# Set the environment variable REPOBASE to point to the directory that contains cwds (the root of the project).
-shell echo "set \$REPOBASE = \"$REPOBASE\"" > /tmp/REPOBASE_gdb_command
-source /tmp/REPOBASE_gdb_command
-eval "source %s/cwds/Restart.gdbinit", $REPOBASE
+# Set the environment variable REPOROOT to point to the directory that contains cwds (the root of the project).
+shell echo "set \$REPOROOT = \"$REPOROOT\"" > /tmp/REPOROOT_gdb_command
+source /tmp/REPOROOT_gdb_command
+eval "source %s/cwds/Restart.gdbinit", $REPOROOT
 
 */
 // Or add cwds/Restart.gdbinit to your .gdbinit file.
