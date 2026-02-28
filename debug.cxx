@@ -195,6 +195,11 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
     Debug( libcw_do.on() );
   }
 
+#if LIBCWD_THREAD_SAFE
+  if (!libcwd::libcw_do.has_mutex())
+    libcwd::libcw_do.set_ostream(libcwd::libcw_do.get_ostream(), &libcwd::cout_mutex);
+#endif
+
   static bool first_thread = true;
   if (!thread_name.empty())
   {
