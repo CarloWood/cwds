@@ -9,8 +9,8 @@ include(AICxxProject OPTIONAL RESULT_VARIABLE _module_path)
 if (NOT _module_path)
   message(FATAL_ERROR
       "include could not find load file: AICxxProject\n"
-      "1) Make sure that you have the git submodule https://github.com/CarloWood/cwm4 in the top-level directory.\n"
-      "2) Use `include(cwm4/cmake/AICxxProject)` right below the `project(...)` command in your top-level CMakeLists.txt."
+      "1) Make sure that you have the git submodule https://github.com/CarloWood/cmake-aicxx added to the project.\n"
+      "2) Use `include(cmake/aicxx/Project NO_POLICY_SCOPE)` right below the `project(...)` command in your top-level CMakeLists.txt."
   )
 endif ()
 
