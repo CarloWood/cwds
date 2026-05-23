@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "debug.h"
+#include <debug.h>
 #include <new>
 #include <ostream>
 #include <vector>

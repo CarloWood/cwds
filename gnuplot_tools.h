@@ -41,7 +41,7 @@
 #include <iostream>
 #include "gnuplot-iostream/gnuplot-iostream.h"  // Please also install https://github.com/dstahlke/gnuplot-iostream.git
 #include "FrequencyCounter.h"
-#include "debug.h"
+#include <debug.h>
 
 // https://en.wikipedia.org/wiki/Exploratory_Data_Analysis
 namespace eda {

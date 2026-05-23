@@ -37,7 +37,7 @@
 #include <array>
 #include <cstdlib>
 #include <iostream>
-#include "debug.h"
+#include <debug.h>
 
 namespace eda {
 using utils::has_print_on::operator<<;

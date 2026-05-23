@@ -2,7 +2,7 @@
 
 #ifdef CWDEBUG
 #include <atomic>
-#include "debug.h"
+#include <debug.h>
 
 // This utility is not threadsafe.
 

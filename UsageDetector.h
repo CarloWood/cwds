@@ -5,7 +5,7 @@
 
 #include "utils/Array.h"
 #include <vector>
-#include "debug.h"
+#include <debug.h>
 
 NAMESPACE_DEBUG_CHANNELS_START
 extern channel_ct usage_detector;
