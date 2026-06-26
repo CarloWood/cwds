@@ -101,6 +101,11 @@
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 #include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
 
+#ifndef LIBCWD_THREAD_SAFE
+// libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is always thread-safe anyway.
+#define LIBCWD_VERSION_2
+#endif
+
 /// Define this macro as 1 when either CWDEBUG is defined or NDEBUG is not defined, otherwise as 0.
 #define CW_DEBUG 1
 
@@ -187,7 +192,11 @@ namespace NAMESPACE_CHANNELS {
 /// The namespace containing the actual debug channels.
 namespace dc {
 using namespace libcwd::channels::dc;
+#ifdef LIBCWD_VERSION_2
+using libcwd::Channel;
+#else
 using libcwd::channel_ct;
+#endif
 
 // Add the declaration of new debug channels here
 // and add their definition in a custom debug.cpp file.
@@ -200,6 +209,7 @@ std::string call_location(void const* return_addr);
 #endif
 bool being_traced();
 
+#ifndef LIBCWD_VERSION_2        // Version 2 dropped memory allocation debugging.
 /**
  * Interface for marking scopes of invisible memory allocations.
  *
@@ -225,6 +235,7 @@ struct InvisibleAllocations
   /// Cancel one call to on().
   void off() { assert(M_on > 0); --M_on; libcwd::set_invisible_off(); }
 };
+#endif // LIBCWD_VERSION_2
 
 /**
  * Interface for marking scopes with indented debug output.
@@ -317,7 +328,11 @@ bool static_print(T&& = {})
 NAMESPACE_DEBUG_END
 
 NAMESPACE_DEBUG_CHANNELS_START
+#ifdef LIBCWD_VERSION_2
+extern Channel system;
+#else
 extern channel_ct system;
+#endif
 NAMESPACE_DEBUG_CHANNELS_END
 
 /// A debug streambuf that prints characters written to it with a green background.
@@ -334,12 +349,12 @@ class DebugBuf : public std::streambuf
       {
         if (c == '\n')
         {
-          Dout(dc::finish, "\e[42m\\n\e[0m");
+          Dout(dc::finish, "\033[42m\\n\033[0m");
           Dout(dc::notice|continued_cf, "");
         }
         else
         {
-          Dout(dc::continued, "\e[42m" << (char)c << "\e[0m");
+          Dout(dc::continued, "\033[42m" << (char)c << "\033[0m");
         }
       }
       return c;
@@ -349,11 +364,17 @@ class DebugBuf : public std::streambuf
 /// A debug streambuf that prints characters written to it to a given debug channel.
 class DebugStreamBuf : public std::streambuf
 {
+#ifdef LIBCWD_VERSION_2
+  using channel_type = libcwd::Channel;
+#else
+  using channel_type = libcwd::channel_ct;
+#endif
+
   private:
-    libcwd::channel_ct const& m_debug_channel;
+    channel_type const& m_debug_channel;
 
   public:
-    DebugStreamBuf(libcwd::channel_ct const& debug_channel) : m_debug_channel(debug_channel)
+    DebugStreamBuf(channel_type const& debug_channel) : m_debug_channel(debug_channel)
     {
       Dout(debug_channel|continued_cf, "");
       setp(0, 0);
@@ -427,11 +448,9 @@ class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
   std::string str();
 };
 
-#if LIBCWD_THREAD_SAFE
 namespace libcwd {
 extern pthread_mutex_t cout_mutex;
 } // namespace libcwd
-#endif
 
 /**
  * Debugging macro.
