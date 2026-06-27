@@ -315,11 +315,12 @@ void init()
 }
 
 #if CWDEBUG_LOCATION
+
 #ifndef LIBCWD_VERSION_2
+NAMESPACE_DEBUG_END
 // Version 1 is using location_ct instead of Location.
-namespace libcwd {
-using Location = location_ct;
-} // namespace libcwd
+namespace libcwd { using Location = location_ct; }
+NAMESPACE_DEBUG_START
 #endif
 
 /**

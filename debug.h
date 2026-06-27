@@ -100,6 +100,7 @@
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 #include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
+#include <mutex>
 
 #if !defined(LIBCWD_THREAD_SAFE) && !defined(LIBCWD_VERSION_2)  // This was probably already defined by sys.h.
 // libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is always thread-safe anyway.
@@ -196,6 +197,7 @@ using namespace libcwd::channels::dc;
 using libcwd::Channel;
 #else
 using libcwd::channel_ct;
+using Channel = libcwd::channel_ct;
 #endif
 
 // Add the declaration of new debug channels here
