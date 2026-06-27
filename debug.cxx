@@ -38,6 +38,7 @@
 #include <cstdio>                       // Needed for sprintf
 #include <iomanip>                      // Needed for setfill
 #include <map>
+#include <mutex>
 #include <string>
 #include <sstream>
 #include "debug.h"
@@ -52,12 +53,19 @@
 #include <common/TracySystem.hpp>
 #endif
 
+#ifndef LIBCWD_VERSION_2
+// Version 1 is using TSD_st instead of ThreadSpecificData.
+namespace libcwd::_private_ {
+using ThreadSpecificData = TSD_st;
+} // namespace libcwd::_private_
+#endif
+
 namespace libcwd {
-pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
+std::mutex cout_mutex;
 namespace _private_ {
 // Non-const pointer - but do NOT write to it.
 // main_thread_tsd is defined in libcwd v1.1.1 and higher (libcwd.so.5.1), or see libcwd github (added 23 apr 2019).
-extern ::libcwd::_private_::TSD_st* main_thread_tsd;
+extern ThreadSpecificData* main_thread_tsd;
 } // namespace _private_
 } // namespace libcwd
 
@@ -269,20 +277,28 @@ void init()
 #warning "NO_SYNC_WITH_STDIO_FALSE is now the default."
 #endif
 #ifdef SYNC_WITH_STDIO_FALSE        // By defining this you will no longer synchronize with the standard C streams.
+#ifndef LIBCWD_VERSION_2
   // The following call allocates the filebuf's of cin, cout, cerr, wcin, wcout and wcerr.
   // Because this causes a memory leak being reported, make them invisible.
   Debug(set_invisible_on());
+#endif
 
   // Read http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio for more information.
   std::ios::sync_with_stdio(false);
 
+#ifndef LIBCWD_VERSION_2
   // Cancel previous call to set_invisible_on.
   Debug(set_invisible_off());
+#endif
 #endif
 
   // This will warn you when you are using header files that do not belong to the
   // shared libcwd object that you linked with.
-  Debug( check_configuration() );
+#ifdef LIBCWD_VERSION_2
+  Debug(main_reached());
+#else
+  Debug(check_configuration());
+#endif
 
   Debug(
     libcw_do.on();		// Show which rcfile we are reading!
@@ -299,6 +315,13 @@ void init()
 }
 
 #if CWDEBUG_LOCATION
+#ifndef LIBCWD_VERSION_2
+// Version 1 is using location_ct instead of Location.
+namespace libcwd {
+using Location = location_ct;
+} // namespace libcwd
+#endif
+
 /**
  * Return call location.
  *
@@ -306,7 +329,7 @@ void init()
  */
 std::string call_location(void const* return_addr)
 {
-  libcwd::location_ct loc((char*)return_addr + libcwd::builtin_return_address_offset);
+  libcwd::Location loc((char*)return_addr + libcwd::builtin_return_address_offset);
   std::ostringstream convert;
   convert << loc;
   return convert.str();
@@ -372,9 +395,9 @@ std::string DebugPipedOStringStream::str()
 }
 
 NAMESPACE_DEBUG_CHANNELS_START
-channel_ct tracked("TRACKED");
-channel_ct system("SYSTEM");    // Intended to be used for system calls.
-channel_ct restart("RESTART");   // Used by debug::Restart.
+Channel tracked("TRACKED");
+Channel system("SYSTEM");       // Intended to be used for system calls.
+Channel restart("RESTART");     // Used by debug::Restart.
 NAMESPACE_DEBUG_CHANNELS_END
 
 #endif // CWDEBUG

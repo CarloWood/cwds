@@ -101,7 +101,7 @@
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 #include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
 
-#ifndef LIBCWD_THREAD_SAFE
+#if !defined(LIBCWD_THREAD_SAFE) && !defined(LIBCWD_VERSION_2)  // This was probably already defined by sys.h.
 // libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is always thread-safe anyway.
 #define LIBCWD_VERSION_2
 #endif
@@ -449,7 +449,7 @@ class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
 };
 
 namespace libcwd {
-extern pthread_mutex_t cout_mutex;
+extern std::mutex cout_mutex;
 } // namespace libcwd
 
 /**
