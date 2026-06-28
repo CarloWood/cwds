@@ -4,7 +4,7 @@
  * @file
  * @brief This file contains the declaration of debug related macros, objects and functions.
  *
- * @Copyright (C) 2016, 2017  Carlo Wood.
+ * @Copyright (C) 2016, 2017, 2026  Carlo Wood.
  *
  * pub   dsa3072/C155A4EEE4E527A2 2018-08-16 Carlo Wood (CarloWood on Libera) <carlo@alinoe.com>
  * fingerprint: 8020 B266 6305 EE2F D53E  6827 C155 A4EE E4E5 27A2
@@ -93,13 +93,11 @@
 #define ASSERT(x) do { } while(0)
 #define AI_NEVER_REACHED __builtin_unreachable();
 #define AI_REACHED_ONCE do { } while(0)
-
 #endif
 
 #else // CWDEBUG
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
-#include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
 #include <mutex>
 
 #if !defined(LIBCWD_THREAD_SAFE) && !defined(LIBCWD_VERSION_2)  // This was probably already defined by sys.h.
@@ -107,8 +105,14 @@
 #define LIBCWD_VERSION_2
 #endif
 
+#ifndef LIBCWD_VERSION_2
+#include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
+#endif // LIBCWD_VERSION_2
+
+#ifndef LIBCWD_VERSION_2
 /// Define this macro as 1 when either CWDEBUG is defined or NDEBUG is not defined, otherwise as 0.
 #define CW_DEBUG 1
+#endif
 
 /// Assert @a x, if debugging is turned on.
 #define ASSERT(x) LIBCWD_ASSERT(x)
@@ -120,6 +124,8 @@
 
 /// Insert a comma followed by debug code, only when debugging.
 #define COMMA_CWDEBUG_ONLY(...) , __VA_ARGS__
+
+#ifndef LIBCWD_VERSION_2
 
 #ifndef NAMESPACE_DEBUG
 #define NAMESPACE_DEBUG debug
@@ -146,6 +152,8 @@
 #define DEBUGCHANNELS ::NAMESPACE_DEBUG::NAMESPACE_CHANNELS
 #endif
 
+#endif // LIBCWD_VERSION_2
+
 #ifndef LIBCWD_USING_OSTREAM_PRELUDE
 struct MakeLIBCWD_USING_OSTREAM_PRELUDEHappy;
 namespace libcwd::ostream_operators {
@@ -157,9 +165,11 @@ void operator<<(std::same_as<MakeLIBCWD_USING_OSTREAM_PRELUDEHappy> auto, int);
 #include <libcwd/debug.h>
 #include <libcwd/char2str.h>
 
+#ifndef LIBCWD_VERSION_2
 // Nested namespace definitions are already a part of C++17.
 #define NAMESPACE_DEBUG_CHANNELS_START namespace NAMESPACE_DEBUG::NAMESPACE_CHANNELS::dc {
 #define NAMESPACE_DEBUG_CHANNELS_END }
+#endif // LIBCWD_VERSION_2
 
 namespace libcwd {
 
@@ -178,6 +188,7 @@ enum thread_init_t {
 /// Debug specific code.
 NAMESPACE_DEBUG_START
 
+#ifndef LIBCWD_VERSION_2
 void init();                                                                            // Initialize debugging code, called once from main.
 extern libcwd::thread_init_t thread_init_default;
 void init_thread(std::string thread_name = "", libcwd::thread_init_t thread_init = libcwd::thread_init_default);      // Initialize debugging code, called once for each thread.
@@ -205,6 +216,7 @@ using Channel = libcwd::channel_ct;
 
 } // namespace dc
 } // namespace NAMESPACE_CHANNELS
+#endif // LIBCWD_VERSION_2
 
 #if CWDEBUG_LOCATION
 std::string call_location(void const* return_addr);
@@ -237,7 +249,6 @@ struct InvisibleAllocations
   /// Cancel one call to on().
   void off() { assert(M_on > 0); --M_on; libcwd::set_invisible_off(); }
 };
-#endif // LIBCWD_VERSION_2
 
 /**
  * Interface for marking scopes with indented debug output.
@@ -304,6 +315,7 @@ struct Mark
     }
   }
 };
+#endif // LIBCWD_VERSION_2
 
 void ignore_being_traced();
 
@@ -450,6 +462,7 @@ class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
   std::string str();
 };
 
+#ifndef LIBCWD_VERSION_2
 namespace libcwd {
 extern std::mutex cout_mutex;
 } // namespace libcwd
@@ -466,6 +479,7 @@ extern std::mutex cout_mutex;
   LibcwDoutStream << "Entering " << __VA_ARGS__;                                \
   LibcwDoutScopeEnd;                                                            \
   NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
+#endif // LIBCWD_VERSION_2
 
 #ifdef __cpp_fold_expressions
 
@@ -478,6 +492,7 @@ extern std::mutex cout_mutex;
 
 #include <tuple>
 #include <type_traits>
+#include <iostream>
 
 template<typename ...Args>
 struct Join

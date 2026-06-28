@@ -58,7 +58,6 @@
 namespace libcwd::_private_ {
 using ThreadSpecificData = TSD_st;
 } // namespace libcwd::_private_
-#endif
 
 namespace libcwd {
 std::mutex cout_mutex;
@@ -133,7 +132,7 @@ void save_dc_states()
   ForAllDebugChannels( set_state(debugChannel.get_label(), debugChannel.is_on()) );
 }
 
-} // anonymous namespace
+} // namespace
 
 /**
  * Returns the the original state of a debug channel.
@@ -277,28 +276,20 @@ void init()
 #warning "NO_SYNC_WITH_STDIO_FALSE is now the default."
 #endif
 #ifdef SYNC_WITH_STDIO_FALSE        // By defining this you will no longer synchronize with the standard C streams.
-#ifndef LIBCWD_VERSION_2
   // The following call allocates the filebuf's of cin, cout, cerr, wcin, wcout and wcerr.
   // Because this causes a memory leak being reported, make them invisible.
   Debug(set_invisible_on());
-#endif
 
   // Read http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio for more information.
   std::ios::sync_with_stdio(false);
 
-#ifndef LIBCWD_VERSION_2
   // Cancel previous call to set_invisible_on.
   Debug(set_invisible_off());
-#endif
 #endif
 
   // This will warn you when you are using header files that do not belong to the
   // shared libcwd object that you linked with.
-#ifdef LIBCWD_VERSION_2
-  Debug(main_reached());
-#else
   Debug(check_configuration());
-#endif
 
   Debug(
     libcw_do.on();		// Show which rcfile we are reading!
@@ -314,14 +305,17 @@ void init()
   init_thread();
 }
 
+NAMESPACE_DEBUG_END
+#endif // LIBCWD_VERSION_2
+
 #if CWDEBUG_LOCATION
 
 #ifndef LIBCWD_VERSION_2
-NAMESPACE_DEBUG_END
 // Version 1 is using location_ct instead of Location.
 namespace libcwd { using Location = location_ct; }
-NAMESPACE_DEBUG_START
 #endif
+
+NAMESPACE_DEBUG_START
 
 /**
  * Return call location.
@@ -335,7 +329,11 @@ std::string call_location(void const* return_addr)
   convert << loc;
   return convert.str();
 }
-#endif
+
+NAMESPACE_DEBUG_END
+#endif // CWDEBUG_LOCATION
+
+NAMESPACE_DEBUG_START
 
 static int s_being_traced = 0;
 
