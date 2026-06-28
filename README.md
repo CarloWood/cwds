@@ -53,7 +53,7 @@ it when you forgot it.
 ## Adding the cwds submodule to a project
 
 To add this submodule to a project, that project should already
-be set up to use [cwm4](https://github.com/CarloWood/cwm4).
+be set up to use [cmake-aicxx](https://github.com/CarloWood/cmake-aicxx).
 
 Then simply execute the following in the root of that project:
 
@@ -72,11 +72,11 @@ of gitache and add the following to the root <tt>CMakeLists.txt</tt> file of you
  ... [cmake_minimum_required, project and CMAKE_CXX_STANDARD]
 # Begin of gitache configuration.
 set(GITACHE_PACKAGES libcwd_r)
-include(cwm4/cmake/StableGitache)
+include(cmake/aicxx/cmake/StableGitache)
 # End of gitache configuration.
 
 # This project uses aicxx modules.
-include(cwm4/cmake/AICxxProject)
+include(cmake/aicxx/Project NO_POLICY_SCOPE)
 
 include(AICxxSubmodules)
  ...
@@ -206,7 +206,7 @@ Finally, run
 ./autogen.sh
 </pre>
 
-to let cwm4 do its magic, and commit all the changes.
+to let cmake-aicxx do its magic, and commit all the changes.
 
 There is a tutorial video on youtube that shows how to set up a project with
 cwds and libcwd [here](https://www.youtube.com/watch?v=53wWV0wqOMA&list=PLJzCXkV5Y8Ze6TtQWQSH6w5J-e-yIhgzP&index=2).
