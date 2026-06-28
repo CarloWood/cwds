@@ -145,24 +145,23 @@ in their top source directory that contains something like
 <pre>
 #pragma once
 
-// These three defines are only necessary if you want the 'example' namespace.
+// This define is only necessary if you want the 'example' namespace.
 // The default is just 'debug'.
 #define NAMESPACE_DEBUG example::debug
-#define NAMESPACE_DEBUG_START namespace example { namespace debug {
-#define NAMESPACE_DEBUG_END } }
 #include "cwds/debug.h"
 
 #ifdef CWDEBUG
 NAMESPACE_DEBUG_CHANNELS_START
-extern channel_ct my_channel;
-extern channel_ct ...
+extern Channel my_channel;      // Use channel_ct for libcwd version < 2.
+extern Channel ...
 NAMESPACE_DEBUG_CHANNELS_END
 #endif
 </pre>
 
-or if they don't, that then <tt>cwds/debug.h</tt> will be included
-directly. The top build directory include is needed to find
-any generated header files, most notably <tt>sys.h</tt>.
+or if the application doesn't put a debug.h in their top source direction,
+then <tt>cwds/debug.h</tt> will be included directly.
+The top build directory include is needed to find any generated header files,
+most notably <tt>sys.h</tt>.
 
 Debug channels that are only used in a single compilation unit can be
 defined by just adding
@@ -175,7 +174,7 @@ defined by just adding
 
 #ifdef CWDEBUG
 NAMESPACE_DEBUG_CHANNELS_START
-channel_ct my_channel;
+Channel my_channel;
 NAMESPACE_DEBUG_CHANNELS_END
 #endif
 </pre>
