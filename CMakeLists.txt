@@ -153,9 +153,9 @@ target_include_directories(cwds_ObjLib
     "${CMAKE_CURRENT_SOURCE_DIR}"               # For fall-back sys.h and debug.h.
 )
 
-# Require support for at least C++17.
+# Require support for at least C++20 (we're now using concepts).
 target_compile_features(cwds_ObjLib
-  PUBLIC cxx_std_17
+  PUBLIC cxx_std_20
 )
 
 # Add dependencies.
@@ -166,9 +166,31 @@ target_link_libraries(cwds_ObjLib
 )
 
 if (OptionEnableLibcwd)
+  message(STATUS "libcwd_TARGET = \"${libcwd_TARGET}\"")
+  message(STATUS "libcwd_r_TARGET = \"${libcwd_r_TARGET}\"")
+  # The idea here is that because libcwd version 1 dropped support for non-threading
+  # a long time ago and libcwd version 2 uses `libcwd` without `_r`. The following is
+  # to be expected:
+  #             |  libcwd_FOUND  |  libcwd_r_FOUND
+  #             +----------------------------------
+  #   version 1 |        ??      |       TRUE
+  #   version 2 |      TRUE      |      FALSE
+  #
+  # For very old version 1 cases, both libcwd_FOUND and libcwd_r_FOUND might be both TRUE.
+  #
+  # We always want to link with a threading supporting libcwd:
+  # - libcwd_r_TARGET in case of version 1,
+  # - libcwd_TARGET in case of version 2.
+  #
+  # Assuming version 2, we link with `libcwd_TARGET`.
+  # If libcwd is still version 1 then that is the special case and we need to
+  # overwrite `libcwd_TARGET` with `libcwd_r_TARGET`.
+  if (libcwd_r_FOUND)
+    set(libcwd_TARGET ${libcwd_r_TARGET})
+  endif ()
   target_link_libraries(cwds_ObjLib
     PUBLIC
-      ${libcwd_r_TARGET}
+      ${libcwd_TARGET}
   )
 endif ()
 

@@ -99,6 +99,10 @@
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 #include <mutex>
+#include <concepts>
+// Added this assert because C++17 doesn't complain if you include <concepts>;
+// you just don't get any and C++17 is still the default for clang++!
+static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
 
 #if !defined(LIBCWD_THREAD_SAFE) && !defined(LIBCWD_VERSION_2)  // This was probably already defined by sys.h.
 // libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is always thread-safe anyway.
