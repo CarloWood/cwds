@@ -40,29 +40,32 @@
 #include <iostream>
 #include <cstdlib>              // std::exit, EXIT_FAILURE
 
+#define Debug(...) do { } while(0)
+#define Dout(a, ...) do { } while(0)
+#define DoutEntering(a, ...)
+#define DoutFatal(a, ...) LibcwDoutFatal(::std, , a, __VA_ARGS__)
+#define ForAllDebugChannels(...)
+#define ForAllDebugObjects(...)
+#define LibcwDebug(dc_namespace, ...)
+#define LibcwDout(a, b, c, ...)
+#define LibcwDoutFatal(a, b, c, ...) do { ::std::cerr << __VA_ARGS__ << ::std::endl; ::std::exit(EXIT_FAILURE); } while (1)
+#define CWDEBUG_LOCATION 0
+#define CWDEBUG_DEBUG 0
+#define CWDEBUG_DEBUGOUTPUT 0
+#define CWDEBUG_DEBUGT 0
+
+#ifndef LIBCWD_VERSION_2
 #define AllocTag1(p)
 #define AllocTag2(p, desc)
 #define AllocTag_dynamic_description(p, x)
 #define AllocTag(p, x)
-#define Debug(x) do { } while(0)
-#define Dout(a, ...) do { } while(0)
-#define DoutEntering(a, ...)
-#define DoutFatal(a, ...) LibcwDoutFatal(::std, , a, __VA_ARGS__)
-#define ForAllDebugChannels(STATEMENT)
-#define ForAllDebugObjects(STATEMENT)
-#define LibcwDebug(dc_namespace, x)
-#define LibcwDout(a, b, c, ...)
-#define LibcwDoutFatal(a, b, c, ...) do { ::std::cerr << __VA_ARGS__ << ::std::endl; ::std::exit(EXIT_FAILURE); } while (1)
 #define NEW(x) new x
 #define CWDEBUG_ALLOC 0
 #define CWDEBUG_MAGIC 0
-#define CWDEBUG_LOCATION 0
 #define CWDEBUG_LIBBFD 0
-#define CWDEBUG_DEBUG 0
-#define CWDEBUG_DEBUGOUTPUT 0
 #define CWDEBUG_DEBUGM 0
-#define CWDEBUG_DEBUGT 0
 #define CWDEBUG_MARKER 0
+#endif // LIBCWD_VERSION_2
 
 /// @endcond
 
@@ -77,7 +80,7 @@
 #include <cassert>
 #include <atomic>
 
-#define ASSERT(x) assert(x)
+#define ASSERT(...) assert(__VA_ARGS__)
 #if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable >= 202202L
 #include <utility>
 #define AI_NEVER_REACHED do { ::std::unreachable(); } while(0);
@@ -90,7 +93,7 @@
 
 #else
 #define CW_DEBUG 0
-#define ASSERT(x) do { } while(0)
+#define ASSERT(...) do { } while(0)
 #define AI_NEVER_REACHED __builtin_unreachable();
 #define AI_REACHED_ONCE do { } while(0)
 #endif
@@ -119,7 +122,7 @@ static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
 #endif
 
 /// Assert @a x, if debugging is turned on.
-#define ASSERT(x) LIBCWD_ASSERT(x)
+#define ASSERT(...) LIBCWD_ASSERT(__VA_ARGS__)
 #define AI_NEVER_REACHED do { LIBCWD_ASSERT(false); __builtin_unreachable(); } while(0);
 #define AI_REACHED_ONCE do { static std::atomic_flag s_reached = ATOMIC_FLAG_INIT; LIBCWD_ASSERT(!s_reached.test_and_set(std::memory_order_relaxed)); } while(0)
 
