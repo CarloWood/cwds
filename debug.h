@@ -145,7 +145,7 @@ static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
 
 #ifndef DEBUGCHANNELS
 /**
- * The namespace in which the @c dc namespace is declared.
+ * The namespace in which the `dc` namespace is declared.
  *
  * <A HREF="http://carlowood.github.io/libcwd/">Libcwd</A> demands that this macro is defined
  * before <libcwd/debug.h> is included and must be the name of the namespace containing
@@ -233,7 +233,7 @@ bool being_traced();
  *
  * Creation of the object does nothing, you have to explicitly call
  * InvisibleAllocations::on. Destruction of the object automatically
- * cancels any call to @c{on()} of this object. This makes it exception-
+ * cancels any call to `on()` of this object. This makes it exception-
  * (stack unwinding) and recursive-safe.
  */
 struct InvisibleAllocations
