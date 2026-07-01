@@ -139,7 +139,7 @@ void save_dc_states()
  *
  * @internal
  *
- * For a given @a dc_label, which must be the exact name (<tt>channel_ct::get_label</tt>) of an
+ * For a given @a dc_label, which must be the exact name (<tt>Channel::get_label</tt>) of an
  * existing debug channel, this function returns `true` when the corresponding debug channel was
  * <em>on</em> at the startup of the application, directly after reading the libcwd runtime
  * configuration file (\filename .libcwdrc \endfilename).

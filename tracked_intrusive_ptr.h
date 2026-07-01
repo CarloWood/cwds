@@ -244,7 +244,7 @@ class intrusive_ptr : public utils::InstanceTracker<intrusive_ptr<T>>
     if (return_address)
     {
 #ifdef CWDEBUG_LOCATION
-      os << libcwd::location_ct((char*)return_address + libcwd::builtin_return_address_offset);
+      os << libcwd::Location((char*)return_address + libcwd::builtin_return_address_offset);
 #else
       os << return_address;
 #endif

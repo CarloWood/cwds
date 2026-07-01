@@ -10,7 +10,7 @@
 #include <boost/range/adaptor/reversed.hpp>
 
 NAMESPACE_DEBUG_CHANNELS_START
-extern channel_ct tracked;
+extern Channel tracked;
 NAMESPACE_DEBUG_CHANNELS_END
 
 #define DECLARE_TRACKED(C)                                              \

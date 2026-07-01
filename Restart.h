@@ -32,7 +32,7 @@ eval "source %s/cwds/Restart.gdbinit", $REPOROOT
 // at which you want to stop.
 
 NAMESPACE_DEBUG_CHANNELS_START
-extern channel_ct restart;
+extern Channel restart;
 NAMESPACE_DEBUG_CHANNELS_END
 
 namespace debug {

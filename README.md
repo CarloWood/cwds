@@ -152,7 +152,7 @@ in their top source directory that contains something like
 
 #ifdef CWDEBUG
 NAMESPACE_DEBUG_CHANNELS_START
-extern Channel my_channel;      // Use channel_ct for libcwd version < 2.
+extern Channel my_channel;
 extern Channel ...
 NAMESPACE_DEBUG_CHANNELS_END
 #endif

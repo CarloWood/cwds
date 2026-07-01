@@ -8,7 +8,7 @@
 #include <debug.h>
 
 NAMESPACE_DEBUG_CHANNELS_START
-extern channel_ct usage_detector;
+extern Channel usage_detector;
 NAMESPACE_DEBUG_CHANNELS_END
 
 NAMESPACE_DEBUG_START
