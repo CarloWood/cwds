@@ -54,6 +54,7 @@
 #define CWDEBUG_DEBUGOUTPUT 0
 #define CWDEBUG_DEBUGT 0
 
+// Your sys.h should define this if you're using libcwd version 2 (and therefore are not using any of these macros).
 #ifndef LIBCWD_VERSION_2
 #define AllocTag1(p)
 #define AllocTag2(p, desc)
