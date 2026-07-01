@@ -102,10 +102,11 @@
 
 #include <ext/stdio_filebuf.h>  // __gnu_cxx::stdio_filebuf.
 #include <mutex>
-#include <concepts>
+
 // Added this assert because C++17 doesn't complain if you include <concepts>;
 // you just don't get any and C++17 is still the default for clang++!
 static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
+#include <concepts>
 
 #if !defined(LIBCWD_THREAD_SAFE) && !defined(LIBCWD_VERSION_2)  // This was probably already defined by sys.h.
 // libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is always thread-safe anyway.
@@ -113,26 +114,11 @@ static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
 #endif
 
 #ifndef LIBCWD_VERSION_2
-#include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
-#endif // LIBCWD_VERSION_2
 
-#ifndef LIBCWD_VERSION_2
+#include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
+
 /// Define this macro as 1 when either CWDEBUG is defined or NDEBUG is not defined, otherwise as 0.
 #define CW_DEBUG 1
-#endif
-
-/// Assert @a x, if debugging is turned on.
-#define ASSERT(...) LIBCWD_ASSERT(__VA_ARGS__)
-#define AI_NEVER_REACHED do { LIBCWD_ASSERT(false); __builtin_unreachable(); } while(0);
-#define AI_REACHED_ONCE do { static std::atomic_flag s_reached = ATOMIC_FLAG_INIT; LIBCWD_ASSERT(!s_reached.test_and_set(std::memory_order_relaxed)); } while(0)
-
-/// Insert debug code, only when debugging.
-#define CWDEBUG_ONLY(...) __VA_ARGS__
-
-/// Insert a comma followed by debug code, only when debugging.
-#define COMMA_CWDEBUG_ONLY(...) , __VA_ARGS__
-
-#ifndef LIBCWD_VERSION_2
 
 #ifndef NAMESPACE_DEBUG
 #define NAMESPACE_DEBUG debug
@@ -159,7 +145,52 @@ static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
 #define DEBUGCHANNELS NAMESPACE_DEBUG::NAMESPACE_CHANNELS
 #endif
 
+// Nested namespace definitions are already a part of C++17.
+#define NAMESPACE_DEBUG_CHANNELS_START namespace NAMESPACE_DEBUG::NAMESPACE_CHANNELS::dc {
+#define NAMESPACE_DEBUG_CHANNELS_END }
+
+namespace libcwd {
+
+enum thread_init_t {
+  thread_init_default,
+  from_rcfile,
+  copy_from_main,
+  debug_off
+};
+
+// Convenience typedef, so we can use libcwd::Channel in version 1 too.
+using Channel = libcwd::channel_ct;
+
+} // namespace libcwd
+
+#include <atomic>       // atomic_bool
+#include <utility>
+
+/**
+ * Debugging macro.
+ *
+ * Print "Entering " << @a data to channel @a cntrl and increment
+ * debugging output indentation until the end of the current scope.
+ */
+#define DoutEntering(cntrl, ...)                                                \
+  int __cwds_debug_indentation = 2;                                             \
+  LibcwDoutScopeBegin(DEBUGCHANNELS, ::libcwd::libcw_do, cntrl)                 \
+  LibcwDoutStream << "Entering " << __VA_ARGS__;                                \
+  LibcwDoutScopeEnd;                                                            \
+  NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
+
 #endif // LIBCWD_VERSION_2
+
+/// Assert @a x, if debugging is turned on.
+#define ASSERT(...) LIBCWD_ASSERT(__VA_ARGS__)
+#define AI_NEVER_REACHED do { LIBCWD_ASSERT(false); __builtin_unreachable(); } while(0);
+#define AI_REACHED_ONCE do { static std::atomic_flag s_reached = ATOMIC_FLAG_INIT; LIBCWD_ASSERT(!s_reached.test_and_set(std::memory_order_relaxed)); } while(0)
+
+/// Insert debug code, only when debugging.
+#define CWDEBUG_ONLY(...) __VA_ARGS__
+
+/// Insert a comma followed by debug code, only when debugging.
+#define COMMA_CWDEBUG_ONLY(...) , __VA_ARGS__
 
 #ifndef LIBCWD_USING_OSTREAM_PRELUDE
 struct MakeLIBCWD_USING_OSTREAM_PRELUDEHappy;
@@ -171,26 +202,6 @@ void operator<<(std::same_as<MakeLIBCWD_USING_OSTREAM_PRELUDEHappy> auto, int);
 
 #include <libcwd/debug.h>
 #include <libcwd/char2str.h>
-
-#ifndef LIBCWD_VERSION_2
-// Nested namespace definitions are already a part of C++17.
-#define NAMESPACE_DEBUG_CHANNELS_START namespace NAMESPACE_DEBUG::NAMESPACE_CHANNELS::dc {
-#define NAMESPACE_DEBUG_CHANNELS_END }
-#endif // LIBCWD_VERSION_2
-
-namespace libcwd {
-
-enum thread_init_t {
-  thread_init_default,
-  from_rcfile,
-  copy_from_main,
-  debug_off
-};
-
-} // namespace libcwd
-
-#include <atomic>       // atomic_bool
-#include <utility>
 
 /// Debug specific code.
 NAMESPACE_DEBUG_START
@@ -211,12 +222,7 @@ namespace NAMESPACE_CHANNELS {
 /// The namespace containing the actual debug channels.
 namespace dc {
 using namespace libcwd::channels::dc;
-#ifdef LIBCWD_VERSION_2
 using libcwd::Channel;
-#else
-using libcwd::channel_ct;
-using Channel = libcwd::channel_ct;
-#endif
 
 // Add the declaration of new debug channels here
 // and add their definition in a custom debug.cpp file.
@@ -349,11 +355,7 @@ bool static_print(T&& = {})
 NAMESPACE_DEBUG_END
 
 NAMESPACE_DEBUG_CHANNELS_START
-#ifdef LIBCWD_VERSION_2
 extern Channel system;
-#else
-extern channel_ct system;
-#endif
 NAMESPACE_DEBUG_CHANNELS_END
 
 /// A debug streambuf that prints characters written to it with a green background.
@@ -385,17 +387,11 @@ class DebugBuf : public std::streambuf
 /// A debug streambuf that prints characters written to it to a given debug channel.
 class DebugStreamBuf : public std::streambuf
 {
-#ifdef LIBCWD_VERSION_2
-  using channel_type = libcwd::Channel;
-#else
-  using channel_type = libcwd::channel_ct;
-#endif
-
   private:
-    channel_type const& m_debug_channel;
+    libcwd::Channel const& m_debug_channel;
 
   public:
-    DebugStreamBuf(channel_type const& debug_channel) : m_debug_channel(debug_channel)
+    DebugStreamBuf(libcwd::Channel const& debug_channel) : m_debug_channel(debug_channel)
     {
       Dout(debug_channel|continued_cf, "");
       setp(0, 0);
@@ -468,25 +464,6 @@ class DebugPipedOStringStream : public HelperPipeBufs, public std::ostream
   /// Read blocking from read-end of pipe until EOF. Call close() (after writing) to unblock.
   std::string str();
 };
-
-#ifndef LIBCWD_VERSION_2
-namespace libcwd {
-extern std::mutex cout_mutex;
-} // namespace libcwd
-
-/**
- * Debugging macro.
- *
- * Print "Entering " << @a data to channel @a cntrl and increment
- * debugging output indentation until the end of the current scope.
- */
-#define DoutEntering(cntrl, ...)                                                \
-  int __cwds_debug_indentation = 2;                                             \
-  LibcwDoutScopeBegin(DEBUGCHANNELS, ::libcwd::libcw_do, cntrl)                 \
-  LibcwDoutStream << "Entering " << __VA_ARGS__;                                \
-  LibcwDoutScopeEnd;                                                            \
-  NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
-#endif // LIBCWD_VERSION_2
 
 #ifdef __cpp_fold_expressions
 
