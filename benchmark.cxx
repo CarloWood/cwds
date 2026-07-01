@@ -30,6 +30,7 @@
  * SOFTWARE.
  */
 
+#define LIBCWD_VERSION_2
 #include "sys.h"
 #include "benchmark.h"
 #include "debug.h"

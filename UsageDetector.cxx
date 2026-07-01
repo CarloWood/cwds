@@ -1,3 +1,4 @@
+#define LIBCWD_VERSION_2
 #include "sys.h"
 #include "debug.h"
 

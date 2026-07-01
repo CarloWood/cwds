@@ -1,10 +1,18 @@
-#ifndef LIBCWD_THREAD_SAFE
+// Mark that this header was included.
+// A guard is not needed: this header should NEVER be included by another header.
+#define __CWDS_DEBUG_H_INCLUDED
+
+#if defined(CWDEBUG) && !defined(LIBCWD_THREAD_SAFE)
+
 // When using libcwd version 1 LIBCWD_THREAD_SAFE should be defined because it
 // makes no sense to use the non-threading version of libcwd.
 // While libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is
 // always thread-safe anyway. Therefore we can use this macro to detect if
 // we're using libcwd version 1 or 2.
-#define LIBCWD_VERSION_2
+#ifndef LIBCWD_VERSION_2
+#warning "If your project is written for libcwd version 2, then it must define LIBCWD_VERSION_2 in its sys.h before including this header."
+#endif
+
 #endif
 
 #ifndef LIBCWD_VERSION_2
