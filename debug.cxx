@@ -200,7 +200,7 @@ void init_thread(std::string thread_name, libcwd::thread_init_t thread_init)
   if (thread_init != libcwd::debug_off)
   {
     // Turn on debug output.
-    Debug( libcw_do.on() );
+    Debug(libcw_do.on());
   }
 
   if (!libcwd::libcw_do.has_mutex())
