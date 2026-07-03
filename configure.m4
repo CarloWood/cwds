@@ -8,8 +8,8 @@ AC_SUBST(CW_EXTRA_CWDS_LIBS)
 AC_SUBST(CW_EXTRA_CWDS_R_LIBS)
 
 AM_COND_IF([LIBCWD_USED], [
-# Require at least version 1.1.1.
-if ! pkg-config --print-errors --atleast-version="1.1.1" libcwd_r; then
+# Require at least version 2.0.0.
+if ! pkg-config --print-errors --atleast-version="2.0.0" libcwd; then
   AC_MSG_ERROR([Please upgrade libcwd.])
 fi
 ])

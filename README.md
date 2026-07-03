@@ -71,7 +71,7 @@ of gitache and add the following to the root <tt>CMakeLists.txt</tt> file of you
 <pre>
  ... [cmake_minimum_required, project and CMAKE_CXX_STANDARD]
 # Begin of gitache configuration.
-set(GITACHE_PACKAGES libcwd_r)
+set(GITACHE_PACKAGES libcwd)
 include(cmake/aicxx/cmake/StableGitache)
 # End of gitache configuration.
 
@@ -90,7 +90,7 @@ add_executable(sum_first_n_primes sum_first_n_primes.cxx)
 target_link_libraries(sum_first_n_primes PRIVATE ${AICXX_OBJECTS_LIST})
 </pre>
 
-To use gitache for libcwd you also have to create the file <tt>`<project_root>/`cmake/gitache-configs/libcwd_r.cmake</tt>
+To use gitache for libcwd you also have to create the file <tt>`<project_root>/`cmake/gitache-configs/libcwd.cmake</tt>
 with normally the following content (see [gitache](https://github.com/CarloWood/gitache) for more information):
 
 <pre>
