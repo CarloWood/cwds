@@ -8,7 +8,7 @@
  * @brief This file contains the definitions of debug related objects and functions.
  */
 
-#include <sys.h>                        // Needed for platform-specific code
+#include "sys.h"                        // Needed for platform-specific code
 
 #ifdef CWDEBUG
 

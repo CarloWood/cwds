@@ -8,7 +8,7 @@
  * @brief This file contains the definition of debug serializers.
  */
 
-#include <sys.h>        // Put this outside the #ifdef CWDEBUG .. #endif in order
+#include "sys.h"        // Put this outside the #ifdef CWDEBUG .. #endif in order
                         // to force recompilation after the configuration changed.
 
 #ifdef CWDEBUG

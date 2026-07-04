@@ -8,6 +8,7 @@
  * @brief This file contains the definition of signal_safe_printf.
  */
 
+#include "sys.h"
 #include "signal_safe_printf.h"
 #include <cassert>
 //#include <cstdio>
