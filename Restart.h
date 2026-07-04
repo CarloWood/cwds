@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024-2026 Carlo Wood
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #ifdef CWDEBUG

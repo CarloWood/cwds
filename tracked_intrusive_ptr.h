@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2021, 2023, 2025-2026 Carlo Wood
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 // This header requires submodules

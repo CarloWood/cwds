@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023, 2026 Carlo Wood
+// SPDX-License-Identifier: MIT
+
 #define LIBCWD_VERSION_2
 #include "sys.h"
 #include "debug.h"

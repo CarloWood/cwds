@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023, 2026 Carlo Wood
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 // UsageDetector requires -std=c++2b or higher.

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2016-2019, 2023, 2025-2026 Carlo Wood
+// SPDX-License-Identifier: MIT
+
 // Mark that this header was included.
 // A guard is not needed: this header should NEVER be included by another header.
 #define __CWDS_DEBUG_H_INCLUDED

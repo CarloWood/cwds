@@ -1,3 +1,13 @@
+// SPDX-FileCopyrightText: 2018, 2023 Carlo Wood
+// SPDX-License-Identifier: MIT
+
+/**
+ * cwds -- Application-side libcwd support code.
+ *
+ * @file
+ * @brief This file contains a test for benchmark::Stopwatch.
+ */
+
 #include "cwds/benchmark.h"
 
 int main()
