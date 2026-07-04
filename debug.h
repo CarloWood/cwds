@@ -75,7 +75,7 @@ static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
 
 // libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is always thread-safe anyway.
 #if defined(LIBCWD_THREAD_SAFE)
-#error This version of cwds doesn't support libcwd version 1. Either downgrade cwds or upgrade libcwd and port your project to libcwd-2.
+#error "This version of cwds doesn't support libcwd version 1. Either downgrade cwds or upgrade libcwd and port your project to libcwd-2."
 #endif
 
 /// Assert @a x, if debugging is turned on.
