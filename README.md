@@ -105,4 +105,4 @@ gitache_config(
 </pre>
 
 There is a tutorial video on youtube that shows how to set up a project with
-cwds and libcwd [vid for version 2 to be added soon](https://www.youtube.com/watch?v=53wWV0wqOMA&list=PLJzCXkV5Y8Ze6TtQWQSH6w5J-e-yIhgzP&index=2).
+cwds and libcwd [here](https://www.youtube.com/watch?v=9tQnhOGK0zo).
