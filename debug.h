@@ -32,20 +32,6 @@
 #define CWDEBUG_DEBUGOUTPUT 0
 #define CWDEBUG_DEBUGT 0
 
-// Your sys.h should define this if you're using libcwd version 2 (and therefore are not using any of these macros).
-#ifndef LIBCWD_VERSION_2
-#define AllocTag1(p)
-#define AllocTag2(p, desc)
-#define AllocTag_dynamic_description(p, x)
-#define AllocTag(p, x)
-#define NEW(x) new x
-#define CWDEBUG_ALLOC 0
-#define CWDEBUG_MAGIC 0
-#define CWDEBUG_LIBBFD 0
-#define CWDEBUG_DEBUGM 0
-#define CWDEBUG_MARKER 0
-#endif // LIBCWD_VERSION_2
-
 /// @endcond
 
 /// Remove arguments of these macros when CWDEBUG is not defined.
@@ -87,78 +73,10 @@
 static_assert(__cplusplus >= 202002L, "cwds requires C++20.");
 #include <concepts>
 
-#if !defined(LIBCWD_THREAD_SAFE) && !defined(LIBCWD_VERSION_2)  // This was probably already defined by sys.h.
 // libcwd version 2 does not define LIBCWD_THREAD_SAFE anymore; it is always thread-safe anyway.
-#define LIBCWD_VERSION_2
+#if defined(LIBCWD_THREAD_SAFE)
+#error This version of cwds doesn't support libcwd version 1. Either downgrade cwds or upgrade libcwd and port your project to libcwd-2.
 #endif
-
-#ifndef LIBCWD_VERSION_2
-
-#include <cwds/config.h>        // Our generated config, to get NAMESPACE_DEBUG.
-
-/// Define this macro as 1 when either CWDEBUG is defined or NDEBUG is not defined, otherwise as 0.
-#define CW_DEBUG 1
-
-#ifndef NAMESPACE_DEBUG
-#define NAMESPACE_DEBUG debug
-#endif
-#ifndef NAMESPACE_DEBUG_START
-#define NAMESPACE_DEBUG_START namespace NAMESPACE_DEBUG {
-#define NAMESPACE_DEBUG_END }
-#endif
-
-#ifndef NAMESPACE_CHANNELS
-#define NAMESPACE_CHANNELS channels
-#endif
-
-#ifndef DEBUGCHANNELS
-/**
- * The namespace in which the `dc` namespace is declared.
- *
- * <A HREF="http://carlowood.github.io/libcwd/">Libcwd</A> demands that this macro is defined
- * before <libcwd/debug.h> is included and must be the name of the namespace containing
- * the @c dc (Debug Channels) namespace.
- *
- * @sa debug::channels::dc
- */
-#define DEBUGCHANNELS NAMESPACE_DEBUG::NAMESPACE_CHANNELS
-#endif
-
-// Nested namespace definitions are already a part of C++17.
-#define NAMESPACE_DEBUG_CHANNELS_START namespace NAMESPACE_DEBUG::NAMESPACE_CHANNELS::dc {
-#define NAMESPACE_DEBUG_CHANNELS_END }
-
-namespace libcwd {
-
-enum thread_init_t {
-  thread_init_default,
-  from_rcfile,
-  copy_from_main,
-  debug_off
-};
-
-// Convenience typedef, so we can use libcwd::Channel in version 1 too.
-using Channel = libcwd::channel_ct;
-
-} // namespace libcwd
-
-#include <atomic>       // atomic_bool
-#include <utility>
-
-/**
- * Debugging macro.
- *
- * Print "Entering " << @a data to channel @a cntrl and increment
- * debugging output indentation until the end of the current scope.
- */
-#define DoutEntering(cntrl, ...)                                                \
-  int __cwds_debug_indentation = 2;                                             \
-  LibcwDoutScopeBegin(DEBUGCHANNELS, ::libcwd::libcw_do, cntrl)                 \
-  LibcwDoutStream << "Entering " << __VA_ARGS__;                                \
-  LibcwDoutScopeEnd;                                                            \
-  NAMESPACE_DEBUG::Indent __cwds_debug_indent(__cwds_debug_indentation);
-
-#endif // LIBCWD_VERSION_2
 
 /// Assert @a x, if debugging is turned on.
 #define ASSERT(...) LIBCWD_ASSERT(__VA_ARGS__)
@@ -185,129 +103,10 @@ void operator<<(std::same_as<MakeLIBCWD_USING_OSTREAM_PRELUDEHappy> auto, int);
 /// Debug specific code.
 NAMESPACE_DEBUG_START
 
-#ifndef LIBCWD_VERSION_2
-void init();                                                                            // Initialize debugging code, called once from main.
-extern libcwd::thread_init_t thread_init_default;
-void init_thread(std::string thread_name = "", libcwd::thread_init_t thread_init = libcwd::thread_init_default);      // Initialize debugging code, called once for each thread.
-extern std::atomic_bool threads_created;
-
-/**
- * Debug Channels (dc) namespace.
- *
- * @sa debug::channels::dc
- */
-namespace NAMESPACE_CHANNELS {
-
-/// The namespace containing the actual debug channels.
-namespace dc {
-using namespace libcwd::channels::dc;
-using libcwd::Channel;
-
-// Add the declaration of new debug channels here
-// and add their definition in a custom debug.cpp file.
-
-} // namespace dc
-} // namespace NAMESPACE_CHANNELS
-#endif // LIBCWD_VERSION_2
-
 #if CWDEBUG_LOCATION
 std::string call_location(void const* return_addr);
 #endif
 bool being_traced();
-
-#ifndef LIBCWD_VERSION_2        // Version 2 dropped memory allocation debugging.
-/**
- * Interface for marking scopes of invisible memory allocations.
- *
- * Creation of the object does nothing, you have to explicitly call
- * InvisibleAllocations::on. Destruction of the object automatically
- * cancels any call to `on()` of this object. This makes it exception-
- * (stack unwinding) and recursive-safe.
- */
-struct InvisibleAllocations
-{
-  /// The number of times that InvisibleAllocations::on() was called.
-  int M_on;
-
-  /// Constructor.
-  InvisibleAllocations() : M_on(0) { }
-
-  /// Destructor.
-  ~InvisibleAllocations() { while (M_on > 0) off(); }
-
-  /// Set invisible allocations on. Can be called recursively.
-  void on() { libcwd::set_invisible_on(); ++M_on; }
-
-  /// Cancel one call to on().
-  void off() { assert(M_on > 0); --M_on; libcwd::set_invisible_off(); }
-};
-
-/**
- * Interface for marking scopes with indented debug output.
- *
- * Creation of the object increments the debug indentation. Destruction
- * of the object automatically decrements the indentation again.
- */
-struct Indent
-{
-  /// The extra number of spaces that were added to the indentation.
-  int M_indent;
-
-  /// Construct an Indent object.
-  explicit Indent(int indent) : M_indent(indent) { if (M_indent > 0) libcwd::libcw_do.inc_indent(M_indent); }
-
-  /// Destructor.
-  ~Indent() { if (M_indent > 0) libcwd::libcw_do.dec_indent(M_indent); }
-};
-
-/**
- * Interface for marking scopes with a marker character.
- *
- * Creation of the object appends the character and a space to
- * the current marker after first adding the current indentation
- * to it as spaces, and sets the indentation to zero. Destruction
- * restores things again.
- */
-struct Mark
-{
-  /// The old indentation.
-  int M_indent;
-
-  /// Construct a Mark object.
-  explicit Mark(char m = '|') : M_indent(libcwd::libcw_do.get_indent())
-  {
-    libcwd::libcw_do.push_marker();
-    libcwd::libcw_do.marker().append(std::string(M_indent, ' ') + m + ' ');
-    // This is basically a decrement of M_indent.
-    libcwd::libcw_do.set_indent(0);
-  }
-  explicit Mark(char const* utf8_m) : M_indent(libcwd::libcw_do.get_indent())
-  {
-    libcwd::libcw_do.push_marker();
-    libcwd::libcw_do.marker().append(std::string(M_indent, ' ') + utf8_m + ' ');
-    // This is basically a decrement of M_indent.
-    libcwd::libcw_do.set_indent(0);
-  }
-#ifdef __cpp_char8_t
-  explicit Mark(char8_t const* utf8_m) : Mark(reinterpret_cast<char const*>(utf8_m)) { }
-#endif
-
-  /// Destructor.
-  ~Mark() { end(); }
-
-  void end()
-  {
-    if (M_indent != -1)
-    {
-      libcwd::libcw_do.pop_marker();
-      // Restore indentation relative to possible other indentation increments that happened in the mean time.
-      libcwd::libcw_do.inc_indent(M_indent);
-      // Mark that end() was already called.
-      M_indent = -1;
-    }
-  }
-};
-#endif // LIBCWD_VERSION_2
 
 void ignore_being_traced();
 

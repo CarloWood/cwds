@@ -127,6 +127,10 @@ target_sources(cwds_ObjLib
     "UsageDetector.h"
 )
 
+# cwds provides the macro that shows that we are expecting to be libcwd version 2 compatible.
+# This is expected because this version of cwds ONLY supports version 2.
+target_compile_definitions(cwds_ObjLib INTERFACE LIBCWD_VERSION_2)
+
 if (BENCHMARK_SUPPORTED)
 
 # Add the benchmark files to the project.

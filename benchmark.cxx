@@ -8,7 +8,6 @@
  * @brief This file contains the definitions of namespace benchmark.
  */
 
-#define LIBCWD_VERSION_2
 #include "sys.h"
 #include "benchmark.h"
 #include "debug.h"
