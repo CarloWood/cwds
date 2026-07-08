@@ -217,6 +217,7 @@ inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, ch
   char const* prefix = "";
   for (auto& val : v)
   {
+    LIBCWD_USING_OSTREAM_PRELUDE
     if constexpr (std::is_same_v<typename CONTAINER::value_type, bool>)
       os << prefix << std::boolalpha << val;
     else
