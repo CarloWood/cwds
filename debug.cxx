@@ -21,9 +21,6 @@
 #include <sstream>
 #include "debug.h"
 #include <unistd.h>                     // Needed for pipe
-#ifdef USE_LIBCW
-#include <libcw/memleak.h>		// memleak_filter
-#endif
 #ifdef DEBUGGLOBAL
 #include "utils/Singleton.h"            // This header is part of git submodule https://github.com/CarloWood/ai-utils
 #endif

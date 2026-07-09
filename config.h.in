@@ -8,4 +8,11 @@ namespace config {
 
 #cmakedefine NAMESPACE_DEBUG @NAMESPACE_DEBUG@
 
+
+// HAVE_LIBBOOST
+//
+// Defined if Boost was found and Boost::boost is publically linked.
+
+#cmakedefine HAVE_LIBBOOST @HAVE_LIBBOOST@
+
 } // namespace config

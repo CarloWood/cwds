@@ -62,7 +62,12 @@ find_package(Threads REQUIRED)
 # debug_ostream_operators.h: #include <boost/shared_ptr.hpp>
 #                            #include <boost/weak_ptr.hpp>
 # tracked.h:                 #include <boost/range/adaptor/reversed.hpp>
-find_package(Boost CONFIG REQUIRED)
+find_package(Boost CONFIG)
+
+if (Boost_FOUND)
+  # Set HAVE_LIBBOOST in config.h.
+  set(HAVE_LIBBOOST 1)
+endif ()
 
 # If utils is part of the project then we depend on it only if EnableDebugGlobal is ON.
 # However, utils depends on cwds. To avoid a circular dependency we do never include
@@ -165,9 +170,15 @@ target_compile_features(cwds_ObjLib
 # Add dependencies.
 target_link_libraries(cwds_ObjLib
   PUBLIC
-    Boost::boost
     Threads::Threads
 )
+
+if (Boost_FOUND)
+  target_link_libraries(cwds_ObjLib
+    PUBLIC
+      Boost::boost
+  )
+endif ()
 
 if (OptionEnableLibcwd)
   target_link_libraries(cwds_ObjLib

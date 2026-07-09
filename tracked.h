@@ -7,7 +7,13 @@
 #include <new>
 #include <ostream>
 #include <vector>
+
+// boost is optional for cwds; but you want to use this header in your project then boost needs to be installed.
+#ifdef HAVE_LIBBOOST
 #include <boost/range/adaptor/reversed.hpp>
+#else
+#error "Cannot use cwds/tracked.h without having libboost installed."
+#endif
 
 NAMESPACE_DEBUG_CHANNELS_START
 extern Channel tracked;

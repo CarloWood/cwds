@@ -22,7 +22,7 @@
 #include <set>
 #include <chrono>
 #include <type_traits>
-#ifdef USE_LIBBOOST
+#ifdef HAVE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
 #endif
@@ -94,7 +94,7 @@ struct tm;
 /// Print debug info for tm instance @a date_time.
 std::ostream& operator<<(std::ostream& os, tm const& date_time);
 
-#ifdef USE_LIBBOOST
+#ifdef HAVE_LIBBOOST
 namespace boost {
 
 /// Print debug info for boost::shared_ptr&lt;T&gt;.
@@ -117,7 +117,7 @@ std::ostream& operator<<(std::ostream& os, weak_ptr<T> const& data)
 }
 
 } // namespace boost
-#endif // USE_LIBBOOST
+#endif // HAVE_LIBBOOST
 
 #ifdef QT_CORE_LIB
 #include <QString>
