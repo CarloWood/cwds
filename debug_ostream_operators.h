@@ -20,8 +20,10 @@
 #include <utility>                      // std::pair
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <chrono>
 #include <type_traits>
+#include <regex>
 #ifdef HAVE_LIBBOOST
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
@@ -290,6 +292,32 @@ std::ostream& operator<<(std::ostream& os, std::set<T1, T2, T3> const& data)
     prefix = ", ";
   }
   return os << '}';
+}
+
+template<typename T1, typename T2, typename T3, typename T4>
+std::ostream& operator<<(std::ostream& os, std::unordered_set<T1, T2, T3, T4> const& data)
+{
+  os << "{unordered_set<" << NAMESPACE_DEBUG::type_name_of<T1>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<
+      ", " << NAMESPACE_DEBUG::type_name_of<T4>() <<">:";
+  using set_type = std::unordered_set<T1, T2, T3, T4>;
+  char const* prefix = "";
+  os << std::boolalpha;
+  for (typename set_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
+  {
+    os << prefix;
+    LIBCWD_USING_OSTREAM_PRELUDE;
+    os << '{' << *iter << '}';
+    prefix = ", ";
+  }
+  return os << '}';
+}
+
+template<typename T1, typename T2>
+std::ostream& operator<<(std::ostream& os, std::basic_regex<T1, T2> const&)
+{
+  return os << "{basic_regex<" << NAMESPACE_DEBUG::type_name_of<T1>() << ", " << NAMESPACE_DEBUG::type_name_of<T2>() << ">}";
 }
 
 template<typename... Args>
