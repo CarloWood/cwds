@@ -251,7 +251,8 @@ inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, ch
 template<typename T1, typename T2>
 std::ostream& operator<<(std::ostream& os, std::pair<T1, T2> const& data)
 {
-  return os << "{first:" << data.first << ", second:" << data.second << '}';
+  LIBCWD_USING_OSTREAM_PRELUDE;
+  return os << std::boolalpha << "{first:" << data.first << ", second:" << data.second << '}';
 }
 
 /// Print a whole map.
@@ -262,8 +263,12 @@ std::ostream& operator<<(std::ostream& os, std::map<T1, T2, T3> const& data)
       ", " << NAMESPACE_DEBUG::type_name_of<T2>() <<
       ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
   using map_type = std::map<T1, T2, T3>;
+  os << std::boolalpha;
   for (typename map_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
+  {
+    LIBCWD_USING_OSTREAM_PRELUDE;
     os << *iter;
+  }
   return os << '}';
 }
 
@@ -276,9 +281,12 @@ std::ostream& operator<<(std::ostream& os, std::set<T1, T2, T3> const& data)
       ", " << NAMESPACE_DEBUG::type_name_of<T3>() <<">:";
   using set_type = std::set<T1, T2, T3>;
   char const* prefix = "";
+  os << std::boolalpha;
   for (typename set_type::const_iterator iter = data.begin(); iter != data.end(); ++iter)
   {
-    os << prefix << '{' << *iter << '}';
+    os << prefix;
+    LIBCWD_USING_OSTREAM_PRELUDE;
+    os << '{' << *iter << '}';
     prefix = ", ";
   }
   return os << '}';
@@ -291,6 +299,8 @@ std::ostream& operator<<(std::ostream& os, std::tuple<Args...> const& t)
   bool first = true;
   os << "std::tuple<" << ((..., (os << (first ? "" : ", ") << NAMESPACE_DEBUG::type_name_of<Args>(), first = false)), ">(");
   first = true;
+  os << std::boolalpha;
+  LIBCWD_USING_OSTREAM_PRELUDE;
   apply([&](auto&&... args){ (..., (os << (first ? "" : ", ") << args, first = false)); }, t);
   return os << ')';
 }
