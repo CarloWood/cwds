@@ -26,7 +26,7 @@
 #include <boost/shared_ptr.hpp>         // boost::shared_ptr
 #include <boost/weak_ptr.hpp>           // boost::weak_ptr
 #endif
-#ifndef NAMESPACE_DEBUG
+#if !defined(NAMESPACE_DEBUG_START) || !defined(CWDEBUG_LOCATION)
 #include <debug.h>                      // NAMESPACE_DEBUG*, CWDEBUG_LOCATION
 #endif
 #if CWDEBUG_LOCATION
