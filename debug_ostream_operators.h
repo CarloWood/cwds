@@ -12,6 +12,9 @@
 
 #ifdef CWDEBUG
 
+#ifndef CWDS_DEBUG_OSTREAM_OPERATORS_H
+#define CWDS_DEBUG_OSTREAM_OPERATORS_H
+
 #include <sys/time.h>
 #include <iosfwd>                       // std::ostream&
 #include <utility>                      // std::pair
@@ -217,11 +220,25 @@ inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, ch
   char const* prefix = "";
   for (auto& val : v)
   {
-    LIBCWD_USING_OSTREAM_PRELUDE
-    if constexpr (std::is_same_v<typename CONTAINER::value_type, bool>)
-      os << prefix << std::boolalpha << val;
-    else
-      os << prefix << val;
+    // There is no need to write std::boolalpha here because 1) we should only get here if LIBCWD_USING_OSTREAM_PRELUDE was already used.
+    os << prefix;
+    LIBCWD_USING_OSTREAM_PRELUDE;
+    os << val;
+    prefix = ", ";
+  }
+  os << '}';
+  return os;
+}
+
+/// Specialization for std::vector<bool>.
+template<typename ch, typename char_traits>
+inline std::basic_ostream<ch, char_traits>& operator<<(std::basic_ostream<ch, char_traits>& os, std::vector<bool> const& v)
+{
+  os << '{';
+  char const* prefix = "";
+  for (bool val : v)
+  {
+    os << prefix /*<< std::boolalpha*/ << val;
     prefix = ", ";
   }
   os << '}';
@@ -280,4 +297,5 @@ std::ostream& operator<<(std::ostream& os, std::tuple<Args...> const& t)
 
 } // libcwd::debug_ostream_operators
 
+#endif // CWDS_DEBUG_OSTREAM_OPERATORS_H
 #endif // CWDEBUG

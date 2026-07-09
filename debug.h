@@ -94,7 +94,7 @@ struct MakeLIBCWD_USING_OSTREAM_PRELUDEHappy;
 namespace libcwd::ostream_operators {
 void operator<<(std::same_as<MakeLIBCWD_USING_OSTREAM_PRELUDEHappy> auto, int);
 } // namespace libcwd::ostream_operators
-#define LIBCWD_USING_OSTREAM_PRELUDE using ::libcwd::ostream_operators::operator<<;
+#define LIBCWD_USING_OSTREAM_PRELUDE using ::libcwd::ostream_operators::operator<<
 #endif
 
 #include <libcwd/debug.h>
