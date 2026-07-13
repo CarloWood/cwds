@@ -49,6 +49,15 @@ inline char const* type_name_of()
 #endif
 }
 
+// The compiler mangles `std::string` as 'NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE' instead of 'Ss'
+// for some reason (probably historically because of the introduction of namespace std::std::__cxx11).
+// Lets print "std::string" instead of "std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >"
+template<>
+[[gnu::always_inline]] inline char const* type_name_of<std::string>()
+{
+  return "std::string";
+}
+
 /// Use to print human readable form of a POSIX mode (see man 2 open).
 struct PosixMode
 {
